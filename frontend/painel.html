@@ -28,6 +28,7 @@
     <div class="toolbar" style="justify-content:center">
       <input id="chave" type="password" placeholder="Chave (se exigida)" style="min-width:200px">
       <button class="btn" id="btn-painel">Atualizar</button>
+      <button class="btn ghost" id="btn-csv">Exportar CSV</button>
       <span class="muted" id="st-painel"></span>
     </div>
   </section>
@@ -87,6 +88,7 @@ function carregarPainel(){
   document.getElementById('st-painel').textContent='Buscando...';
   jget('/api/visitas/resumo'+(chave?'?chave='+encodeURIComponent(chave):'')).then(function(r){
     document.getElementById('st-painel').textContent='';
+    window._painel=r;
     document.getElementById('cards-resumo').style.display='grid';
     document.getElementById('cards-resumo2').style.display='grid';
     document.getElementById('card-dia').style.display='block';
@@ -107,6 +109,17 @@ function carregarPainel(){
   }).catch(function(e){document.getElementById('st-painel').textContent='Erro: '+e.message+' (chave incorreta?)';});
 }
 document.getElementById('btn-painel').onclick=carregarPainel;
+document.getElementById('btn-csv').onclick=function(){
+  var r=window._painel;if(!r){toast('Clique em Atualizar primeiro');return;}
+  var L=['secao;item;valor'];
+  (r.topPaginas||[]).forEach(function(x){L.push('paginas;'+String(x.k).replace(/;/g,',')+';'+x.v);});
+  (r.topOrigens||[]).forEach(function(x){L.push('origens;'+String(x.k).replace(/;/g,',')+';'+x.v);});
+  (r.porDia||[]).forEach(function(x){L.push('dia;'+x.dia+';'+x.total);});
+  L.push('resumo;hoje;'+(r.hoje||0));L.push('resumo;7 dias;'+(r.dias7||0));L.push('resumo;30 dias;'+(r.dias30||0));L.push('resumo;total;'+(r.total||0));
+  var blob=new Blob([L.join('\n')],{type:'text/csv;charset=utf-8;'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brbrics-visitas.csv';a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+  toast('CSV exportado');
+};
 document.getElementById('chave').addEventListener('keydown',function(e){if(e.key==='Enter')carregarPainel();});
 if(document.getElementById('chave').value)carregarPainel();
 </script>
