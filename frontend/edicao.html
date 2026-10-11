@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edição Semanal — BrBRICS</title>
+<meta name="description" content="Os destaques da semana no Diário Oficial da União, em uma só leitura. Licitações, atos normativos, nomeações e muito mais.">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav">
+      <a href="index.html">Início</a>
+      <div class="navgrp">
+        <a class="navtop" href="edicao.html">Diário Oficial</a>
+        <div class="sub">
+          <a href="edicao.html">Edição da Semana</a>
+          <a href="manchetes.html">Manchetes do Dia</a>
+          <a href="busca.html?q=dou">Buscar no DOU</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="licitacoes.html">Licitações</a>
+        <div class="sub">
+          <a href="licitacoes.html">Todas (PNCP)</a>
+          <a href="busca.html?q=licitacao">Buscar Licitações</a>
+          <a href="diretorios.html">Por Órgão/UF</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="proposicoes.html">Congresso</a>
+        <div class="sub">
+          <a href="proposicoes.html">Proposições Recentes</a>
+          <a href="legislacao.html">Busca Avançada</a>
+          <a href="busca.html?q=proposicao">Buscar no Congresso</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="indicadores.html">Indicadores</a>
+        <div class="sub">
+          <a href="indicadores.html">Séries BCB (IPCA, Selic, Câmbio)</a>
+          <a href="indicadores.html#focus">Boletim Focus 2026</a>
+          <a href="indicadores.html#extras">IPCA 12m & Desemprego</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="tribunais.html">Tribunais</a>
+        <div class="sub">
+          <a href="tribunais.html">Consulta Processual (DataJud)</a>
+          <a href="tribunais.html#jurisprudencia">Jurisprudência por Tema</a>
+          <a href="tribunais.html#feed">Notícias dos Tribunais</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="manchetes.html">Notícias</a>
+        <div class="sub">
+          <a href="manchetes.html">Manchetes (Reguladores + Tribunais)</a>
+          <a href="reguladores.html">Agências & Ministérios</a>
+          <a href="diretorios.html">Diretórios Oficiais</a>
+        </div>
+      </div>
+      <a href="sobre.html">Sobre</a>
+    </nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero-edicao">
+    <p class="kicker">Edição da semana — <span id="edicao-periodo">Carregando…</span></p>
+    <h1>Diário Oficial da União<br><span class="hl">Os destaques da semana</span></h1>
+    <p class="sub">Curadoria dos atos mais relevantes publicados no DOU: licitações, nomeações, leis, decretos, portarias e editais.</p>
+    <div class="cta">
+      <a class="btn ghost" href="https://www.in.gov.br/leiturajornal" target="_blank" rel="noopener">Ver DOU completo no portal oficial</a>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-h"><h2>Atos normativos & nomeações</h2><span class="tag">DOU Seção 1</span></div>
+      <div id="dou-sec1" class="list"><div class="skel"></div><div class="skel"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Editais, licitações & contratos</h2><span class="tag">DOU Seção 3</span></div>
+      <div id="dou-sec3" class="list"><div class="skel"></div><div class="skel"></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Trilhas da edição</h2><a href="licitacoes.html">Ver todas licitações</a></div>
+    <div class="toolbar">
+      <a class="btn" href="licitacoes.html">Licitações por estado</a>
+      <a class="btn" href="proposicoes.html">Leis & Política</a>
+      <a class="btn" href="indicadores.html">Economia</a>
+      <a class="btn ghost" href="tribunais.html">Tribunais</a>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fontes: IN/DOU, PNCP, Câmara, Senado, BCB.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+jget('/api/edicao/destaques').then(function(r){
+  var sec1 = r.secao1 || []; var sec3 = r.secao3 || [];
+  var period = r.periodo || '';
+  document.getElementById('edicao-periodo').textContent = period || 'últimos 7 dias';
+  function render(arr, elId, emptyMsg){
+    var html = '';
+    (arr||[]).forEach(function(a){
+      html += '<article><div class="tag-row"><span class="tag">'+esc(a.secao||'DOU')+'</span>'+favBtnHTML(a.link,a.titulo)+'</div><h4><a href="'+esc(a.link)+'" target="_blank" rel="noopener">'+esc(a.titulo)+'</a></h4>';
+      if(a.orgao) html += '<small class="muted">'+esc(a.orgao)+' · '+esc(a.data)+'</small>';
+      else html += '<small class="muted">'+esc(a.data)+'</small>';
+      html += shareHTML(a.link,a.titulo)+'</article>';
+    });
+    document.getElementById(elId).innerHTML = html || '<p class="muted">'+esc(emptyMsg)+'</p>';
+  }
+  render(sec1, 'dou-sec1', 'Sem atos normativos recentes');
+  render(sec3, 'dou-sec3', 'Sem editais recentes');
+}).catch(function(){ 
+  document.getElementById('dou-sec1').innerHTML = '<p class="muted">Erro ao carregar destaques. <button class="btn ghost" onclick="location.reload()">Tentar de novo</button></p>';
+  document.getElementById('dou-sec3').innerHTML = '<p class="muted">Erro ao carregar destaques.</p>';
+});
+</script>
+</body>
+</html>

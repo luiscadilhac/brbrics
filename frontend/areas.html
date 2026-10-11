@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Áreas do Direito — BrBRICS</title>
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0e">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar"><div class="wrap topbar-in"><a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+<nav class="nav">
+  <a href="index.html">Início</a>
+  <div class="navgrp">
+    <a class="navtop" href="edicao.html">Diário Oficial</a>
+    <div class="sub">
+      <a href="edicao.html">Edição da Semana</a>
+      <a href="manchetes.html">Manchetes do Dia</a>
+      <a href="busca.html?q=dou">Buscar no DOU</a>
+    </div>
+  </div>
+  <div class="navgrp">
+    <a class="navtop" href="licitacoes.html">Licitações</a>
+    <div class="sub">
+      <a href="licitacoes.html">Todas (PNCP)</a>
+      <a href="busca.html?q=licitacao">Buscar Licitações</a>
+      <a href="diretorios.html">Por Órgão/UF</a>
+    </div>
+  </div>
+  <div class="navgrp">
+    <a class="navtop" href="proposicoes.html">Congresso</a>
+    <div class="sub">
+      <a href="proposicoes.html">Proposições Recentes</a>
+      <a href="legislacao.html">Busca Avançada</a>
+      <a href="busca.html?q=proposicao">Buscar no Congresso</a>
+    </div>
+  </div>
+  <div class="navgrp">
+    <a class="navtop" href="indicadores.html">Indicadores</a>
+    <div class="sub">
+      <a href="indicadores.html">Séries BCB (IPCA, Selic, Câmbio)</a>
+      <a href="indicadores.html">Boletim Focus 2026</a>
+      <a href="indicadores.html">IPCA 12m & Desemprego</a>
+    </div>
+  </div>
+  <div class="navgrp">
+    <a class="navtop" href="tribunais.html">Tribunais</a>
+    <div class="sub">
+      <a href="tribunais.html">Consulta Processual (DataJud)</a>
+      <a href="tribunais.html">Jurisprudência por Tema</a>
+      <a href="tribunais.html">Notícias dos Tribunais</a>
+      <a href="areas.html">Áreas do Direito</a>
+    </div>
+  </div>
+  <div class="navgrp">
+    <a class="navtop" href="manchetes.html">Notícias</a>
+    <div class="sub">
+      <a href="manchetes.html">Manchetes (Reguladores + Tribunais)</a>
+      <a href="reguladores.html">Agências & Ministérios</a>
+      <a href="diretorios.html">Diretórios Oficiais</a>
+    </div>
+  </div>
+  <a href="sobre.html">Sobre</a>
+</nav>
+<div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div></div></header>
+<main class="wrap">
+<h1>Áreas do Direito</h1>
+<p class="muted">Jurisprudência, leis e notícias por área do Direito — lastreado em dados oficiais ao vivo (CNJ DataJud + Câmara dos Deputados + RSS dos tribunais).</p>
+<div class="toolbar" id="areas-bar" style="flex-wrap:wrap;gap:8px"></div>
+<div class="grid2">
+  <div class="card"><div class="card-h"><h2>Jurisprudência recente (STJ)</h2><span class="muted" id="st-jur"></span></div><div id="jur" class="list"><p class="muted">Escolha uma área acima.</p></div></div>
+  <div class="card"><div class="card-h"><h2>Proposições sobre o tema</h2><span class="muted" id="st-prop"></span></div><div id="prop" class="list"><p class="muted">Escolha uma área acima.</p></div></div>
+</div>
+<div class="card"><div class="card-h"><h2>Notícias relacionadas</h2><span class="muted" id="st-news"></span></div><div id="news" class="list"><p class="muted">Escolha uma área acima.</p></div></div>
+</main>
+<footer class="statusbar"><div class="wrap"><span class="st-fontes">verificando fontes…</span> &nbsp;|&nbsp; <span class="muted">BrBRICS · dados oficiais ao vivo</span></div></footer>
+<script src="common.js?v=14"></script>
+<script src="areas.js?v=14"></script>
+</body>
+</html>

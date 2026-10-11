@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indicadores — BrBRICS</title>
+<meta name="description" content="Indicadores econômicos oficiais do Banco Central: IPCA, Selic, Câmbio, IGP-M, Boletim Focus e mais.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav">
+      <a href="index.html">Início</a>
+      <div class="navgrp">
+        <a class="navtop" href="edicao.html">Diário Oficial</a>
+        <div class="sub">
+          <a href="edicao.html">Edição da Semana</a>
+          <a href="manchetes.html">Manchetes do Dia</a>
+          <a href="busca.html?q=dou">Buscar no DOU</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="licitacoes.html">Licitações</a>
+        <div class="sub">
+          <a href="licitacoes.html">Todas (PNCP)</a>
+          <a href="busca.html?q=licitacao">Buscar Licitações</a>
+          <a href="diretorios.html">Por Órgão/UF</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="proposicoes.html">Congresso</a>
+        <div class="sub">
+          <a href="proposicoes.html">Proposições Recentes</a>
+          <a href="legislacao.html">Busca Avançada</a>
+          <a href="busca.html?q=proposicao">Buscar no Congresso</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="indicadores.html">Indicadores</a>
+        <div class="sub">
+          <a href="indicadores.html">Séries BCB (IPCA, Selic, Câmbio)</a>
+          <a href="indicadores.html#focus">Boletim Focus 2026</a>
+          <a href="indicadores.html#extras">IPCA 12m & Desemprego</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="tribunais.html">Tribunais</a>
+        <div class="sub">
+          <a href="tribunais.html">Consulta Processual (DataJud)</a>
+          <a href="tribunais.html#jurisprudencia">Jurisprudência por Tema</a>
+          <a href="tribunais.html#feed">Notícias dos Tribunais</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="manchetes.html">Notícias</a>
+        <div class="sub">
+          <a href="manchetes.html">Manchetes (Reguladores + Tribunais)</a>
+          <a href="reguladores.html">Agências & Ministérios</a>
+          <a href="diretorios.html">Diretórios Oficiais</a>
+        </div>
+      </div>
+      <a href="sobre.html">Sobre</a>
+    </nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">Banco Central do Brasil — SGS & Boletim Focus</p>
+    <h1>Indicadores <span class="hl">econômicos oficiais</span></h1>
+    <p class="sub">Séries temporais do SGS/BCB e projeções do Boletim Focus (mediana Top 5). Clique nos gráficos para ver a série completa no BCB.</p>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Boletim Focus 2026 — Projeções de Mercado (Top 5)</h2><span class="tag" id="focus-atualizado"></span></div>
+    <div id="focus-kpis" class="kpis"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+  </section>
+
+  <section class="grid2">
+    <div class="card"><h3>IPCA mensal (%) — SGS 433 <span class="tend" id="t-ipca"></span></h3><canvas id="c-ipca"></canvas></div>
+    <div class="card"><h3>Selic (% a.a.) — SGS 432 <span class="tend" id="t-selic"></span></h3><canvas id="c-selic"></canvas></div>
+    <div class="card"><h3>Câmbio (R$/US$) — SGS 3698 <span class="tend" id="t-cambio"></span></h3><canvas id="c-cambio"></canvas></div>
+    <div class="card"><h3>IGP-M mensal (%) — SGS 189 <span class="tend" id="t-igpm"></span></h3><canvas id="c-igpm"></canvas></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Extras — IPCA 12m & Desemprego</h2></div>
+    <div id="extras-kpis" class="kpis"><div class="skel"></div><div class="skel"></div></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Tabela — últimas observações (SGS)</h2></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>Série</th><th>Data</th><th>Valor</th></tr></thead><tbody id="tb"><tr><td colspan="3" class="muted">Carregando…</td></tr></tbody></table></div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fontes: BCB (SGS, Olinda/Focus).</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+var charts = {};
+function sgsLink(cod){return 'https://api.bcb.gov.br/dados/serie/bcdata.sgs.'+cod+'/dados?formato=json';}
+function renderFocus(f){
+  var ind = (f && f.indicadores) || {};
+  var html='';
+  function row(nome,o,suf){
+    if(!o||!o.disponivel) return '<div class="kpi"><b>'+nome+'</b> - indisponivel</div>';
+    var varhtml=''; if(o.variacao!=null){var cls=o.variacao>0?'var-up':(o.variacao<0?'var-down':'var-flat');var sinal=o.variacao>0?'+':'';varhtml=' <span class="'+cls+'">'+sinal+o.variacao.toFixed(2)+' vs sem. anterior</span>';}
+    return '<div class="kpi"><b>'+nome+' 2026</b> - '+esc(String(o.mediana))+suf+varhtml+' <span class="muted">('+esc(o.data)+')</span></div>';
+  }
+  html+=row('IPCA',ind.ipca,'%');
+  html+=row('Selic',ind.selic,'%');
+  html+=row('Câmbio',ind.cambio,' R$');
+  html+=row('PIB',ind.pib,'%');
+  document.getElementById('focus-kpis').innerHTML = html;
+  document.getElementById('focus-atualizado').textContent = 'Atualizado: ' + new Date(f.atualizadoEm).toLocaleString('pt-BR');
+}
+function renderExtras(e){
+  var html='';
+  if(e.ipca12m) html+='<div class="kpi"><b>IPCA 12 meses</b> - '+esc(e.ipca12m.valor)+'% <span class="muted">('+esc(e.ipca12m.data)+')</span>'+(e.ipca12m.variacaoPP!=null?(' <span class="var-up">'+(e.ipca12m.variacaoPP>0?'+':'')+e.ipca12m.variacaoPP.toFixed(2)+' pp</span>'):'')+'</div>';
+  if(e.desemprego) html+='<div class="kpi"><b>Taxa de desemprego</b> - '+esc(e.desemprego.valor)+'% <span class="muted">('+esc(e.desemprego.data)+')</span>'+(e.desemprego.variacaoPP!=null?(' <span class="var-up">'+(e.desemprego.variacaoPP>0?'+':'')+e.desemprego.variacaoPP.toFixed(2)+' pp</span>'):'')+'</div>';
+  document.getElementById('extras-kpis').innerHTML = html || '<p class="muted">Indisponível</p>';
+}
+function renderTable(d){
+  var SGS = { ipca: 433, selic: 432, cambio: 3698, igpm: 189 };
+  var rows = '';
+  ['ipca','selic','cambio','igpm'].forEach(function(k){
+    var arr = (d[k]||[]).slice(-4);
+    arr.forEach(function(p){
+      rows += '<tr class="clickable" onclick="window.open(\''+sgsLink(SGS[k])+'\',\'_blank\')" title="Abrir série '+k.toUpperCase()+' no BCB">';
+      rows += '<td><b>'+k.toUpperCase()+'</b></td><td>'+esc(p.data)+'</td><td>'+esc(p.valor)+' <span style="color:#FF7A00">↗</span></td></tr>';
+    });
+  });
+  document.getElementById('tb').innerHTML = rows || '<tr><td colspan="3">Sem dados.</td></tr>';
+}
+function mkChart(id, data, color, cod){
+  var el = document.getElementById(id);
+  if(typeof Chart==='undefined'){ el.outerHTML='<p class="muted">Gráfico indisponível (Chart.js offline).</p>'; return null; }
+  var arr = (data||[]).slice(-12);
+  if(charts[id]) charts[id].destroy();
+  return charts[id] = new Chart(el, {
+    type: 'line',
+    data: {
+      labels: arr.map(function(p){return p.data;}),
+      datasets: [{ data: arr.map(function(p){return parseFloat(String(p.valor).replace(',','.'));}), borderColor: color, backgroundColor: color+'33', fill: true, tension: .35, pointBackgroundColor: color, pointRadius: 6, pointHoverRadius: 9, borderWidth: 3 }]
+    },
+    options: {
+      interaction: { mode: 'nearest', intersect: true },
+      onClick: function(evt, els){
+        if(els && els.length){
+          var p = arr[els[0].index];
+          if(p) window.open('https://api.bcb.gov.br/dados/serie/bcdata.sgs.'+cod+'/dados?formato=json&dataInicial='+encodeURIComponent(p.data)+'&dataFinal='+encodeURIComponent(p.data), '_blank');
+        }
+      },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { title: function(it){ return it[0].label+' (clique para abrir no BCB)'; } } } },
+      scales: { x: { ticks: { color: '#a7a7b3' } }, y: { ticks: { color: '#a7a7b3' } } }
+    }
+  });
+}
+function tendencia(arr,id){
+  var el=document.getElementById(id);if(!el)return;
+  var nums=(arr||[]).map(function(p){return parseFloat(String(p.valor).replace(',','.'));}).filter(function(x){return !isNaN(x);});
+  if(nums.length<2){el.textContent='';return;}
+  var dif=nums[nums.length-1]-nums[nums.length-2];
+  el.className='tend '+(dif>0?'var-up':(dif<0?'var-down':'var-flat'));
+  el.textContent=(dif>0?'▲ +':(dif<0?'▼ ':'＝ '))+Math.abs(dif).toFixed(2);
+}
+function carregar(){
+  jget('/api/indicadores').then(function(r){
+    renderTable(r.dados||{});
+    tendencia(r.dados.ipca,'t-ipca');tendencia(r.dados.selic,'t-selic');tendencia(r.dados.cambio,'t-cambio');tendencia(r.dados.igpm,'t-igpm');
+    mkChart('c-ipca', r.dados.ipca, '#FFC400', 433);
+    mkChart('c-selic', r.dados.selic, '#FF7A00', 432);
+    mkChart('c-cambio', r.dados.cambio, '#8B5CF6', 3698);
+    mkChart('c-igpm', r.dados.igpm, '#06B6D4', 189);
+    document.getElementById('s').textContent = 'Fonte: '+(r.fonte||'BCB')+(r.offline?' (offline)':'');
+  }).catch(function(e){document.getElementById('tb').innerHTML='<tr><td colspan="3" class="muted">Erro: '+e.message+'</td></tr>';});
+  jget('/api/focus').then(renderFocus).catch(function(){});
+  jget('/api/economia').then(renderExtras).catch(function(){});
+}
+carregar();
+</script>
+</body>
+</html>

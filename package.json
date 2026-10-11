@@ -1,0 +1,16 @@
+{
+  "name": "brbrics",
+  "version": "1.0.0",
+  "description": "BrBRICS - portal de transparencia com dados reais",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "node-fetch": "^2.7.0",
+    "rss-parser": "^3.13.0"
+  }
+}

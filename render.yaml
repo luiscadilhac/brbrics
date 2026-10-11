@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: brbrics-portal
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: TRANSPARENCIA_TOKEN
+        sync: false
+      - key: BRAPI_TOKEN
+        sync: false

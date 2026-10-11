@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Busca — BrBRICS</title>
+<meta name="description" content="Busca global no BrBRICS: licitações, proposições, indicadores, tribunais e Diário Oficial.">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav">
+      <a href="index.html">Início</a>
+      <div class="navgrp">
+        <a class="navtop" href="edicao.html">Diário Oficial</a>
+        <div class="sub">
+          <a href="edicao.html">Edição da Semana</a>
+          <a href="manchetes.html">Manchetes do Dia</a>
+          <a href="busca.html?q=dou">Buscar no DOU</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="licitacoes.html">Licitações</a>
+        <div class="sub">
+          <a href="licitacoes.html">Todas (PNCP)</a>
+          <a href="busca.html?q=licitacao">Buscar Licitações</a>
+          <a href="diretorios.html">Por Órgão/UF</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="proposicoes.html">Congresso</a>
+        <div class="sub">
+          <a href="proposicoes.html">Proposições Recentes</a>
+          <a href="legislacao.html">Busca Avançada</a>
+          <a href="busca.html?q=proposicao">Buscar no Congresso</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="indicadores.html">Indicadores</a>
+        <div class="sub">
+          <a href="indicadores.html">Séries BCB (IPCA, Selic, Câmbio)</a>
+          <a href="indicadores.html">Boletim Focus 2026</a>
+          <a href="indicadores.html">IPCA 12m & Desemprego</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="tribunais.html">Tribunais</a>
+        <div class="sub">
+          <a href="tribunais.html">Consulta Processual (DataJud)</a>
+          <a href="tribunais.html">Jurisprudência por Tema</a>
+          <a href="tribunais.html">Notícias dos Tribunais</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="manchetes.html">Notícias</a>
+        <div class="sub">
+          <a href="manchetes.html">Manchetes (Reguladores + Tribunais)</a>
+          <a href="reguladores.html">Agências & Ministérios</a>
+          <a href="diretorios.html">Diretórios Oficiais</a>
+        </div>
+      </div>
+      <a href="sobre.html">Sobre</a>
+    </nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:32px 0;text-align:center">
+    <p class="kicker">Resultados da busca</p>
+    <h1><span id="busca-termo" class="hl">carregando…</span></h1>
+    <p class="sub" id="busca-estats"></p>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2><span class="nav-ico" style="margin:0 8px 0 0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12l2 2 4-4"/></svg></span>Licitações (PNCP)</h2><span class="tag" id="cnt-lic">0</span></div>
+    <div id="res-lic" class="list"><div class="skel"></div></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2><span class="nav-ico" style="margin:0 8px 0 0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span>Proposições (Câmara)</h2><span class="tag" id="cnt-prop">0</span></div>
+    <div id="res-prop" class="list"><div class="skel"></div></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2><span class="nav-ico" style="margin:0 8px 0 0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10l10-6 10 6"/><path d="M5 10v11"/><path d="M9.5 10v11"/><path d="M14.5 10v11"/><path d="M19 10v11"/><path d="M3 21h18"/></svg></span>Matérias (Senado)</h2><span class="tag" id="cnt-sen">0</span></div>
+    <div id="res-sen" class="list"><div class="skel"></div></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2><span class="nav-ico" style="margin:0 8px 0 0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><path d="M8 20h8"/><path d="M3 7h18"/><path d="M6 7l-2.5 6a2.9 2.9 0 0 0 5 0L6 7z"/><path d="M18 7l-2.5 6a2.9 2.9 0 0 0 5 0L18 7z"/></svg></span>Notícias dos Tribunais</h2><span class="tag" id="cnt-tri">0</span></div>
+    <div id="res-tri" class="list"><div class="skel"></div></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2><span class="nav-ico" style="margin:0 8px 0 0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M12 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg></span>Órgãos Reguladores</h2><span class="tag" id="cnt-reg">0</span></div>
+    <div id="res-reg" class="list"><div class="skel"></div></div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+function pncpLink(ctrl){if(!ctrl)return '';var p=String(ctrl).split('-');if(p.length<3)return '';var na=p[2].split('/');if(na.length<2)return '';return 'https://pncp.gov.br/app/editais/'+p[0]+'/'+p[1]+'/'+na[1];}
+function propLink(id){return 'https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao='+encodeURIComponent(id);}
+
+var params = new URLSearchParams(location.search);
+var q = params.get('q') || '';
+document.getElementById('busca-termo').textContent = '"'+esc(q)+'"';
+if(document.getElementById('busca')) document.getElementById('busca').value = q;
+
+function renderLic(data){
+  var html=''; var itens = (data.dados||[]).slice(0,10);
+  itens.forEach(function(o){
+    var link=pncpLink(o.numeroControlePNCP);
+    var tit=esc((o.objetoCompra||'Contratação').slice(0,140));
+    var org=o.orgaoEntidade?esc(o.orgaoEntidade.razaoSocial):'';
+    var uf=o.unidadeOrgao?esc(o.unidadeOrgao.ufSigla||''):'';
+    var meta=[esc(o.modalidadeNome||''),esc(o.situacaoCompraNome||''),org,(uf?('UF '+uf):'')].filter(Boolean).join(' · ');
+    html+='<article'+(link?' data-lnk="'+link+'" onclick="if(event.target.tagName!==\'A\'&&event.target.tagName!==\'BUTTON\')window.open(this.dataset.lnk,\'_blank\')"':'')+'><span class="tag">PNCP</span><h4>'+(link?'<a href="'+link+'" target="_blank" rel="noopener">'+tit+'</a>':tit)+'</h4><small class="muted">'+meta+'</small></article>';
+  });
+  document.getElementById('res-lic').innerHTML = html || '<p class="muted">Nenhum resultado.</p>';
+  document.getElementById('cnt-lic').textContent = itens.length+' resultados';
+}
+
+function renderProp(data){
+  var html=''; var itens = (data.dados||[]).slice(0,10);
+  itens.forEach(function(x){
+    var tit=esc((x.ementa||'Proposição').slice(0,150));
+    html+='<article><span class="tag">'+esc(x.siglaTipo)+' '+esc(x.numero)+'/'+esc(x.ano)+'</span><h4><a href="'+propLink(x.id)+'" target="_blank" rel="noopener">'+tit+'</a></h4></article>';
+  });
+  document.getElementById('res-prop').innerHTML = html || '<p class="muted">Nenhum resultado.</p>';
+  document.getElementById('cnt-prop').textContent = itens.length+' resultados';
+}
+
+function renderSen(data){
+  var html=''; var itens = (data.dados||[]).slice(0,10);
+  itens.forEach(function(x){
+    var tit=esc((x.DadosBasicosMateria && x.DadosBasicosMateria.EmentaMateria) || 'Matéria do Senado');
+    var link = x.DadosBasicosMateria && x.DadosBasicosMateria.LinkInteiroTeor ? esc(x.DadosBasicosMateria.LinkInteiroTeor) : '#';
+    html+='<article><span class="tag">Senado</span><h4>'+(link!=='#'?'<a href="'+link+'" target="_blank" rel="noopener">'+tit+'</a>':tit)+'</h4></article>';
+  });
+  document.getElementById('res-sen').innerHTML = html || '<p class="muted">Nenhum resultado.</p>';
+  document.getElementById('cnt-sen').textContent = itens.length+' resultados';
+}
+
+function renderTri(data){
+  var html=''; var n=0;
+  (data.tribunais||[]).forEach(function(t){
+    (t.noticias||[]).forEach(function(x){
+      if(n<15 && (!q || (x.titulo||'').toLowerCase().indexOf(q.toLowerCase())!==-1)){
+        n++; html+='<article><span class="tag">'+esc(t.sigla)+'</span><h4><a href="'+x.link+'" target="_blank" rel="noopener">'+esc((x.titulo||'').slice(0,120))+'</a></h4></article>';
+      }
+    });
+  });
+  document.getElementById('res-tri').innerHTML = html || '<p class="muted">Nenhum resultado.</p>';
+  document.getElementById('cnt-tri').textContent = n+' resultados';
+}
+
+function renderReg(data){
+  var html=''; var n=0;
+  (data.orgaos||[]).forEach(function(o){
+    (o.noticias||[]).forEach(function(x){
+      if(n<15 && (!q || (x.titulo||'').toLowerCase().indexOf(q.toLowerCase())!==-1)){
+        n++; html+='<article><span class="tag">'+esc(o.sigla)+'</span><h4><a href="'+x.link+'" target="_blank" rel="noopener">'+esc((x.titulo||'').slice(0,120))+'</a></h4></article>';
+      }
+    });
+  });
+  document.getElementById('res-reg').innerHTML = html || '<p class="muted">Nenhum resultado.</p>';
+  document.getElementById('cnt-reg').textContent = n+' resultados';
+}
+
+if(q){
+  var total=0;
+  jget('/api/licitacoes?q='+encodeURIComponent(q)).then(renderLic).catch(function(){document.getElementById('res-lic').innerHTML='<p class="muted">Erro ao buscar.</p>';});
+  jget('/api/proposicoes?q='+encodeURIComponent(q)).then(renderProp).catch(function(){document.getElementById('res-prop').innerHTML='<p class="muted">Erro ao buscar.</p>';});
+  jget('/api/legislacao/senado').then(renderSen).catch(function(){document.getElementById('res-sen').innerHTML='<p class="muted">Erro ao buscar.</p>';});
+  jget('/api/tribunais/noticias').then(renderTri).catch(function(){document.getElementById('res-tri').innerHTML='<p class="muted">Erro ao buscar.</p>';});
+  jget('/api/reguladores').then(renderReg).catch(function(){document.getElementById('res-reg').innerHTML='<p class="muted">Erro ao buscar.</p>';});
+  // Atualiza contador total
+  var checkDone = setInterval(function(){
+    var c = parseInt(document.getElementById('cnt-lic').textContent)||0
+      + parseInt(document.getElementById('cnt-prop').textContent)||0
+      + parseInt(document.getElementById('cnt-sen').textContent)||0
+      + parseInt(document.getElementById('cnt-tri').textContent)||0
+      + parseInt(document.getElementById('cnt-reg').textContent)||0;
+    if(c>0 || document.getElementById('res-lic').querySelector('article')){
+      document.getElementById('busca-estats').textContent = c+' resultados no total';
+      clearInterval(checkDone);
+    }
+  },500);
+} else {
+  document.getElementById('busca-termo').textContent = 'Digite um termo para buscar';
+  document.getElementById('busca-estats').textContent = 'Busque por licitações, leis, tribunais, órgãos reguladores...';
+  ['res-lic','res-prop','res-sen','res-tri','res-reg'].forEach(function(id){
+    document.getElementById(id).innerHTML = '<p class="muted">Digite um termo na busca acima.</p>';
+  });
+}
+</script>
+</body>
+</html>

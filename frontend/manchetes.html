@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manchetes — BrBRICS</title>
+<meta name="description" content="As principais notícias oficiais dos órgãos reguladores, ministérios e tribunais — com fotos, vídeos e link para a fonte. Tudo automático e em tempo real.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0e">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav">
+      <a href="index.html">Início</a>
+      <div class="navgrp">
+        <a class="navtop" href="edicao.html">Diário Oficial</a>
+        <div class="sub">
+          <a href="edicao.html">Edição da Semana</a>
+          <a href="manchetes.html">Manchetes do Dia</a>
+          <a href="busca.html?q=dou">Buscar no DOU</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="licitacoes.html">Licitações</a>
+        <div class="sub">
+          <a href="licitacoes.html">Todas (PNCP)</a>
+          <a href="busca.html?q=licitacao">Buscar Licitações</a>
+          <a href="diretorios.html">Por Órgão/UF</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="proposicoes.html">Congresso</a>
+        <div class="sub">
+          <a href="proposicoes.html">Proposições Recentes</a>
+          <a href="legislacao.html">Busca Avançada</a>
+          <a href="busca.html?q=proposicao">Buscar no Congresso</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="indicadores.html">Indicadores</a>
+        <div class="sub">
+          <a href="indicadores.html">Séries BCB (IPCA, Selic, Câmbio)</a>
+          <a href="indicadores.html#focus">Boletim Focus 2026</a>
+          <a href="indicadores.html#extras">IPCA 12m & Desemprego</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="tribunais.html">Tribunais</a>
+        <div class="sub">
+          <a href="tribunais.html">Consulta Processual (DataJud)</a>
+          <a href="tribunais.html#jurisprudencia">Jurisprudência por Tema</a>
+          <a href="tribunais.html#feed">Notícias dos Tribunais</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="manchetes.html">Notícias</a>
+        <div class="sub">
+          <a href="manchetes.html">Manchetes (Reguladores + Tribunais)</a>
+          <a href="reguladores.html">Agências & Ministérios</a>
+          <a href="diretorios.html">Diretórios Oficiais</a>
+        </div>
+      </div>
+      <a href="sobre.html">Sobre</a>
+    </nav>
+    <div class="actions">
+      <input id="busca-topo" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">Notícias Oficiais em Tempo Real</p>
+    <h1>Manchetes do <span class="hl">Dia</span></h1>
+    <p class="sub">Agências reguladoras, ministérios e tribunais — fotos, vídeos e link direto para a fonte. Tudo automático via RSS gov.br.</p>
+  </section>
+
+  <div class="toolbar">
+    <input id="busca" type="search" placeholder="Buscar nas manchetes..." style="flex:1;min-width:220px">
+    <button class="btn" id="b">Atualizar</button>
+    <span class="muted" id="s"></span>
+  </div>
+  <div class="chip-row" id="chips" style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap">
+    <button class="chip active" data-cat="">Todas</button>
+    <button class="chip" data-cat="trib">Tribunais</button>
+    <button class="chip" data-cat="reg">Agências</button>
+    <button class="chip" data-cat="min">Ministérios</button>
+  </div>
+
+  <div id="carousel" class="carousel" style="display:none">
+    <div class="car-track" id="car-track"></div>
+    <button class="car-nav prev" id="car-prev" aria-label="Anterior">&#10094;</button>
+    <button class="car-nav next" id="car-next" aria-label="Próxima">&#10095;</button>
+    <div class="car-dots" id="car-dots"></div>
+  </div>
+
+  <div class="mch-layout" style="display:grid;grid-template-columns:1fr 320px;gap:24px;margin-top:16px">
+    <div>
+      <div class="news-grid" id="grid"><p class="muted">Carregando manchetes…</p></div>
+    </div>
+    <aside>
+      <div class="side-card"><h3>⚖ Destaques do Judiciário</h3><div id="jud"><p class="muted">Carregando…</p></div></div>
+      <div class="side-card"><h3>Mais lidas</h3><div id="maislidas"><p class="muted">Suas notícias mais clicadas aparecem aqui.</p></div></div>
+    <div class="side-card"><h3>Salvos</h3><div data-salvos><p class="muted">Toque na estrela dos cards para salvar.</p></div></div>
+    </aside>
+  </div>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+function limpar(t){return String(t==null?'':t).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');}
+function fmtData(d){if(!d)return '';try{return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
+function badgeCat(cat){var map={reg:['reg','Agência'],min:['min','Ministério'],trib:['trib','Tribunal']};return map[cat]||['','Fonte'];}
+var _dados=null,_cat='',_q='';
+
+function cliques(){try{return JSON.parse(localStorage.getItem('brbrics_clicks')||'{}');}catch(e){return {};}}
+function registrarClique(link){if(!link)return;try{var c=cliques();c[link]=(c[link]||0)+1;localStorage.setItem('brbrics_clicks',JSON.stringify(c));}catch(e){}}
+
+var _carItems=[],_carIdx=0,_carTimer=null;
+function montarCarrossel(items){
+  _carItems=items;_carIdx=0;
+  var box=document.getElementById('carousel'),track=document.getElementById('car-track'),dots=document.getElementById('car-dots');
+  if(items.length<2){box.style.display='none';return;}
+  box.style.display='block';
+  track.innerHTML=items.map(function(n,i){
+    var b=badgeCat(n.cat);var vd=n.video||'';var src=n.imagem||(vd?ytThumb(ytId(vd)):'');
+    var vid=vd?'▶ Vídeo · ':'';
+    var img=src?'<img loading="lazy" src="'+limpar(src)+'" alt="" style="width:100%;height:100%;object-fit:cover">':'<div style="position:absolute;inset:0;background:linear-gradient(135deg,#16161c,#0c0c0e)"></div>';
+    var rel=tempoRel(n.data);
+    return '<div class="car-slide" data-idx="'+i+'">'+img+(vd?playIco():'')+'<div class="car-fade"></div><div class="car-cap"><span class="badge '+b[0]+'">'+vid+b[1]+'</span><h3>'+limpar(n.titulo)+'</h3><div class="car-meta">'+limpar(n.fonteNome||n.fonte)+(rel?' · '+rel:(n.data?' · '+fmtData(n.data):''))+' · '+tempoLeitura(n.resumo)+' · <span class="car-cta">Ler matéria &#8599;</span></div></div></div>';
+  }).join('');
+  dots.innerHTML=items.map(function(_,i){return '<button data-dot="'+i+'" class="'+(i===0?'active':'')+'"></button>';}).join('');
+  irCarrossel(0);iniciarAuto();
+}
+function irCarrossel(i){
+  if(!_carItems.length)return;
+  _carIdx=(i+_carItems.length)%_carItems.length;
+  document.getElementById('car-track').style.transform='translateX(-'+(_carIdx*100)+'%)';
+  var ds=document.querySelectorAll('#car-dots button');
+  for(var k=0;k<ds.length;k++){ds[k].className=(k===_carIdx?'active':'');}
+}
+function iniciarAuto(){if(_carTimer)clearInterval(_carTimer);_carTimer=setInterval(function(){irCarrossel(_carIdx+1);},5200);}
+function abrirLightbox(src,titulo,link){
+  if(!src)return;var lb=document.getElementById('lightbox');
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lb-cap').innerHTML=limpar(titulo)+(link?' · <a href="'+limpar(link)+'" target="_blank" rel="noopener">Ler matéria completa &#8599;</a>':'');
+  lb.classList.add('on');
+}
+function fecharLightbox(){document.getElementById('lightbox').classList.remove('on');}
+
+function filtrados(){
+  var q=_q.toLowerCase().trim();
+  var all=(_dados&&_dados.manchetes)||[];
+  return all.filter(function(n){
+    if(_cat&&n.cat!==_cat)return false;
+    if(q&&((n.titulo||'')+' '+(n.resumo||'')).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+}
+function thumbHTML(n){
+  var vd=n.video||'';var src=n.imagem||(vd?ytThumb(ytId(vd)):'');
+  var img=src?'<a class="vid-link" href="'+limpar(vd||n.link)+'" target="_blank" rel="noopener" title="Abrir matéria original"><img loading="lazy" src="'+limpar(src)+'" alt="" onerror="this.closest(\'a\').style.display=\'none\';var t=this.closest(\'.news-thumb\');if(t){var x=t.querySelector(\'.noimg\');if(x)x.style.display=\'flex\';}">'+(vd?playIco():'')+'</a>':'';
+  var noimg=src?'<div class="noimg" style="display:none">📰</div>':'<div class="noimg">📰</div>';
+  return '<div class="news-thumb">'+img+noimg+(vd?'<span class="badge vid">Vídeo</span>':'')+'</div>';
+}
+function heroMCH(n){
+  var b=badgeCat(n.cat);var vd=n.video||'';var src=n.imagem||(vd?ytThumb(ytId(vd)):'');var rel=tempoRel(n.data);
+  return '<article class="hero-news">'+(src?'<a class="hero-link" href="'+limpar(vd||n.link)+'" target="_blank" rel="noopener" title="Abrir matéria original"><img class="hero-bg" loading="lazy" src="'+limpar(src)+'" alt=""></a>'+(vd?playIco():''):'')
+  +'<div class="hero-fade"></div><div class="hero-body"><span class="badge '+b[0]+'">'+(vd?'Vídeo · ':'')+b[1]+'</span> '+favBtnHTML(n.link,n.titulo)
+  +'<h2><a href="'+limpar(vd||n.link)+'" target="_blank" rel="noopener" data-link="'+limpar(n.link)+'">'+limpar(n.titulo)+'</a></h2>'
+  +(n.resumo?'<p class="muted">'+limpar(n.resumo.slice(0,180))+'…</p>':'')
+  +'<div class="car-meta">'+limpar(n.fonteNome||n.fonte)+(rel?' · '+rel:(n.data?' · '+fmtData(n.data):''))+' · '+tempoLeitura(n.resumo)+' · <span class="car-cta">Ler matéria &#8599;</span></div>'
+  +shareHTML(n.link,n.titulo)+'</div></article>';
+}
+function render(){
+  var items=filtrados();
+  var st=document.getElementById('s');if(st)st.textContent=items.length+' manchete(s)'+(_cat?' ('+_cat+')':'')+(_q?' para "'+_q+'"':'');
+  var grid=document.getElementById('grid');
+  if(!items.length){grid.innerHTML=emptyHTML('Nenhuma manchete encontrada','Ajuste o filtro ou o termo buscado.');return;}
+  var html=heroMCH(items[0]);
+  html+=items.slice(1).map(function(n){var b=badgeCat(n.cat);var vd=n.video||'';var rel=tempoRel(n.data);return '<article class="news-card">'+thumbHTML(n)+'<div class="news-body"><div class="tag-row">'+favBtnHTML(n.link,n.titulo)+'</div><h4><a href="'+limpar(vd||n.link)+'" target="_blank" rel="noopener" data-link="'+limpar(n.link)+'">'+limpar(n.titulo)+'</a></h4>'+(n.resumo?'<p>'+limpar(n.resumo.slice(0,120))+'…</p>':'')+'<div class="news-src"><span class="badge '+b[0]+'">'+(vd?'Vídeo · ':'')+b[1]+'</span><span>'+(rel?rel:fmtData(n.data))+' · '+tempoLeitura(n.resumo)+'</span></div>'+shareHTML(n.link,n.titulo)+'</div></article>';}).join('');
+  grid.innerHTML=html;
+}
+function renderJud(){
+  var el=document.getElementById('jud');var j=(_dados&&_dados.judiciario)||[];
+  if(!j.length){el.innerHTML='<p class="muted">Sem destaques do Judiciário no momento.</p>';return;}
+  el.innerHTML=j.slice(0,6).map(function(n){return '<div class="rank"><span class="n">⚖</span><div><a href="'+limpar(n.link)+'" target="_blank" rel="noopener" data-link="'+limpar(n.link)+'">'+limpar(n.titulo.slice(0,110))+'</a><div class="r-meta">'+limpar(n.fonte)+' · '+fmtData(n.data)+'</div></div></div>';}).join('');
+}
+function renderMaisLidas(){
+  var el=document.getElementById('maislidas');var c=cliques();
+  var pool=((_dados&&_dados.manchetes)||[]).concat((_dados&&_dados.judiciario)||[]);
+  var rank=Object.keys(c).map(function(k){var it=null;for(var i=0;i<pool.length;i++){if(pool[i].link===k){it=pool[i];break;}}return {link:k,n:c[k],it:it};}).filter(function(r){return r.it;});
+  rank.sort(function(a,b){return b.n-a.n;});
+  if(!rank.length){el.innerHTML='<p class="muted">Clique nas notícias para montar seu ranking.</p>';return;}
+  el.innerHTML=rank.slice(0,6).map(function(r,i){return '<div class="rank"><span class="n">'+(i+1)+'</span><div><a href="'+limpar(r.link)+'" target="_blank" rel="noopener" data-link="'+limpar(r.link)+'">'+limpar(r.it.titulo.slice(0,110))+'</a><div class="r-meta">'+r.n+' clique'+(r.n>1?'s':'')+'</div></div></div>';}).join('');
+}
+function carregar(){
+  var s=document.getElementById('s');s.textContent='Agregando manchetes...';
+  jget('/api/manchetes').then(function(r){
+    _dados=r;render();renderJud();renderMaisLidas();
+    (r.manchetes||[]).forEach(function(n){if(!n.imagem&&n.video){n.imagem=ytThumb(ytId(n.video));}});
+    var comImg=(r.manchetes||[]).filter(function(n){return n.imagem;});
+    var paraCarrossel=comImg.slice(0,5);
+    if(paraCarrossel.length<3)paraCarrossel=(r.manchetes||[]).slice(0,5);
+    montarCarrossel(paraCarrossel);
+  }).catch(function(e){s.textContent='Erro: '+e.message;});
+}
+document.getElementById('b').onclick=carregar;
+document.getElementById('busca').addEventListener('input',function(e){_q=e.target.value;render();});
+document.querySelectorAll('#chips .chip').forEach(function(c){c.onclick=function(){document.querySelectorAll('#chips .chip').forEach(function(x){x.classList.remove('active');});c.classList.add('active');_cat=c.getAttribute('data-cat');render();};});
+document.getElementById('car-prev').onclick=function(){irCarrossel(_carIdx-1);iniciarAuto();};
+document.getElementById('car-next').onclick=function(){irCarrossel(_carIdx+1);iniciarAuto();};
+document.getElementById('car-dots').addEventListener('click',function(e){var d=e.target.getAttribute('data-dot');if(d!=null){irCarrossel(parseInt(d,10));iniciarAuto();}});
+document.getElementById('lb-close').onclick=fecharLightbox;
+document.getElementById('lightbox').addEventListener('click',function(e){if(e.target.id==='lightbox')fecharLightbox();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')fecharLightbox();});
+document.body.addEventListener('click',function(e){
+  var a=e.target.closest('[data-link]');if(a)registrarClique(a.getAttribute('data-link'));
+  var slide=e.target.closest('.car-slide');
+  if(slide&&slide.getAttribute('data-idx')!=null){var idx=parseInt(slide.getAttribute('data-idx'),10);var it=_carItems[idx];if(it&&(it.video||it.link)){var dest=it.video||it.link;registrarClique(it.link);trackLeitura(dest,it.titulo,it.fonteNome||it.fonte);window.open(dest,'_blank','noopener');}return;}
+});
+carregar();
+</script>
+</body>
+</html>

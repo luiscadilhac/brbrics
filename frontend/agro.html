@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agro — BrBRICS</title>
+<meta name="description" content="Safra por produto e UF (IBGE PAM), notícias do agro e Ministério da Agricultura.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">BrBRICS — safra e agronegócio...</div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">IBGE PAM · MAPA · Conab</p>
+    <h1>Safra <span class="hl">brasileira</span></h1>
+    <p class="sub">Quantidade produzida e valor por produto e UF (Produção Agrícola Municipal) + notícias do agro.</p>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Produção por produto e UF</h2><span class="tag" id="pam-ano"></span></div>
+    <div class="toolbar">
+      <select id="pam-prod">
+        <option value="40124">Soja</option><option value="40122">Milho</option><option value="40106">Cana-de-açúcar</option>
+        <option value="40139">Café (total)</option><option value="40099">Algodão herbáceo</option><option value="40127">Trigo</option>
+        <option value="40102">Arroz</option><option value="40112">Feijão</option><option value="40151">Laranja</option>
+        <option value="40119">Mandioca</option><option value="all">Todos (ranking)</option>
+      </select>
+      <select id="pam-uf"><option value="all">Brasil (por UF)</option></select>
+      <input id="pam-ano-in" placeholder="Ano" value="2024" style="width:80px">
+      <button class="btn" id="btn-pam">Consultar</button>
+    </div>
+    <div id="res-pam"><p class="muted">Escolha produto e ano para ver o ranking.</p></div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-h"><h2>Notícias do agro (IBGE)</h2></div>
+      <div id="res-agro-news" class="list"><div class="skel"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Ministério da Agricultura</h2><a href="https://www.gov.br/agricultura" target="_blank" rel="noopener">MAPA</a></div>
+      <div id="res-mapa" class="list"><div class="skel"></div></div>
+      <div class="toolbar"><a class="btn ghost" href="https://www.conab.gov.br/info-agro/precos" target="_blank" rel="noopener">Preços Conab</a></div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fontes: IBGE PAM, MAPA, Conab.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+jget('/api/ibge/estados').then(function(r){
+  var sel=document.getElementById('pam-uf');
+  (r.estados||[]).forEach(function(e){var o=document.createElement('option');o.value=e.id;o.textContent=e.sigla+' - '+e.nome;sel.appendChild(o);});
+}).catch(function(){});
+document.getElementById('btn-pam').onclick=function(){
+  var prod=document.getElementById('pam-prod').value;
+  var uf=document.getElementById('pam-uf').value||'all';
+  var ano=document.getElementById('pam-ano-in').value.replace(/\D/g,'')||'2024';
+  document.getElementById('pam-ano').textContent=ano;
+  document.getElementById('res-pam').innerHTML='<div class="skel"></div><div class="skel"></div>';
+  jget('/api/ibge/pam?produto='+prod+'&uf='+uf+'&ano='+ano).then(function(r){
+    var html=(r.series||[]).map(function(s){
+      var rows=(s.dados||[]).slice(0,15);
+      var max=rows.length?rows[0].valor||1:1;
+      var linhas=rows.map(function(d){
+        var w=Math.max(2,Math.round((d.valor||0)/max*100));
+        var nome=prod==='all'?(d.produto+' · '+d.localidade):d.localidade;
+        return '<div style="display:flex;align-items:center;gap:8px;margin:7px 0"><span style="min-width:170px;font-size:13px">'+esc(nome)+'</span>'
+        +'<span style="flex:1;background:#101014;border:1px solid var(--line);border-radius:99px;height:12px;overflow:hidden"><span style="display:block;height:100%;width:'+w+'%;background:var(--grad)"></span></span>'
+        +'<small class="muted" style="min-width:150px;text-align:right">'+(d.valor!=null?Number(d.valor).toLocaleString('pt-BR'):'—')+' '+esc(s.unidade||'')+'</small></div>';
+      }).join('');
+      return '<h3 style="margin:14px 0 4px">'+esc(s.variavel)+' <span class="muted">('+esc(s.unidade||'')+')</span></h3>'+(linhas||'<p class="muted">Sem dados.</p>');
+    }).join('');
+    document.getElementById('res-pam').innerHTML='<p class="muted">Fonte: '+esc(r.fonte||'')+'</p>'+html||emptyHTML('Sem dados de safra','Tente outro produto ou ano.');
+  }).catch(function(e){document.getElementById('res-pam').innerHTML='<p class="muted">Erro: '+esc(e.message)+'</p>';});
+};
+var AGROKW=['agro','soja','milho','café','cafe','safra','lavoura','pecuária','pecuaria','leite','trigo','arroz','feijão','feijao','cana','algodão','algodao','fruta','hortali','pampa','rural','colheita','plantio','irrigação','irrigacao','agricultura','pesca'];
+jget('/api/ibge/noticias?tipo=noticia&qtd=30').then(function(r){
+  var items=(r.noticias||[]).filter(function(n){
+    var t=((n.titulo||'')+' '+(n.resumo||'')).toLowerCase();
+    return AGROKW.some(function(k){return t.indexOf(k)>=0;});
+  }).slice(0,6);
+  document.getElementById('res-agro-news').innerHTML=items.map(function(n){
+    var rel=tempoRel(n.data);
+    return '<article><div class="tag-row"><span class="tag">IBGE</span>'+favBtnHTML(n.link,n.titulo)+'</div><h4><a href="'+n.link+'" target="_blank" rel="noopener">'+esc(n.titulo)+'</a></h4><small class="muted">'+esc(n.data||'')+(rel?' · '+esc(rel):'')+'</small>'+shareHTML(n.link,n.titulo)+'</article>';
+  }).join('')||'<p class="muted">Sem notícias do agro no lote atual.</p>';
+}).catch(function(){document.getElementById('res-agro-news').innerHTML='<p class="muted">Feed indisponível.</p>';});
+jget('/api/reguladores').then(function(r){
+  var org=(r.orgaos||[]).filter(function(o){return o.sigla==='AGRICULTURA';})[0]||{};
+  var items=(org.noticias||[]).slice(0,5);
+  document.getElementById('res-mapa').innerHTML=items.map(function(n){
+    var rel=tempoRel(n.data);
+    return '<article><h4><a href="'+n.link+'" target="_blank" rel="noopener">'+esc(n.titulo)+'</a></h4><small class="muted">'+esc(n.data||'')+(rel?' · '+esc(rel):'')+'</small></article>';
+  }).join('')||'<p class="muted">Sem notícias do MAPA no momento.</p>';
+}).catch(function(){document.getElementById('res-mapa').innerHTML='<p class="muted">Feed indisponível.</p>';});
+document.getElementById('btn-pam').click();
+</script>
+</body>
+</html>

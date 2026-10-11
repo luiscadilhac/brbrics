@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legislação — BrBRICS</title>
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0e">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+<div class="wrap topbar-in">
+<a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+<nav class="nav">
+  <a href="index.html">Início</a>
+  <div class="navgrp">
+    <a class="navtop" href="edicao.html">Diário Oficial</a>
+    <div class="sub">
+      <a href="edicao.html">Edição da Semana</a>
+      <a href="manchetes.html">Manchetes do Dia</a>
+      <a href="busca.html?q=dou">Buscar no DOU</a>
+    </div>
+  </div>
+  <div class="navgrp">
+    <a class="navtop" href="licitacoes.html">Licitações</a>
+    <div class="sub">
+      <a href="licitacoes.html">Todas (PNCP)</a>
+      <a href="busca.html?q=licitacao">Buscar Licitações</a>
+      <a href="diretorios.html">Por Órgão/UF</a>
+    </div>
+  </div>
+  <div class="navgrp">
+    <a class="navtop" href="proposicoes.html">Congresso</a>
+    <div class="sub">
+      <a href="proposicoes.html">Proposições Recentes</a>
+      <a href="legislacao.html">Busca Avançada</a>
+      <a href="busca.html?q=proposicao">Buscar no Congresso</a>
+    </div>
+  </div>
+  <div class="navgrp">
+    <a class="navtop" href="indicadores.html">Indicadores</a>
+    <div class="sub">
+      <a href="indicadores.html">Séries BCB (IPCA, Selic, Câmbio)</a>
+      <a href="indicadores.html">Boletim Focus 2026</a>
+      <a href="indicadores.html">IPCA 12m & Desemprego</a>
+    </div>
+  </div>
+  <div class="navgrp">
+    <a class="navtop" href="tribunais.html">Tribunais</a>
+    <div class="sub">
+      <a href="tribunais.html">Consulta Processual (DataJud)</a>
+      <a href="tribunais.html">Jurisprudência por Tema</a>
+      <a href="tribunais.html">Notícias dos Tribunais</a>
+    </div>
+  </div>
+  <div class="navgrp">
+    <a class="navtop" href="manchetes.html">Notícias</a>
+    <div class="sub">
+      <a href="manchetes.html">Manchetes (Reguladores + Tribunais)</a>
+      <a href="reguladores.html">Agências & Ministérios</a>
+      <a href="diretorios.html">Diretórios Oficiais</a>
+    </div>
+  </div>
+  <a href="sobre.html">Sobre</a>
+</nav>
+<div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+</div>
+</header>
+<main class="wrap">
+<p class="breadcrumb"><a href="index.html">Início</a> / Legislação</p>
+<div class="hero-mini">
+<h1>Legislação em linguagem direta</h1>
+<p class="muted">Busque proposições da Câmara por tema, acompanhe a tramitação passo a passo, veja votações com placar e acesse as normas oficiais do Planalto — tudo num só lugar, direto das fontes oficiais.</p>
+</div>
+<div class="card">
+<h3>Buscar proposições (Câmara)</h3>
+<div class="toolbar">
+<input id="q" placeholder="Tema: ex. inteligencia artificial, tributos..." style="min-width:240px">
+<select id="tipo"><option value="">Todos os tipos</option><option>PL</option><option>PEC</option><option>MPV</option><option>PLP</option><option>PDC</option><option>REQ</option></select>
+<select id="ano"><option value="">Todos os anos</option><option>2026</option><option>2025</option><option>2024</option><option>2023</option></select>
+<button class="btn" id="btn-buscar">Buscar</button>
+<span class="muted" id="st"></span>
+</div>
+<div id="res" class="list"><p class="muted">Digite um tema e busque.</p></div>
+</div>
+<div class="grid2">
+<div class="card">
+<div class="card-h"><h2>Votações recentes (placar)</h2><button class="btn ghost" id="btn-vot">Atualizar</button></div>
+<div id="vot" class="list"><p class="muted">Carregando...</p></div>
+</div>
+<div class="card">
+<div class="card-h"><h2>Normas oficiais (Planalto)</h2><a href="https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm" target="_blank" rel="noopener">Abrir</a></div>
+<div class="list">
+<article><span class="pill">CF/88</span><h4><a href="https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm" target="_blank" rel="noopener">Constituição Federal</a></h4></article>
+<article><span class="pill">Leis</span><h4><a href="https://www.planalto.gov.br/ccivil_03/leis/l8666cons.htm" target="_blank" rel="noopener">Lei 8.666/93 (Licitações — regime anterior)</a></h4></article>
+<article><span class="pill">Leis</span><h4><a href="https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm" target="_blank" rel="noopener">Lei 14.133/21 (Nova Lei de Licitações)</a></h4></article>
+<article><span class="pill">Códigos</span><h4><a href="https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm" target="_blank" rel="noopener">Código Civil</a></h4></article>
+<article><span class="pill">Códigos</span><h4><a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm" target="_blank" rel="noopener">Código Penal</a></h4></article>
+<article><span class="pill">Códigos</span><h4><a href="https://www.planalto.gov.br/ccivil_03/leis/l5869.htm" target="_blank" rel="noopener">Código de Processo Civil (1973, histórico)</a></h4></article>
+<article><span class="pill">Busca</span><h4><a href="https://www.planalto.gov.br/ccivil_03/busca.htm" target="_blank" rel="noopener">Busca geral de normas no Planalto</a></h4></article>
+</div>
+</div>
+</div>
+<div class="card" id="det-card" style="display:none">
+<div class="card-h"><h2>Tramitação da proposição</h2><button class="btn ghost" onclick="document.getElementById('det-card').style.display='none'">Fechar</button></div>
+<div id="det"></div>
+</div>
+<div class="card">
+<div class="card-h"><h2>Agenda do Congresso (próximos 7 dias)</h2><button class="btn ghost" id="btn-agenda">Atualizar</button></div>
+<div id="agenda" class="list"><p class="muted">Carregando agenda oficial da Câmara...</p></div>
+</div>
+<div class="card" id="votos-card" style="display:none">
+<div class="card-h"><h2>Votos nominais da votação</h2><button class="btn ghost" onclick="document.getElementById('votos-card').style.display='none'">Fechar</button></div>
+<div id="votos"></div>
+</div>
+<div class="statusbar"><div class="wrap st-fontes">Verificando fontes...</div></div>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fontes: Câmara, Senado, Planalto.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop">up</button>
+<script src="common.js?v=14"></script>
+<script src="legislacao-page.js?v=14"></script>
+</body>
+</html>

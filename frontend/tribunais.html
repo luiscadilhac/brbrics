@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tribunais — BrBRICS</title>
+<meta name="description" content="Consulta unificada de processos no CNJ DataJud (API oficial). Busque por número, tema ou tribunal.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav">
+      <a href="index.html">Início</a>
+      <div class="navgrp">
+        <a class="navtop" href="edicao.html">Diário Oficial</a>
+        <div class="sub">
+          <a href="edicao.html">Edição da Semana</a>
+          <a href="manchetes.html">Manchetes do Dia</a>
+          <a href="busca.html?q=dou">Buscar no DOU</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="licitacoes.html">Licitações</a>
+        <div class="sub">
+          <a href="licitacoes.html">Todas (PNCP)</a>
+          <a href="busca.html?q=licitacao">Buscar Licitações</a>
+          <a href="diretorios.html">Por Órgão/UF</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="proposicoes.html">Congresso</a>
+        <div class="sub">
+          <a href="proposicoes.html">Proposições Recentes</a>
+          <a href="legislacao.html">Busca Avançada</a>
+          <a href="busca.html?q=proposicao">Buscar no Congresso</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="indicadores.html">Indicadores</a>
+        <div class="sub">
+          <a href="indicadores.html">Séries BCB (IPCA, Selic, Câmbio)</a>
+          <a href="indicadores.html#focus">Boletim Focus 2026</a>
+          <a href="indicadores.html#extras">IPCA 12m & Desemprego</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="tribunais.html">Tribunais</a>
+        <div class="sub">
+          <a href="tribunais.html">Consulta Processual (DataJud)</a>
+          <a href="tribunais.html#jurisprudencia">Jurisprudência por Tema</a>
+          <a href="tribunais.html#feed">Notícias dos Tribunais</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="manchetes.html">Notícias</a>
+        <div class="sub">
+          <a href="manchetes.html">Manchetes (Reguladores + Tribunais)</a>
+          <a href="reguladores.html">Agências & Ministérios</a>
+          <a href="diretorios.html">Diretórios Oficiais</a>
+        </div>
+      </div>
+      <a href="sobre.html">Sobre</a>
+    </nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">CNJ DataJud — API Oficial</p>
+    <h1>Tribunais do <span class="hl">Brasil</span></h1>
+    <p class="sub">Consulta unificada de processos em todos os tribunais brasileiros. Busque por número CNJ, tema ou tribunal. Fonte oficial, dados abertos.</p>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Buscar processo por número CNJ</h2></div>
+    <div class="toolbar">
+      <label class="muted">Ramo:</label>
+      <select id="ramo-filter"><option value="">Todos os ramos</option><option>Superiores</option><option>Federal</option><option>Estadual</option><option>Trabalho</option><option>Eleitoral</option><option>Militar</option></select>
+      <select id="trib"><option value="">Carregando tribunais.</option></select>
+      <input id="numero" placeholder="Ex: 01005138120205010014 (20 dígitos)" style="min-width:260px">
+      <button class="btn" id="btn-buscar">Buscar</button>
+      <span class="muted" id="st-busca"></span>
+    </div>
+    <div id="res-busca"></div>
+  </section>
+
+  <section class="card" id="det-card">
+    <div class="card-h"><h2>Detalhe do processo (movimentação)</h2><span class="muted" id="st-detalhe"></span></div>
+    <div id="res-detalhe" class="list"><p class="muted">Clique num processo da lista, da tabela ou do feed para ver a movimentação aqui.</a></p></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Jurisprudência por tema</h2><span class="muted" id="st-tema"></span><button class="btn ghost" onclick="abrirTodos('res-tema')">Abrir todos</button></div>
+    <p class="muted">Busque processos por assunto ou classe direto na fonte oficial (CNJ DataJud).</p>
+    <div class="toolbar">
+      <select id="trib3"><option value="">Carregando.</option></select>
+      <input id="tema" placeholder="Tema: ex. consumidor, tributário, previdenciário..." style="min-width:240px">
+      <button class="btn" id="btn-tema">Pesquisar tema</button>
+    </div>
+    <div style="margin-bottom:8px"><span class="pill" data-tema="consumidor">consumidor</span><span class="pill" data-tema="tributario">tributário</span><span class="pill" data-tema="previdenciario">previdenciário</span><span class="pill" data-tema="trabalhista">trabalhista</span><span class="pill" data-tema="penal">penal</span><span class="pill" data-tema="ambiental">ambiental</span></div>
+    <div id="res-tema" class="list"><p class="muted">Digite um tema ou clique numa sugestão.</p></div>
+    <div class="toolbar" id="pager-tema" style="justify-content:center;gap:12px;margin-top:12px"></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Processos recentes por tribunal</h2><span class="muted" id="st-rec"></span></div>
+    <div class="toolbar">
+      <select id="trib2"><option value="">Carregando.</option></select>
+      <button class="btn" id="btn-rec">Carregar recentes</button>
+    </div>
+    <div class="card" style="box-shadow:none"><table><thead><tr><th>Número</th><th>Classe</th><th>Órgão julgador</th><th>Ajuizamento</th></tr></thead><tbody id="tb-rec"><tr><td colspan="4" class="muted">Escolha um tribunal e carregue.</td></tr></tbody></table></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Feed geral — vários tribunais</h2><button class="btn ghost" onclick="abrirTodos('feed')">Abrir todos</button><button class="btn ghost" id="btn-feed">Atualizar feed</button></div>
+    <div id="feed" class="list"><p class="muted">Carregando feed.</p></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Notícias dos tribunais (RSS oficial)</h2><button class="btn ghost" id="btn-rss">Atualizar</button></div>
+    <div id="rss" class="list"><p class="muted">Carregando notícias.</p></div>
+  </section>
+
+  <div class="statusbar"><div class="wrap st-fontes">Verificando fontes.</div></div>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fonte: CNJ DataJud.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script src="tribunais-page.js?v=14"></script>
+</body>
+</html>

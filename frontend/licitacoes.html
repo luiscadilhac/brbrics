@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Licitações — BrBRICS</title>
+<meta name="description" content="Busque licitações reais do PNCP (Portal Nacional de Contratações Públicas) por estado, palavra-chave e período.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav">
+      <a href="index.html">Início</a>
+      <div class="navgrp">
+        <a class="navtop" href="edicao.html">Diário Oficial</a>
+        <div class="sub">
+          <a href="edicao.html">Edição da Semana</a>
+          <a href="manchetes.html">Manchetes do Dia</a>
+          <a href="busca.html?q=dou">Buscar no DOU</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="licitacoes.html">Licitações</a>
+        <div class="sub">
+          <a href="licitacoes.html">Todas (PNCP)</a>
+          <a href="busca.html?q=licitacao">Buscar Licitações</a>
+          <a href="diretorios.html">Por Órgão/UF</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="proposicoes.html">Congresso</a>
+        <div class="sub">
+          <a href="proposicoes.html">Proposições Recentes</a>
+          <a href="legislacao.html">Busca Avançada</a>
+          <a href="busca.html?q=proposicao">Buscar no Congresso</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="indicadores.html">Indicadores</a>
+        <div class="sub">
+          <a href="indicadores.html">Séries BCB (IPCA, Selic, Câmbio)</a>
+          <a href="indicadores.html#focus">Boletim Focus 2026</a>
+          <a href="indicadores.html#extras">IPCA 12m & Desemprego</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="tribunais.html">Tribunais</a>
+        <div class="sub">
+          <a href="tribunais.html">Consulta Processual (DataJud)</a>
+          <a href="tribunais.html#jurisprudencia">Jurisprudência por Tema</a>
+          <a href="tribunais.html#feed">Notícias dos Tribunais</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="manchetes.html">Notícias</a>
+        <div class="sub">
+          <a href="manchetes.html">Manchetes (Reguladores + Tribunais)</a>
+          <a href="reguladores.html">Agências & Ministérios</a>
+          <a href="diretorios.html">Diretórios Oficiais</a>
+        </div>
+      </div>
+      <a href="sobre.html">Sobre</a>
+    </nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">Portal Nacional de Contratações Públicas</p>
+    <h1>Licitações <span class="hl">do Brasil inteiro</span></h1>
+    <p class="sub">Dados em tempo real do PNCP. Filtre por UF, palavra-chave e período. Acesse o edital original com um clique.</p>
+  </section>
+
+  <section class="card">
+    <div class="toolbar">
+      <select id="uf"><option value="">Todas as UFs</option></select>
+      <label class="muted">Itens/pág.</label>
+      <select id="tam"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select>
+      <input id="filtro" placeholder="Filtrar na página atual…">
+      <button class="btn" id="btn-carregar">Atualizar</button>
+      <button class="btn ghost" id="btn-csv">Exportar CSV</button>
+      <span class="muted" id="status"></span>
+    </div>
+    <div style="overflow-x:auto"><table><thead>
+      <tr><th>Objeto</th><th>Órgão</th><th>UF/Município</th><th>Publicação</th><th>Valor estimado</th><th>Ação</th></tr>
+    </thead><tbody id="tb"><tr><td colspan="6" class="muted">Carregando…</td></tr></tbody></table></div>
+    <div class="toolbar" id="pager" style="justify-content:center;gap:12px;margin-top:14px"></div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fonte: PNCP.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+var UFS=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+UFS.forEach(function(u){var o=document.createElement('option');o.value=u;o.textContent=u;document.getElementById('uf').appendChild(o);});
+function pncpLink(o){var c=(o.orgaoEntidade&&o.orgaoEntidade.cnpj)||'';if(c&&o.sequencialCompra&&o.anoCompra){return 'https://pncp.gov.br/app/editais/'+c+'/'+o.sequencialCompra+'/'+o.anoCompra;}return o.linkProcessoEletronico||o.linkSistemaOrigem||'';}
+function renderLic(rows){
+  document.getElementById('tb').innerHTML=rows.map(function(o){
+    var org=o.orgaoEntidade?o.orgaoEntidade.razaoSocial:'';
+    var u=o.unidadeOrgao?((o.unidadeOrgao.ufSigla||'')+' - '+(o.unidadeOrgao.municipioNome||'')):'';
+    var val=o.valorTotalEstimado?('R$ '+Number(o.valorTotalEstimado).toLocaleString('pt-BR',{minimumFractionDigits:2})):'—';
+    var mod='<span class="mod '+modPNCP(o.modalidadeNome)+'" title="'+esc(o.modalidadeNome||'Modalidade')+'"></span>';
+    var pz=prazoPNCP(o);var prazoHtml=pz?'<span class="prazo '+pz.cls+'">'+esc(pz.txt)+'</span>':'';
+    var lnk=pncpLink(o);
+    var clk=lnk?(' onclick="window.open(this.dataset.lnk,\'_blank\')" data-lnk="'+lnk+'" title="Abrir edital no PNCP"'):'';
+    return '<tr'+(lnk?' class="clickable"':'')+clk+'><td>'+mod+esc((o.objetoCompra||'').slice(0,140))+'<br>'+prazoHtml+'</td><td>'+esc(org)+'</td><td>'+esc(u)+'</td><td>'+esc((o.dataPublicacaoPncp||'').slice(0,10))+'</td><td>'+esc(val)+'</td><td>'+(lnk?'<a class="btn ghost" href="'+lnk+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">Edital</a>':'—')+'</td></tr>';
+  }).join('')||'<tr><td colspan="6">'+emptyHTML('Sem registros no período','Ajuste os filtros ou o período.')+'</td></tr>';
+}
+var _pg=1,_totalPg=1,_tam=20;
+function irPag(n){if(n<1||n>_totalPg)return;_pg=n;carregar();}
+function renderPager(){
+  var el=document.getElementById('pager');if(!el)return;
+  var dis=_pg<=1?' disabled':'';var dis2=_pg>=_totalPg?' disabled':'';
+  var h='<button class="btn ghost"'+dis+' onclick="irPag('+(_pg-1)+')">&laquo; Anterior</button>';
+  h+='<span class="muted" style="align-self:center">Página '+_pg+' de '+_totalPg+'</span>';
+  h+='<button class="btn ghost"'+dis2+' onclick="irPag('+(_pg+1)+')">Próxima &raquo;</button>';
+  el.innerHTML=h;
+}
+function carregar(){
+  var st=document.getElementById('status');st.textContent='Buscando PNCP (página '+_pg+')...';
+  var uf=document.getElementById('uf').value;
+  var q = document.getElementById('filtro').value || '';
+  jget('/api/licitacoes?pagina='+_pg+'&tamanhoPagina='+_tam+'&q='+encodeURIComponent(q)).then(function(d1){
+    _totalPg=(d1.totalPaginas&&d1.totalPaginas>0)?d1.totalPaginas:1;
+    var all=Array.isArray(d1.dados)?d1.dados.slice():[];
+    if(uf)all=all.filter(function(o){return o.unidadeOrgao&&o.unidadeOrgao.ufSigla===uf;});
+    if(q)all=all.filter(function(o){return (o.objetoCompra||'').toLowerCase().indexOf(q.toLowerCase())>=0;});
+    window._lic=all;renderLic(all);
+    st.textContent='Página '+_pg+' de '+_totalPg+' — '+all.length+' exibidos'+(uf?' · UF '+uf:'')+(q?' · filtro "'+q+'"':'')+' (total PNCP: '+(d1.total||'-')+')';
+    renderPager();
+  }).catch(function(e){st.textContent='PNCP indisponível: '+e.message;document.getElementById('tb').innerHTML='<tr><td colspan="6">Erro ao carregar. <button class="btn ghost" onclick="carregar()">Tentar de novo</button></td></tr>';});
+}
+function exportCSV(){
+  var rows=window._lic||[];if(!rows.length){toast('Nada para exportar');return;}
+  var hdr='Objeto,Órgão,UF/Município,Publicação,Valor estimado,Link\n';
+  var csv=rows.map(function(o){
+    var org=o.orgaoEntidade?o.orgaoEntidade.razaoSocial:'';
+    var u=o.unidadeOrgao?((o.unidadeOrgao.ufSigla||'')+' - '+(o.unidadeOrgao.municipioNome||'')):'';
+    var val=o.valorTotalEstimado?Number(o.valorTotalEstimado).toFixed(2):'';
+    var lnk=pncpLink(o);
+    return '"'+esc(o.objetoCompra||'').replace(/"/g,'""')+'","'+esc(org).replace(/"/g,'""')+'","'+esc(u).replace(/"/g,'""')+'","'+esc((o.dataPublicacaoPncp||'').slice(0,10))+'","'+val+'","'+esc(lnk)+'"';
+  }).join('\n');
+  var blob=new Blob([hdr+csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='licitacoes_pncp_'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(url);
+  toast('CSV exportado');
+}
+function ordenarPorData(){
+  var rows=window._lic||[];rows.sort(function(a,b){return new Date(b.dataPublicacaoPncp)-new Date(a.dataPublicacaoPncp);});renderLic(rows);toast('Ordenado por data');
+}
+document.getElementById('btn-carregar').onclick=carregar;
+document.getElementById('btn-csv').onclick=exportCSV;
+document.getElementById('btn-ordem').onclick=ordenarPorData;
+(function(){var sel=document.getElementById('tam');if(sel){sel.value=String(_tam);sel.onchange=function(){_tam=parseInt(sel.value,10)||20;_pg=1;carregar();};}})();
+document.getElementById('filtro').oninput=function(e){
+  if(window._lic)renderLic(window._lic.filter(function(o){return (o.objetoCompra||'').toLowerCase().indexOf(e.target.value.toLowerCase())>=0;}));
+};
+carregar();
+</script>
+</body>
+</html>

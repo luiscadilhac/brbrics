@@ -1,0 +1,185 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Reguladores — BrBRICS</title><link rel="icon" href="favicon.png" type="image/png"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0c0c0e"><link rel="stylesheet" href="style.css?v=14"><link rel="stylesheet" href="pro.css?v=14"></head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav">
+      <a href="index.html">Início</a>
+      <div class="navgrp">
+        <a class="navtop" href="edicao.html">Diário Oficial</a>
+        <div class="sub">
+          <a href="edicao.html">Edição da Semana</a>
+          <a href="manchetes.html">Manchetes do Dia</a>
+          <a href="busca.html?q=dou">Buscar no DOU</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="licitacoes.html">Licitações</a>
+        <div class="sub">
+          <a href="licitacoes.html">Todas (PNCP)</a>
+          <a href="busca.html?q=licitacao">Buscar Licitações</a>
+          <a href="diretorios.html">Por Órgão/UF</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="proposicoes.html">Congresso</a>
+        <div class="sub">
+          <a href="proposicoes.html">Proposições Recentes</a>
+          <a href="legislacao.html">Busca Avançada</a>
+          <a href="busca.html?q=proposicao">Buscar no Congresso</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="indicadores.html">Indicadores</a>
+        <div class="sub">
+          <a href="indicadores.html">Séries BCB (IPCA, Selic, Câmbio)</a>
+          <a href="indicadores.html">Boletim Focus 2026</a>
+          <a href="indicadores.html">IPCA 12m & Desemprego</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="tribunais.html">Tribunais</a>
+        <div class="sub">
+          <a href="tribunais.html">Consulta Processual (DataJud)</a>
+          <a href="tribunais.html">Jurisprudência por Tema</a>
+          <a href="tribunais.html">Notícias dos Tribunais</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="manchetes.html">Notícias</a>
+        <div class="sub">
+          <a href="manchetes.html">Manchetes (Reguladores + Tribunais)</a>
+          <a href="reguladores.html">Agências & Ministérios</a>
+          <a href="diretorios.html">Diretórios Oficiais</a>
+        </div>
+      </div>
+      <a href="sobre.html">Sobre</a>
+    </nav>
+    <div class="actions">
+      <input id="busca-topo" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+</header>
+<main class="wrap">
+<section class="hero" style="padding:28px 0;text-align:center">
+<p class="kicker">RSS oficial gov.br</p>
+<h1>Agências & <span class="hl">Ministérios</span></h1>
+<p class="sub">Notícias oficiais direto dos portais do governo federal. Cada card abre a matéria original em nova janela.</p>
+</section>
+<div class="toolbar"><input id="busca" type="search" placeholder="Buscar em todas as noticias (ex: energia, tarifa, imposto)..." style="flex:1;min-width:240px"><button class="btn" id="b">Carregar notícias</button><span class="muted" id="s"></span></div>
+<div class="toolbar" id="tabs" style="gap:8px;margin-bottom:6px"><button class="btn ghost active" data-cat="">Todos</button><button class="btn ghost" data-cat="reg">Agências reguladoras</button><button class="btn ghost" data-cat="min">Ministérios</button></div>
+<div class="toolbar" id="filtros" style="gap:8px;margin-bottom:14px"></div>
+<div id="carousel" class="carousel" style="display:none"><div class="car-track" id="car-track"></div><button class="car-nav prev" id="car-prev" aria-label="Anterior">&#10094;</button><button class="car-nav next" id="car-next" aria-label="Próxima">&#10095;</button><div class="car-dots" id="car-dots"></div></div><div id="feed" class="list"><p class="muted">Clique em carregar.</p></div></main>
+<script src="common.js?v=14">
+// ===== Carrossel (fotos do /api/manchetes, reg+min) =====
+var _carItems=[],_carIdx=0,_carTimer=null;
+function _fmtData(d){if(!d)return '';try{return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
+function _badge(cat){var map={reg:['reg','Agência'],min:['min','Ministério'],trib:['trib','Tribunal']};return map[cat]||['','Fonte'];}
+function _irCarrossel(i){
+  if(!_carItems.length)return;
+  _carIdx=(i+_carItems.length)%_carItems.length;
+  document.getElementById('car-track').style.transform='translateX(-'+(_carIdx*100)+'%)';
+  var ds=document.querySelectorAll('#car-dots button');
+  for(var k=0;k<ds.length;k++){ds[k].className=(k===_carIdx?'active':'');}
+}
+function _iniciarAuto(){if(_carTimer)clearInterval(_carTimer);_carTimer=setInterval(function(){_irCarrossel(_carIdx+1);},5200);}
+function montarCarrossel(items){
+  _carItems=items;_carIdx=0;
+  var box=document.getElementById('carousel'),track=document.getElementById('car-track'),dots=document.getElementById('car-dots');
+  if(items.length<2){if(box)box.style.display='none';return;}
+  if(box)box.style.display='block';
+  track.innerHTML=items.map(function(n,i){
+    var b=_badge(n.cat);
+    var img=n.imagem?'<img loading="lazy" src="'+limpar(n.imagem)+'" alt="">':'<div style="position:absolute;inset:0;background:linear-gradient(135deg,#16161c,#0c0c0e)"></div>';
+    return '<div class="car-slide" data-idx="'+i+'">'+img+'<div class="car-fade"></div><div class="car-cap"><span class="badge '+b[0]+'">'+b[1]+'</span><h3>'+limpar(n.titulo)+'</h3><div class="car-meta">'+limpar(n.fonteNome||n.fonte)+(n.data?' · '+_fmtData(n.data):'')+' · <span class="car-cta">Ler matéria &#8599;</span></div></div></div>';
+  }).join('');
+  dots.innerHTML=items.map(function(_,i){return '<button data-dot="'+i+'" class="'+(i===0?'active':'')+'"></button>';}).join('');
+  _irCarrossel(0);_iniciarAuto();
+}
+document.getElementById('car-prev').onclick=function(){_irCarrossel(_carIdx-1);_iniciarAuto();};
+document.getElementById('car-next').onclick=function(){_irCarrossel(_carIdx+1);_iniciarAuto();};
+document.getElementById('car-dots').addEventListener('click',function(e){var d=e.target.getAttribute('data-dot');if(d!=null){_irCarrossel(parseInt(d,10));_iniciarAuto();}});
+document.body.addEventListener('click',function(e){
+  var slide=e.target.closest('.car-slide');
+  if(slide&&slide.getAttribute('data-idx')!=null){var it=_carItems[parseInt(slide.getAttribute('data-idx'),10)];if(it&&it.link)window.open(it.link,'_blank','noopener');}
+});
+// busca fotos para o carrossel sem travar a lista principal
+jget('/api/manchetes').then(function(r){
+  var comImg=(r.manchetes||[]).filter(function(n){return n.imagem&&(n.cat==='reg'||n.cat==='min');});
+  var para=comImg.slice(0,5);
+  if(para.length<3)para=(r.manchetes||[]).filter(function(n){return n.cat==='reg'||n.cat==='min';}).slice(0,5);
+  if(para.length)montarCarrossel(para);
+}).catch(function(){});
+</script>
+<script>
+var _dados=null,_cat='',_org='',_q='';
+function limpar(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function render(){
+  var feed=document.getElementById('feed');
+  if(!_dados){feed.innerHTML='<p class="muted">Clique em carregar.</p>';return;}
+  var q=_q.toLowerCase().trim();
+  var html='';var count=0;
+  (_dados.orgaos||[]).forEach(function(t){
+    if(t.erro)return;
+    if(_cat&&(t.cat||'reg')!==_cat)return;
+    if(_org&&t.sigla!==_org)return;
+    var noticias=(t.noticias||[]).filter(function(n){
+      if(!q)return true;
+      return ((n.titulo||'')+' '+(n.resumo||'')).toLowerCase().indexOf(q)>=0;
+    });
+    if(q&&!noticias.length)return;
+    count+=noticias.length;
+    var classe=(t.cat==='min'?'min':'reg');
+    html+='<h3 style="color:#FFC400;margin:18px 0 8px"><span class="badge '+classe+'">'+limpar(t.cat==='min'?'MINISTERIO':'AGENCIA')+'</span> '+limpar(t.sigla)+' - '+limpar(t.nome)+'</h3>';
+    html+='<div class="news-grid">';
+    noticias.forEach(function(n){
+      var vd=n.video||'';var src=n.imagem||(vd?ytThumb(ytId(vd)):'');
+      var vid=vd?'<span class="badge vid">Vídeo</span>':'';
+      var img=src?'<a class="vid-link" href="'+limpar(vd||n.link)+'" target="_blank" rel="noopener" title="Abrir matéria original"><img loading="lazy" src="'+limpar(src)+'" alt="" onerror="this.closest(\'a\').style.display=\'none\'">'+(vd?playIco():'')+'</a>':'';
+      var noimg=src?'<div class="noimg" style="display:none">📰</div>':'<div class="noimg">📰</div>';
+      var rel=tempoRel(n.data);
+      html+='<article class="news-card"><div class="news-thumb">'+img+noimg+vid+'</div><div class="news-body"><div class="tag-row">'+favBtnHTML(n.link,n.titulo)+'</div><h4><a href="'+limpar(vd||n.link)+'" target="_blank" rel="noopener">'+limpar(n.titulo)+'</a></h4>'+(n.resumo?'<p>'+limpar(n.resumo.slice(0,120))+'…</p>':'')+'<div class="news-src"><span class="badge '+classe+'">'+limpar(t.sigla)+'</span><span>'+(rel?rel:(n.data?limpar(new Date(n.data).toLocaleString('pt-BR')):''))+' · '+tempoLeitura(n.resumo)+'</span></div>'+shareHTML(n.link,n.titulo)+'</div></article>';
+    });
+    html+='</div>';
+  });
+  if(!count){feed.innerHTML='<p class="muted">Nenhuma noticia encontrada'+(q?' para "'+limpar(_q)+'"':'')+'.</p>';return;}
+  var st=document.getElementById('s');if(st&&q)st.textContent=count+' noticia(s) para "'+_q+'"';
+  feed.innerHTML=html;
+}
+function buildFiltros(){
+ var f=document.getElementById('filtros');if(!_dados){f.innerHTML='';return;}
+ var orgaos=(_dados.orgaos||[]).filter(function(t){return !t.erro&&(!_cat||(t.cat||'reg')===_cat);}).map(function(t){return t.sigla;});
+ if(_org&&orgaos.indexOf(_org)<0)_org='';
+ var h='<button class="btn ghost' + (_org?'':' active') + '" data-o="">Todas as fontes</button>';
+ orgaos.forEach(function(sg){h+='<button class="btn ghost' + (_org===sg?' active':'') + '" data-o="'+limpar(sg)+'">'+limpar(sg)+'</button>';});
+ f.innerHTML=h;
+ Array.prototype.forEach.call(f.querySelectorAll('button'),function(b){b.onclick=function(){
+  _org=b.getAttribute('data-o')||'';buildFiltros();render();
+ };}); 
+}
+function carregar(){
+ var s=document.getElementById('s');s.textContent='Buscando RSS gov.br...';
+ jget('/api/reguladores').then(function(r){
+  _dados=r;s.textContent=r.online+' de '+r.total+' orgaos online'+(r.atualizadoEm?' · '+new Date(r.atualizadoEm).toLocaleTimeString('pt-BR'):'');
+  buildFiltros();render();
+ }).catch(function(e){s.textContent='Erro: '+e.message;document.getElementById('feed').innerHTML='<p class="muted">Erro. <button class="btn ghost" onclick="carregar()">Tentar de novo</button></p>';});
+}
+document.getElementById('b').onclick=carregar;
+var _bt=null;
+document.getElementById('busca').addEventListener('input',function(e){_q=e.target.value;clearTimeout(_bt);_bt=setTimeout(render,180);});
+Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.onclick=function(){
+ Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(x){x.classList.remove('active');});
+ b.classList.add('active');_cat=b.getAttribute('data-cat')||'';buildFiltros();render();
+};});
+carregar();
+</script>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fonte: RSS gov.br.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+</body></html>

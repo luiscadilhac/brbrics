@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comércio Exterior — BrBRICS</title>
+<meta name="description" content="Balança comercial por UF e principais parceiros do Brasil (MDIC ComexStat, API oficial).">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">BrBRICS — balança comercial (MDIC)...</div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">MDIC — ComexStat (API oficial)</p>
+    <h1>Balança <span class="hl">comercial</span></h1>
+    <p class="sub">Exportações, importações e saldo por UF, além dos principais parceiros do Brasil — em US$ FOB.</p>
+    <div class="toolbar" style="justify-content:center">
+      <input id="cx-ano" placeholder="Ano" value="2025" style="width:90px">
+      <button class="btn" id="btn-cx">Atualizar</button>
+      <span class="muted" id="cx-meta"></span>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Resumo do ano</h2><span class="tag" id="cx-ano-tag"></span></div>
+    <div id="res-resumo" class="kpis"><div class="skel"></div><div class="skel"></div></div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-h"><h2>Top UFs (movimentação)</h2></div>
+      <div id="res-ufs"><div class="skel"></div><div class="skel"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Top parceiros</h2></div>
+      <div class="toolbar">
+        <select id="cx-fluxo"><option value="export">Exportação</option><option value="import">Importação</option></select>
+      </div>
+      <div id="res-par"><div class="skel"></div></div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fonte: MDIC ComexStat.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+function bi(v){return 'US$ '+Number(v||0).toLocaleString('pt-BR');}
+function barras(items, fmt){
+  var max=items.length?items[0].valor||items[0].mov||1:1;
+  return items.map(function(x){
+    var v=x.valor!=null?x.valor:(x.mov||0);
+    var w=Math.max(2,Math.round(v/max*100));
+    return '<div style="display:flex;align-items:center;gap:8px;margin:7px 0"><span style="min-width:150px;font-size:13px">'+esc(x.rotulo||x.uf||'')+'</span>'
+    +'<span style="flex:1;background:#101014;border:1px solid var(--line);border-radius:99px;height:12px;overflow:hidden"><span style="display:block;height:100%;width:'+w+'%;background:var(--grad)"></span></span>'
+    +'<small class="muted" style="min-width:130px;text-align:right">'+esc(fmt?fmt(v):bi(v))+'</small></div>';
+  }).join('');
+}
+function carregarResumo(){
+  var ano=document.getElementById('cx-ano').value.replace(/\D/g,'')||new Date().getFullYear();
+  document.getElementById('cx-ano-tag').textContent=ano;
+  document.getElementById('res-resumo').innerHTML='<div class="skel"></div>';
+  document.getElementById('res-ufs').innerHTML='<div class="skel"></div>';
+  jget('/api/comex/resumo?ano='+ano).then(function(r){
+    document.getElementById('res-resumo').innerHTML=
+      '<div class="kpi"><b>Exportações</b> — '+bi(r.exportTotal)+'</div>'
+      +'<div class="kpi"><b>Importações</b> — '+bi(r.importTotal)+'</div>'
+      +'<div class="kpi"><b>Saldo</b> — '+bi(r.saldo)+'</div>'
+      +'<small class="muted">Fonte: '+esc(r.fonte||'')+(r.aviso?' · '+esc(r.aviso):'')+'</small>';
+    document.getElementById('res-ufs').innerHTML=barras((r.ufs||[]).map(function(u){return {rotulo:u.uf, valor:u.mov};}))||emptyHTML('Sem dados por UF','Tente outro ano.');
+    carregarParceiros();
+  }).catch(function(e){document.getElementById('res-resumo').innerHTML='<p class="muted">Erro: '+esc(e.message)+'</p>';});
+}
+function carregarParceiros(){
+  var ano=document.getElementById('cx-ano').value.replace(/\D/g,'')||new Date().getFullYear();
+  var fluxo=document.getElementById('cx-fluxo').value;
+  document.getElementById('res-par').innerHTML='<div class="skel"></div>';
+  jget('/api/comex/parceiros?ano='+ano+'&fluxo='+fluxo).then(function(r){
+    document.getElementById('res-par').innerHTML=barras(r.parceiros||[])||emptyHTML('Sem parceiros','Tente outro ano.');
+  }).catch(function(e){document.getElementById('res-par').innerHTML='<p class="muted">Erro: '+esc(e.message)+'</p>';});
+}
+document.getElementById('btn-cx').onclick=carregarResumo;
+document.getElementById('cx-fluxo').onchange=carregarParceiros;
+jget('/api/comex/meta').then(function(r){
+  var a=r.anos&&(r.anos.data||r.anos);
+  document.getElementById('cx-meta').textContent='Base: '+(a&&a.max?('até '+a.max):'MDIC');
+}).catch(function(){});
+carregarResumo();
+</script>
+</body>
+</html>

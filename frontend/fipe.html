@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia Fipe — BrBRICS</title>
+<meta name="description" content="Preço médio de carros, motos e caminhões pela Tabela Fipe. Marca, modelo, ano e valor.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">BrBRICS — guia de preços Fipe...</div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">Tabela Fipe — preço médio de mercado</p>
+    <h1>Quanto vale <span class="hl">seu veículo?</span></h1>
+    <p class="sub">Carros, motos e caminhões: escolha marca, modelo e ano para ver o valor de referência.</p>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Guia de preços (Tabela Fipe)</h2><span class="tag">carros · motos · caminhões</span></div>
+    <div class="toolbar">
+      <select id="f-tipo"><option value="carros">Carros</option><option value="motos">Motos</option><option value="caminhoes">Caminhões</option></select>
+      <select id="f-marca"><option value="">Marca...</option></select>
+      <select id="f-modelo"><option value="">Modelo...</option></select>
+      <select id="f-ano"><option value="">Ano...</option></select>
+      <button class="btn" id="btn-fipe">Ver preço</button>
+    </div>
+    <div id="res-fipe"><p class="muted">Selecione marca, modelo e ano.</p></div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fonte: Tabela Fipe.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+function fillSel(id, arr, val, txt){
+  var sel=document.getElementById(id);
+  sel.innerHTML='<option value="">'+(arr._ph||'Escolha...')+'</option>'+arr.map(function(x){return '<option value="'+esc(x[val])+'">'+esc(x[txt])+'</option>';}).join('');
+}
+function carregarMarcas(){
+  var t=document.getElementById('f-tipo').value;
+  var sel=document.getElementById('f-marca');sel.innerHTML='<option value="">Carregando...</option>';
+  document.getElementById('f-modelo').innerHTML='<option value="">Modelo...</option>';
+  document.getElementById('f-ano').innerHTML='<option value="">Ano...</option>';
+  jget('/api/fipe/marcas?tipo='+t).then(function(r){
+    fillSel('f-marca', r.marcas||[], 'codigo', 'nome');
+  }).catch(function(e){sel.innerHTML='<option value="">Erro</option>';});
+}
+document.getElementById('f-tipo').onchange=carregarMarcas;
+document.getElementById('f-marca').onchange=function(){
+  var t=document.getElementById('f-tipo').value, m=this.value;
+  var sel=document.getElementById('f-modelo');sel.innerHTML='<option value="">Carregando...</option>';
+  if(!m)return;
+  jget('/api/fipe/modelos?tipo='+t+'&marca='+m).then(function(r){
+    fillSel('f-modelo', r.modelos||[], 'codigo', 'nome');
+  }).catch(function(){});
+};
+document.getElementById('f-modelo').onchange=function(){
+  var t=document.getElementById('f-tipo').value, m=document.getElementById('f-marca').value, mo=this.value;
+  var sel=document.getElementById('f-ano');sel.innerHTML='<option value="">Carregando...</option>';
+  if(!mo)return;
+  jget('/api/fipe/anos?tipo='+t+'&marca='+m+'&modelo='+mo).then(function(r){
+    fillSel('f-ano', r.anos||[], 'codigo', 'nome');
+  }).catch(function(){});
+};
+document.getElementById('btn-fipe').onclick=function(){
+  var t=document.getElementById('f-tipo').value, m=document.getElementById('f-marca').value,
+      mo=document.getElementById('f-modelo').value, a=document.getElementById('f-ano').value;
+  if(!m||!mo||!a){toast('Selecione marca, modelo e ano');return;}
+  document.getElementById('res-fipe').innerHTML='<div class="skel"></div>';
+  jget('/api/fipe/valor?tipo='+t+'&marca='+m+'&modelo='+mo+'&ano='+encodeURIComponent(a)).then(function(r){
+    var v=r.avaliacao||{};
+    document.getElementById('res-fipe').innerHTML='<div class="kpis">'
+    +'<div class="kpi"><b>'+esc(v.Modelo||'')+'</b> — '+esc(v.Marca||'')+' · '+esc(v.AnoModelo||'')+' · '+esc(v.Combustivel||'')+'</div>'
+    +'<div class="kpi"><b>Valor médio</b> — '+esc(v.Valor||'—')+'</div>'
+    +'<div class="kpi"><b>Referência</b> — '+esc(v.MesReferencia||'')+' · Código Fipe '+esc(v.CodigoFipe||'')+'</div></div>'
+    +'<small class="muted">Fonte: '+esc(r.fonte||'')+'. Valor de referência para negociação — consulte um avaliador para laudo.</small>';
+  }).catch(function(e){document.getElementById('res-fipe').innerHTML='<p class="muted">Erro: '+esc(e.message)+'</p>';});
+};
+carregarMarcas();
+</script>
+</body>
+</html>

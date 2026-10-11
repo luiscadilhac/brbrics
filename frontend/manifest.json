@@ -1,0 +1,17 @@
+{
+  "name": "BrBRICS - Transparência e dados do setor público",
+  "short_name": "BrBRICS",
+  "description": "Licitações, Diário Oficial, Congresso, indicadores, tribunais e notícias oficiais em tempo real.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c0c0e",
+  "theme_color": "#FFC400",
+  "icons": [
+    { "src": "favicon.png", "sizes": "64x64", "type": "image/png" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "logo-brics.png", "sizes": "200x200", "type": "image/png", "purpose": "any" }
+  ]
+}

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrBRICS — Transparência e Dados do Setor Público</title>
+<meta name="theme-color" content="#0c0c0e">
+<meta name="description" content="BrBRICS: portal de transparência com dados oficiais em tempo real. Licitações, Diário Oficial, Congresso, indicadores econômicos, tribunais e notícias dos reguladores.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav">
+      <a href="index.html">Início</a>
+      <div class="navgrp">
+        <a class="navtop" href="edicao.html">Diário Oficial</a>
+        <div class="sub">
+          <a href="edicao.html">Edição da Semana</a>
+          <a href="manchetes.html">Manchetes do Dia</a>
+          <a href="busca.html?q=dou">Buscar no DOU</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="licitacoes.html">Licitações</a>
+        <div class="sub">
+          <a href="licitacoes.html">Todas (PNCP)</a>
+          <a href="busca.html?q=licitacao">Buscar Licitações</a>
+          <a href="diretorios.html">Por Órgão/UF</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="proposicoes.html">Congresso</a>
+        <div class="sub">
+          <a href="proposicoes.html">Proposições Recentes</a>
+          <a href="legislacao.html">Busca Avançada</a>
+          <a href="busca.html?q=proposicao">Buscar no Congresso</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="indicadores.html">Indicadores</a>
+        <div class="sub">
+          <a href="indicadores.html">Séries BCB (IPCA, Selic, Câmbio)</a>
+          <a href="indicadores.html#focus">Boletim Focus 2026</a>
+          <a href="indicadores.html#extras">IPCA 12m & Desemprego</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="tribunais.html">Tribunais</a>
+        <div class="sub">
+          <a href="tribunais.html">Consulta Processual (DataJud)</a>
+          <a href="tribunais.html#jurisprudencia">Jurisprudência por Tema</a>
+          <a href="tribunais.html#feed">Notícias dos Tribunais</a>
+        </div>
+      </div>
+      <div class="navgrp">
+        <a class="navtop" href="manchetes.html">Notícias</a>
+        <div class="sub">
+          <a href="manchetes.html">Manchetes (Reguladores + Tribunais)</a>
+          <a href="reguladores.html">Agências & Ministérios</a>
+          <a href="diretorios.html">Diretórios Oficiais</a>
+        </div>
+      </div>
+      <a href="sobre.html">Sobre</a>
+    </nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">BrBRICS — carregando mercado...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:32px 0 8px">
+    <div>
+      <p class="kicker">Portal de Transparência do Setor Público</p>
+      <h1>Dados Oficiais<br><span class="hl">em Tempo Real</span></h1>
+      <p class="sub">O <b>BrBRICS</b> agrega fontes primárias: <b>PNCP</b> (licitações), <b>Câmara/Senado</b> (legislação), <b>BCB</b> (indicadores), <b>CNJ DataJud</b> (processos), <b>IN/DOU</b> (diário oficial), <b>RSS gov.br</b> (reguladores). Sem intermediários, sem paywall.</p>
+      <div class="cta" style="margin-top:20px">
+        <a class="btn big" href="manchetes.html">Ver Manchetes do Dia</a>
+        <a class="btn big ghost" href="licitacoes.html">Explorar Licitações</a>
+        <a class="btn big ghost" href="tribunais.html">Consultar Processos</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="st-lic">-</b><span>pregões/PNCP — 7 dias</span></div>
+        <div class="stat"><b id="st-prop">-</b><span>proposições/Câmara</span></div>
+        <div class="stat"><b id="st-ipca">-</b><span>IPCA mensal (BCB)</span></div>
+        <div class="stat"><b id="st-selic">-</b><span>Selic % a.a. (BCB)</span></div>
+      </div>
+    </div>
+    <aside class="card newsletter" style="max-width:360px">
+      <h3 style="margin-top:0">Fontes Ativas</h3>
+      <div id="st-fontes" class="st-fontes" style="font-size:13px;line-height:1.8">Verificando...</div>
+    </aside>
+  </section>
+
+  <section class="card" id="mercado" style="margin-top:16px">
+    <div class="card-h"><h2>Mercado — Bolsas, Câmbio e Cripto</h2><a class="btn ghost" href="indicadores.html">Indicadores</a></div>
+    <div class="mkt-grid">
+      <div><h3 style="font-size:14px;color:var(--yellow);margin:0 0 6px">B3 — Ibovespa e ações</h3><div id="mercado-bolsa"><div class="skel"></div></div></div>
+      <div><h3 style="font-size:14px;color:var(--yellow);margin:0 0 6px">Câmbio oficial</h3><div id="mercado-cambio"><div class="skel"></div></div></div>
+      <div><h3 style="font-size:14px;color:var(--yellow);margin:0 0 6px">Criptomoedas</h3><div id="mercado-cripto"><div class="skel"></div></div></div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:16px">
+    <div class="card-h"><h2>Manchetes do Dia — Carrossel</h2><a class="btn ghost" href="manchetes.html">Ver todas</a></div>
+    <div id="home-carousel" class="carousel" style="display:none">
+      <div class="car-track" id="home-car-track"></div>
+      <button class="car-nav prev" id="home-car-prev" aria-label="Anterior">&#10094;</button>
+      <button class="car-nav next" id="home-car-next" aria-label="Próxima">&#10095;</button>
+      <div class="car-dots" id="home-car-dots"></div>
+    </div>
+    <div id="home-car-grid" class="news-grid" style="display:none"></div>
+    <p id="home-car-loading" class="muted" style="text-align:center;padding:20px">Carregando manchetes com imagens...</p>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-h"><h2>Licitações Recentes (PNCP)</h2><a href="licitacoes.html">Ver todas</a></div>
+      <div id="licitacoes" class="list"><div class="skel"></div><div class="skel"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Congresso — Proposições</h2><a href="proposicoes.html">Ver todas</a></div>
+      <div id="congresso" class="list"><div class="skel"></div><div class="skel"></div></div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-h"><h2>Indicadores Oficiais (BCB)</h2><a href="indicadores.html">Ver todas</a></div>
+      <div id="indicadores" class="kpis"><div class="skel"></div><div class="skel"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Justiça — Tribunais (DataJud)</h2><a href="tribunais.html">Ver todas</a></div>
+      <div id="justica" class="list"><div class="skel"></div><div class="skel"></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Mercado — Boletim Focus 2026 (Top 5)</h2><a class="btn ghost" href="indicadores.html">Ver séries</a></div>
+    <div id="focus" class="list"><div class="skel"></div><div class="skel"></div></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Reguladores — Últimas Atualizações</h2><a href="reguladores.html">Ver todas</a></div>
+    <div id="reguladores-home" class="list"><div class="skel"></div><div class="skel"></div></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Mais dados</h2><a href="territorio.html">Território</a></div>
+    <div class="toolbar">
+      <a class="btn ghost" href="territorio.html">Território (IBGE)</a>
+      <a class="btn ghost" href="clima.html">Clima</a>
+      <a class="btn ghost" href="contas.html">Contas públicas</a>
+      <a class="btn ghost" href="energia.html">Energia</a>
+      <a class="btn ghost" href="comex.html">Comércio exterior</a>
+      <a class="btn ghost" href="fipe.html">Guia Fipe</a>
+      <a class="btn ghost" href="agro.html">Agro e safra</a>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-h"><h2>Mais lidas</h2><a href="manchetes.html">Manchetes</a></div>
+      <div id="mais-lidas" data-mais><p class="muted">Clique nas notícias para montar seu ranking.</p></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Salvos para ler depois</h2><a href="manchetes.html">Explorar</a></div>
+      <div id="salvos" data-salvos><p class="muted">Toque na estrela dos cards para salvar.</p></div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fontes: PNCP, Câmara, Senado, BCB, CNJ, IN/DOU, gov.br.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script src="app.js?v=14"></script>
+</body>
+</html>
