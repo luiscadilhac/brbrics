@@ -215,7 +215,9 @@ app.get('/api/status', function(req, res){
     { id: 'energia', nome: 'ANEEL - Bandeiras', url: base+'/api/energia/bandeiras' },
     { id: 'comex', nome: 'MDIC - ComexStat', url: base+'/api/comex/meta' },
     { id: 'fipe', nome: 'Tabela Fipe', url: base+'/api/fipe/marcas?tipo=carros' },
-    { id: 'mercado', nome: 'Mercado (bolsa/cripto/ptax)', url: base+'/api/mercado/resumo' }
+    { id: 'mercado', nome: 'Mercado (bolsa/cripto/ptax)', url: base+'/api/mercado/resumo' },
+    { id: 'sitemap', nome: 'SEO - Sitemap', url: base+'/sitemap.xml' },
+    { id: 'rssgeral', nome: 'RSS geral', url: base+'/rss.xml' }
   ];
   Promise.all(alvos.map(function(a){
     var t0 = Date.now();
@@ -230,7 +232,7 @@ app.get('/api/status', function(req, res){
 // Pre-aquece o cache das fontes rapidas ao ligar (homepage abre instantanea)
 function preaquecer(){
   var base = 'http://localhost:'+PORT;
-  ['/api/licitacoes','/api/proposicoes','/api/indicadores','/api/focus','/api/tribunais/noticias','/api/reguladores','/api/manchetes','/api/ibge/noticias','/api/ibge/estados','/api/fipe/marcas?tipo=carros','/api/mercado/resumo'].forEach(function(p){
+  ['/api/licitacoes','/api/proposicoes','/api/indicadores','/api/focus','/api/tribunais/noticias','/api/reguladores','/api/manchetes','/api/ibge/noticias','/api/ibge/estados','/api/fipe/marcas?tipo=carros','/api/mercado/resumo','/sitemap.xml'].forEach(function(p){
     getJSON(base+p, {}, 20000).catch(function(){});
   });
 }
@@ -261,6 +263,10 @@ try {
   comex.registrarComex(app, cacheGet, cacheSet, getJSON);
   fipe.registrarFipe(app, cacheGet, cacheSet, getJSON);
   mercado.registrarMercado(app, cacheGet, cacheSet, getJSON);
+  var seo = require('./seo');
+  var visitas = require('./visitas');
+  seo.registrarSEO(app, cacheGet, cacheSet);
+  visitas.registrarVisitas(app);
 } catch(e){ console.log('Modulo tribunais indisponivel:', e.message); }
 
 app.listen(PORT, function(){ console.log('BrBRICS em http://localhost:'+PORT); });

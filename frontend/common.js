@@ -274,6 +274,14 @@ function initFonte(){
     })((function(){var s=document.createElement('span');s.className='font-ctl';acts[i].appendChild(s);return s;})(),nv);
   }
 }
+function initVisita(){
+  try{
+    var ua=navigator.userAgent||'';
+    if(/bot|crawl|spider|slurp|mediapartners/i.test(ua))return;
+    var img=new Image();
+    img.src='/api/visita?pag='+encodeURIComponent(location.pathname)+'&ref='+encodeURIComponent(document.referrer||'');
+  }catch(e){}
+}
 function initProgresso(){
   if(document.getElementById('leitura-bar'))return;
   var b=document.createElement('div');b.id='leitura-bar';b.innerHTML='<span></span>';document.body.appendChild(b);
@@ -288,9 +296,9 @@ function buildFooter(){
     +'<div class="f-brand"><img src="logo-brics.png" alt="BrBRICS"><div><b>BrBRICS</b><p class="muted">Transparência de dados do setor público — direto das fontes oficiais, sem intermediários.</p><div class="st-fontes" style="font-size:12px">Verificando fontes...</div></div></div>'
     +'<div class="f-col"><h4>Seções</h4><a href="index.html">Início</a><a href="edicao.html">Diário Oficial</a><a href="licitacoes.html">Licitações</a><a href="proposicoes.html">Congresso</a><a href="indicadores.html">Indicadores</a><a href="tribunais.html">Tribunais</a></div>'
     +'<div class="f-col"><h4>Mais dados</h4><a href="territorio.html">Território</a><a href="clima.html">Clima</a><a href="contas.html">Contas públicas</a><a href="energia.html">Energia</a><a href="comex.html">Comércio exterior</a><a href="fipe.html">Guia Fipe</a><a href="agro.html">Agro</a></div>'
-    +'<div class="f-col"><h4>Institucional</h4><a href="sobre.html">Sobre</a><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>'
+    +'<div class="f-col"><h4>Institucional</h4><a href="sobre.html">Sobre</a><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a><a href="painel.html">Painel de visitas</a><a href="/rss.xml">RSS</a></div>'
     +'<div class="f-col"><h4>Fontes oficiais</h4><a href="https://pncp.gov.br" target="_blank" rel="noopener">PNCP</a><a href="https://dadosabertos.camara.leg.br/" target="_blank" rel="noopener">Câmara</a><a href="https://www.bcb.gov.br/" target="_blank" rel="noopener">BCB</a><a href="https://servicodados.ibge.gov.br/api/docs/" target="_blank" rel="noopener">IBGE</a><a href="https://www.gov.br/cgu/pt-br" target="_blank" rel="noopener">CGU</a><a href="https://dadosabertos.aneel.gov.br/" target="_blank" rel="noopener">ANEEL</a></div>'
     +'</div><div class="wrap foot-base"><small class="muted">© '+new Date().getFullYear()+' BrBRICS · Dados públicos com link de conferência na fonte.</small></div>';
   }
 }
-buildNav();buildFooter();initHamburger();setActiveNav();initSearch();initBackTop();initStatus();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();
+buildNav();buildFooter();initHamburger();setActiveNav();initSearch();initBackTop();initStatus();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();initVisita();

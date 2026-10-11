@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de visitas — BrBRICS</title>
+<meta name="description" content="Estatísticas de visitação do BrBRICS: páginas vistas, conteúdo popular e origens. Medição própria, sem cookies.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">Medição própria · sem cookies</p>
+    <h1>Painel de <span class="hl">visitas</span></h1>
+    <p class="sub">Páginas vistas, conteúdo popular e origens — contadas no nosso servidor, sem Google e sem rastreadores. O histórico zera a cada novo deploy no plano gratuito.</p>
+    <div class="toolbar" style="justify-content:center">
+      <input id="chave" type="password" placeholder="Chave (se exigida)" style="min-width:200px">
+      <button class="btn" id="btn-painel">Atualizar</button>
+      <span class="muted" id="st-painel"></span>
+    </div>
+  </section>
+
+  <section class="grid3" id="cards-resumo" style="display:none">
+    <div class="card" style="text-align:center"><h3>Hoje</h3><p style="font-size:28px;margin:4px 0"><b id="n-hoje" style="color:var(--yellow)">-</b></p></div>
+    <div class="card" style="text-align:center"><h3>Últimos 7 dias</h3><p style="font-size:28px;margin:4px 0"><b id="n-7" style="color:var(--yellow)">-</b></p></div>
+    <div class="card" style="text-align:center"><h3>Últimos 30 dias</h3><p style="font-size:28px;margin:4px 0"><b id="n-30" style="color:var(--yellow)">-</b></p></div>
+  </section>
+  <section class="grid3" id="cards-resumo2" style="display:none">
+    <div class="card" style="text-align:center"><h3>Total (mês)</h3><p style="font-size:28px;margin:4px 0"><b id="n-total" style="color:var(--yellow)">-</b></p></div>
+    <div class="card" style="text-align:center"><h3>Online agora (5 min)</h3><p style="font-size:28px;margin:4px 0"><b id="n-online" style="color:#4ade80">-</b></p></div>
+    <div class="card" style="text-align:center"><h3>Modo</h3><p style="font-size:14px" id="n-modo" class="muted">-</p></div>
+  </section>
+
+  <section class="card" id="card-dia" style="display:none">
+    <div class="card-h"><h2>Visitas por dia (30 dias)</h2></div>
+    <div id="res-dia" style="display:flex;align-items:flex-end;gap:3px;height:110px"></div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-h"><h2>Páginas mais vistas (30 dias)</h2></div>
+      <div id="res-pag"><p class="muted">Carregue acima.</p></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Origens (30 dias)</h2></div>
+      <div id="res-ref"><p class="muted">Carregue acima.</p></div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+try{var qk=new URLSearchParams(location.search).get('chave');if(qk){document.getElementById('chave').value=qk;try{sessionStorage.setItem('brbrics_painel',qk);}catch(e){}}}catch(e){}
+try{var sk=sessionStorage.getItem('brbrics_painel');if(sk)document.getElementById('chave').value=sk;}catch(e){}
+function barras(items, fmt){
+  if(!items||!items.length)return '<p class="muted">Sem dados ainda.</p>';
+  var max=items[0].v||1;
+  return items.map(function(x){
+    var w=Math.max(3,Math.round(x.v/max*100));
+    return '<div style="display:flex;align-items:center;gap:8px;margin:7px 0"><span style="min-width:150px;font-size:13px">'+esc(String(x.k).slice(0,60))+'</span>'
+    +'<span style="flex:1;background:#101014;border:1px solid var(--line);border-radius:99px;height:12px;overflow:hidden"><span style="display:block;height:100%;width:'+w+'%;background:var(--grad)"></span></span>'
+    +'<small class="muted" style="min-width:60px;text-align:right">'+esc(fmt?fmt(x.v):String(x.v))+'</small></div>';
+  }).join('');
+}
+function carregarPainel(){
+  var chave=document.getElementById('chave').value.trim();
+  try{sessionStorage.setItem('brbrics_painel',chave);}catch(e){}
+  document.getElementById('st-painel').textContent='Buscando...';
+  jget('/api/visitas/resumo'+(chave?'?chave='+encodeURIComponent(chave):'')).then(function(r){
+    document.getElementById('st-painel').textContent='';
+    document.getElementById('cards-resumo').style.display='grid';
+    document.getElementById('cards-resumo2').style.display='grid';
+    document.getElementById('card-dia').style.display='block';
+    document.getElementById('n-hoje').textContent=Number(r.hoje||0).toLocaleString('pt-BR');
+    document.getElementById('n-7').textContent=Number(r.dias7||0).toLocaleString('pt-BR');
+    document.getElementById('n-30').textContent=Number(r.dias30||0).toLocaleString('pt-BR');
+    document.getElementById('n-total').textContent=Number(r.total||0).toLocaleString('pt-BR');
+    document.getElementById('n-online').textContent=Number(r.online5min||0).toLocaleString('pt-BR');
+    document.getElementById('n-modo').textContent=r.aberto?'aberto (defina PAINEL_TOKEN no servidor)':'protegido por chave';
+    var dias=r.porDia||[];
+    var mx=dias.length?Math.max.apply(null,dias.map(function(d){return d.total;})):1;
+    document.getElementById('res-dia').innerHTML=dias.map(function(d){
+      var h=Math.max(4,Math.round(d.total/mx*100));
+      return '<div title="'+esc(d.dia)+': '+d.total+'" style="flex:1;background:var(--grad);border-radius:4px 4px 0 0;height:'+h+'%"></div>';
+    }).join('')||'<p class="muted">Sem dados.</p>';
+    document.getElementById('res-pag').innerHTML=barras(r.topPaginas);
+    document.getElementById('res-ref').innerHTML=barras(r.topOrigens);
+  }).catch(function(e){document.getElementById('st-painel').textContent='Erro: '+e.message+' (chave incorreta?)';});
+}
+document.getElementById('btn-painel').onclick=carregarPainel;
+document.getElementById('chave').addEventListener('keydown',function(e){if(e.key==='Enter')carregarPainel();});
+if(document.getElementById('chave').value)carregarPainel();
+</script>
+</body>
+</html>

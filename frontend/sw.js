@@ -1,6 +1,6 @@
 // BrBRICS - Service Worker (network-first: dados sempre frescos; cache so para offline)
-var CACHE_NAME = 'brbrics-v20';
-var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/style.css','/pro.css','/common.js','/app.js','/tribunais-page.js','/legislacao-page.js','/areas.js','/logo-brics.png','/favicon.png','/manifest.json'];
+var CACHE_NAME = 'brbrics-v21';
+var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/style.css','/pro.css','/common.js','/app.js','/tribunais-page.js','/legislacao-page.js','/areas.js','/logo-brics.png','/favicon.png','/manifest.json','/painel.html'];
 self.addEventListener('install', function(e){
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE_NAME).then(function(c){ return c.addAll(CORE); }).catch(function(){}));
