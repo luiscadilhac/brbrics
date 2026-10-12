@@ -9,6 +9,14 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 var fetch = require('node-fetch');
 
+// Global error handlers to catch silent crashes
+process.on('uncaughtException', function(err) {
+  console.error('UNCAUGHT EXCEPTION:', err.stack || err);
+});
+process.on('unhandledRejection', function(reason, promise) {
+  console.error('UNHANDLED REJECTION at:', promise, 'reason:', reason.stack || reason);
+});
+
 // Cache em memoria com TTL por tipo (DataJud e lento: 10 min)
 var CACHE = {};
 function cacheGet(k){var e=CACHE[k];if(!e)return null;var ttl=e.ttl||60000;if((Date.now()-e.t)>ttl){delete CACHE[k];return null;}return e.v;}
@@ -232,7 +240,16 @@ app.get('/api/status', function(req, res){
 // Pre-aquece o cache das fontes rapidas ao ligar (homepage abre instantanea)
 function preaquecer(){
   var base = 'http://localhost:'+PORT;
-  ['/api/licitacoes','/api/proposicoes','/api/indicadores','/api/focus','/api/tribunais/noticias','/api/reguladores','/api/manchetes','/api/ibge/noticias','/api/ibge/estados','/api/fipe/marcas?tipo=carros','/api/mercado/resumo','/sitemap.xml'].forEach(function(p){
+  ['/api/licitacoes','/api/proposicoes','/api/indicadores','/api/focus','/api/tribunais/noticias','/api/reguladores','/api/manchetes','/api/ibge/noticias','/api/ibge/estados','/api/fipe/marcas?tipo=carros','/api/mercado/resumo','/sitemap.xml',
+   '/api/biomas/cobertura','/api/biomas/alertas','/api/biomas/fogo','/api/biomas/estatisticas','/api/biomas/saldo','/api/biomas/ranking',
+   '/api/minerais/processos','/api/minerais/substancias','/api/minerais/producao','/api/minerais/barragens','/api/minerais/cfem',
+   '/api/satelites/tle/25544','/api/satelites/populares','/api/satelites/ativos','/api/satelites/focos','/api/satelites/focos?bbox=-50,-20,-40,-10&sensor=viirs_snpp&dias=1',
+   '/api/satelites/ativos','/api/satelites/tle/ISS','/api/satelites/passagem/25544?lat=-23.55&lon=-46.63','/api/satelites/focos?bbox=-50,-20,-40,-10&sensor=viirs_snpp&dias=1',
+   '/api/minerais/processos','/api/minerais/substancias','/api/minerais/producao','/api/minerais/barragens','/api/minerais/cfem',
+   '/api/biomas/cobertura','/api/biomas/alertas','/api/biomas/fogo','/api/biomas/estatisticas','/api/biomas/saldo','/api/biomas/ranking',
+   '/api/minerais/processos','/api/minerais/substancias','/api/minerais/producao','/api/minerais/barragens','/api/minerais/cfem',
+   '/api/satelites/tle/25544','/api/satelites/populares','/api/satelites/ativos','/api/satelites/focos','/api/satelites/focos?bbox=-50,-20,-40,-10&sensor=viirs_snpp&dias=1',
+   '/api/satelites/ativos','/api/satelites/tle/ISS','/api/satelites/passagem/25544?lat=-23.55&lon=-46.63'].forEach(function(p){
     getJSON(base+p, {}, 20000).catch(function(){});
   });
 }
@@ -251,6 +268,12 @@ try {
   var comex = require('./comex');
   var fipe = require('./fipe');
   var mercado = require('./mercado');
+var biomas = require('./biomas');
+var minerais = require('./minerais');
+var satelites = require('./satelites');
+var biomas = require('./biomas');
+var minerais = require('./minerais');
+var satelites = require('./satelites');
   trib.registrarTribunais(app, cacheGet, cacheSet);
   not.registrarNoticias(app, cacheGet, cacheSet);
   not.registrarReguladores(app, cacheGet, cacheSet);
@@ -262,7 +285,22 @@ try {
   energia.registrarEnergia(app, cacheGet, cacheSet, getJSON);
   comex.registrarComex(app, cacheGet, cacheSet, getJSON);
   fipe.registrarFipe(app, cacheGet, cacheSet, getJSON);
-  mercado.registrarMercado(app, cacheGet, cacheSet, getJSON);
+mercado.registrarMercado(app, cacheGet, cacheSet, getJSON);
+  try {
+    var biomas = require('./biomas');
+    biomas.registrarBiomas(app, cacheGet, cacheSet, getJSON);
+    console.log('Biomas module loaded');
+  } catch(e) { console.log('Erro ao carregar biomas:', e.message); }
+  try {
+    var minerais = require('./minerais');
+    minerais.registrarMinerais(app, cacheGet, cacheSet, getJSON);
+    console.log('Minerais module loaded');
+  } catch(e) { console.log('Erro ao carregar minerais:', e.message); }
+  try {
+    var satelites = require('./satelites');
+    satelites.registrarSatelites(app, cacheGet, cacheSet, getJSON);
+    console.log('Satelites module loaded');
+  } catch(e) { console.log('Erro ao carregar satelites:', e.message); }
   var seo = require('./seo');
   var visitas = require('./visitas');
   seo.registrarSEO(app, cacheGet, cacheSet);
