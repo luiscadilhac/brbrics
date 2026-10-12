@@ -47,7 +47,7 @@ function initStatus(){
   }).catch(function(){});
 }
 // Service Worker: network-first + força atualização
-if('serviceWorker' in navigator && location.protocol==='http:'){
+if('serviceWorker' in navigator && location.protocol!=='file:'){
   var __brbrics_reloading = false;
   navigator.serviceWorker.addEventListener('controllerchange', function(){
     if(__brbrics_reloading) return; __brbrics_reloading = true; location.reload();

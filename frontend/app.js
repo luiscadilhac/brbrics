@@ -1,5 +1,5 @@
 // BrBRICS - homepage
-function pncpLink(ctrl){if(!ctrl)return '';var m=String(ctrl).match(/^(\d{14})-1-(\d{1,6})\/(\d{4})$/);if(!m)return '';return 'https://pncp.gov.br/app/editais/'+m[1]+'/'+m[3]+'/'+parseInt(m[2],10);}
+function pncpLink(ctrl){if(!ctrl)return '';var m=String(ctrl).match(/^(\d{14})-1-(\d{1,6})\/(\d{4})$/);if(!m)return '';return '/licitacao/'+encodeURIComponent(String(ctrl));}
 function propLink(id){return 'https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao='+encodeURIComponent(id);}
 function propIdFromUri(uri){var m=String(uri||'').match(/proposicoes\/(\d+)/);return m?m[1]:'';}
 function fail(id,msg){var el=document.getElementById(id);if(el)el.innerHTML='<p class="muted">'+msg+' <button class="btn ghost" onclick="location.reload()">Tentar de novo</button></p>';}
@@ -102,7 +102,7 @@ jget('/api/licitacoes').then(function(lic){
     var uf=o.unidadeOrgao?esc(o.unidadeOrgao.ufSigla||''):'';
     var valor=o.valorTotalEstimado?('R$ '+Number(o.valorTotalEstimado).toLocaleString('pt-BR',{maximumFractionDigits:2})):'';
     var meta=[esc(o.modalidadeNome||''),esc(o.situacaoCompraNome||''),org,(uf?('UF '+uf):''),esc(valor),(o.numeroControlePNCP?esc(o.numeroControlePNCP):'')].filter(function(x){return x;}).join(' · ');
-    html+='<article class="lic-card"'+(link?' data-lnk="'+escA(link)+'" onclick="if(event.target.tagName!==\'A\'&&event.target.tagName!==\'BUTTON\')window.open(this.dataset.lnk,\'_blank\',\'noopener\')"':'')+'><span class="tag">PNCP</span><h4>'+(link?'<a href="'+link+'" target="_blank" rel="noopener">'+tit+'</a>':tit)+'</h4><small class="muted">'+meta+'</small>'+(link?'<div class="toolbar" style="margin-top:8px"><a class="btn ghost" href="'+link+'" target="_blank" rel="noopener">Abrir edital no PNCP</a></div>':'')+'</article>';
+    html+='<article class="lic-card"'+(link?' data-lnk="'+escA(link)+'" onclick="if(event.target.tagName!==\'A\'&&event.target.tagName!==\'BUTTON\')window.open(this.dataset.lnk,\'_blank\',\'noopener\')"':'')+'><span class="tag">PNCP</span><h4>'+(link?'<a href="'+link+'" target="_blank" rel="noopener">'+tit+'</a>':tit)+'</h4><small class="muted">'+meta+'</small>'+(link?'<div class="toolbar" style="margin-top:8px"><a class="btn ghost" href="'+link+'" target="_blank" rel="noopener">Ver detalhes</a></div>':'')+'</article>';
   });
   document.getElementById('licitacoes').innerHTML=html||'<p class="muted">Sem registros no período.</p>';
   var st=document.getElementById('st-lic');if(st&&lic.total)st.textContent=Number(lic.total).toLocaleString('pt-BR');

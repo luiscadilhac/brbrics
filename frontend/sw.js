@@ -1,9 +1,15 @@
-// BrBRICS - Service Worker (network-first: dados sempre frescos; cache so para offline)
-var CACHE_NAME = 'brbrics-v22';
-var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/style.css','/pro.css','/common.js','/app.js','/tribunais-page.js','/legislacao-page.js','/areas.js','/logo-brics.png','/favicon.png','/manifest.json','/painel.html'];
+// BrBRICS - Service Worker (rede primeiro em tudo; cache serve so como fallback offline)
+// Incrementar CACHE_NAME junto de qualquer mudanca em .js/.css/.html: o activate apaga o nome antigo.
+var CACHE_NAME = 'brbrics-v23';
+var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/style.css?v=14','/pro.css?v=14','/common.js?v=14','/app.js?v=14','/tribunais-page.js?v=14','/legislacao-page.js?v=14','/areas.js?v=14','/logo-brics.png','/favicon.png','/manifest.json'];
 self.addEventListener('install', function(e){
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE_NAME).then(function(c){ return c.addAll(CORE); }).catch(function(){}));
+  // addAll() e tudo-ou-nada: um 404 derruba o precache inteiro. Um por um, falha isolada.
+  e.waitUntil(caches.open(CACHE_NAME).then(function(c){
+    return Promise.all(CORE.map(function(u){
+      return fetch(u).then(function(r){ if(r && r.ok) return c.put(u, r); }).catch(function(){});
+    }));
+  }));
 });
 self.addEventListener('activate', function(e){
   e.waitUntil(caches.keys().then(function(ks){
@@ -36,15 +42,13 @@ self.addEventListener('fetch', function(e){
     );
     return;
   }
-  // Estaticos (css/js/img): serve do cache e atualiza em segundo plano (rapido + fresco)
+  // Estaticos (css/js/img): REDE PRIMEIRO. Cache-first entregava JS velho para sempre,
+  // porque a chave (?v=14) nunca mudava e o navegador nunca pedia a versao nova.
   e.respondWith(
-    caches.match(req).then(function(hit){
-      var net = fetch(req).then(function(r){
-        if(r && r.ok){ var cp = r.clone(); caches.open(CACHE_NAME).then(function(c){ c.put(req, cp); }); }
-        return r;
-      }).catch(function(){ return hit; });
-      return hit || net;
-    })
+    fetch(req).then(function(r){
+      if(r && r.ok){ var cp = r.clone(); caches.open(CACHE_NAME).then(function(c){ c.put(req, cp); }); }
+      return r;
+    }).catch(function(){ return caches.match(req); })
   );
 });
 

@@ -114,7 +114,7 @@
 <script>
 var UFS=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 UFS.forEach(function(u){var o=document.createElement('option');o.value=u;o.textContent=u;document.getElementById('uf').appendChild(o);});
-function pncpLink(o){var c=(o.orgaoEntidade&&o.orgaoEntidade.cnpj)||'';if(c&&o.sequencialCompra&&o.anoCompra){return 'https://pncp.gov.br/app/editais/'+c+'/'+o.anoCompra+'/'+o.sequencialCompra;}return o.linkProcessoEletronico||o.linkSistemaOrigem||'';}
+function pncpLink(o){var ctrl=o.numeroControlePNCP||'';if(ctrl)return 'https://pncp.gov.br/app/editais?q='+encodeURIComponent(ctrl);var c=(o.orgaoEntidade&&o.orgaoEntidade.cnpj)||'';if(c&&o.sequencialCompra&&o.anoCompra){return 'https://pncp.gov.br/app/editais/'+c+'/'+o.anoCompra+'/'+o.sequencialCompra;}return o.linkProcessoEletronico||o.linkSistemaOrigem||'';}
 function renderLic(rows){
   document.getElementById('tb').innerHTML=rows.map(function(o){
     var org=o.orgaoEntidade?o.orgaoEntidade.razaoSocial:'';
@@ -123,9 +123,10 @@ function renderLic(rows){
     var mod='<span class="mod '+modPNCP(o.modalidadeNome)+'" title="'+esc(o.modalidadeNome||'Modalidade')+'"></span>';
     var pz=prazoPNCP(o);var prazoHtml=pz?'<span class="prazo '+pz.cls+'">'+esc(pz.txt)+'</span>':'';
     var lnk=pncpLink(o);
-    var det=(o.numeroControlePNCP?('<a class="btn ghost" href="/licitacao/'+encodeURIComponent(o.numeroControlePNCP)+'" onclick="event.stopPropagation()">Detalhe</a>'):'');
-    var clk=lnk?(' onclick="window.open(this.dataset.lnk,\'_blank\',\'noopener\')" data-lnk="'+escA(lnk)+'" title="Abrir edital no PNCP"'):'';
-    return '<tr'+(lnk?' class="clickable"':'')+clk+'><td>'+mod+esc((o.objetoCompra||'').slice(0,140))+'<br>'+prazoHtml+'</td><td>'+esc(org)+'</td><td>'+esc(u)+'</td><td>'+esc((o.dataPublicacaoPncp||'').slice(0,10))+'</td><td>'+esc(val)+'</td><td style="white-space:nowrap">'+det+(lnk?' <a class="btn ghost" href="'+lnk+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">Edital</a>':'—')+'</td></tr>';
+    var local=o.numeroControlePNCP?('/licitacao/'+encodeURIComponent(o.numeroControlePNCP)):'';
+    var det=(local?('<a class="btn ghost" href="'+local+'" onclick="event.stopPropagation()">Detalhe</a>'):'');
+    var clk=local?(' onclick="location.href=this.dataset.lnk" data-lnk="'+escA(local)+'" title="Ver detalhes da contratacao"'):(lnk?(' onclick="window.open(this.dataset.lnk,\'_blank\',\'noopener\')" data-lnk="'+escA(lnk)+'" title="Abrir edital no PNCP"'):'');
+    return '<tr'+(local||lnk?' class="clickable"':'')+clk+'><td>'+mod+esc((o.objetoCompra||'').slice(0,140))+'<br>'+prazoHtml+'</td><td>'+esc(org)+'</td><td>'+esc(u)+'</td><td>'+esc((o.dataPublicacaoPncp||'').slice(0,10))+'</td><td>'+esc(val)+'</td><td style="white-space:nowrap">'+det+(lnk?' <a class="btn ghost" href="'+lnk+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">PNCP</a>':(local?'':'—'))+'</td></tr>';
   }).join('')||'<tr><td colspan="6">'+emptyHTML('Sem registros no período','Ajuste os filtros ou o período.')+'</td></tr>';
 }
 var _pg=1,_totalPg=1,_tam=20;

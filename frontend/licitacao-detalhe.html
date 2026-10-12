@@ -39,6 +39,7 @@
     <div class="card-h">
       <h2 id="det-title">Licitação</h2>
       <a class="btn ghost" id="btn-pncp" target="_blank" rel="noopener" href="#">Ver no PNCP</a>
+      <a class="btn ghost" id="btn-origem" target="_blank" rel="noopener" href="#" style="display:none">Sistema de origem</a>
     </div>
     
     <div class="grid2" style="margin-top:16px">
@@ -112,7 +113,10 @@ function carregar(id){
     
     document.getElementById('bc-title').textContent = titulo.slice(0,60);
     document.getElementById('det-title').textContent = titulo.slice(0,100);
-    document.getElementById('btn-pncp').href = 'https://pncp.gov.br/app/editais/'+(l.orgaoEntidade?.cnpj||'')+'/'+(l.anoCompra||'')+'/'+(l.sequencialCompra||'');
+    document.getElementById('btn-pncp').href = (l.numeroControlePNCP ? 'https://pncp.gov.br/app/editais?q='+encodeURIComponent(l.numeroControlePNCP) : 'https://pncp.gov.br/app/editais/'+(l.orgaoEntidade?.cnpj||'')+'/'+(l.anoCompra||'')+'/'+(l.sequencialCompra||''));
+    var origem = l.linkProcessoEletronico || l.linkSistemaOrigem || '';
+    var bOrg = document.getElementById('btn-origem');
+    if (/^https?:\/\//i.test(origem)) { bOrg.href = origem; bOrg.style.display = ''; }
     document.getElementById('objeto').textContent = l.objetoCompra || '—';
     
     // Info principal
