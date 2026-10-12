@@ -112,7 +112,7 @@ function carregar(id){
     
     document.getElementById('bc-title').textContent = titulo.slice(0,60);
     document.getElementById('det-title').textContent = titulo.slice(0,100);
-    document.getElementById('btn-pncp').href = 'https://pncp.gov.br/app/editais/'+(l.orgaoEntidade?.cnpj||'')+'/'+(l.sequencialCompra||'')+'/'+(l.anoCompra||'');
+    document.getElementById('btn-pncp').href = 'https://pncp.gov.br/app/editais/'+(l.orgaoEntidade?.cnpj||'')+'/'+(l.anoCompra||'')+'/'+(l.sequencialCompra||'');
     document.getElementById('objeto').textContent = l.objetoCompra || '—';
     
     // Info principal

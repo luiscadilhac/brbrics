@@ -114,7 +114,7 @@
 <script>
 var UFS=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 UFS.forEach(function(u){var o=document.createElement('option');o.value=u;o.textContent=u;document.getElementById('uf').appendChild(o);});
-function pncpLink(o){var c=(o.orgaoEntidade&&o.orgaoEntidade.cnpj)||'';if(c&&o.sequencialCompra&&o.anoCompra){return 'https://pncp.gov.br/app/editais/'+c+'/'+o.sequencialCompra+'/'+o.anoCompra;}return o.linkProcessoEletronico||o.linkSistemaOrigem||'';}
+function pncpLink(o){var c=(o.orgaoEntidade&&o.orgaoEntidade.cnpj)||'';if(c&&o.sequencialCompra&&o.anoCompra){return 'https://pncp.gov.br/app/editais/'+c+'/'+o.anoCompra+'/'+o.sequencialCompra;}return o.linkProcessoEletronico||o.linkSistemaOrigem||'';}
 function renderLic(rows){
   document.getElementById('tb').innerHTML=rows.map(function(o){
     var org=o.orgaoEntidade?o.orgaoEntidade.razaoSocial:'';

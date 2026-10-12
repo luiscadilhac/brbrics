@@ -1,5 +1,5 @@
 // BrBRICS - homepage
-function pncpLink(ctrl){if(!ctrl)return '';var p=String(ctrl).split('-');if(p.length<3)return '';var na=p[2].split('/');if(na.length<2)return '';return 'https://pncp.gov.br/app/editais/'+p[0]+'/'+p[1]+'/'+na[1];}
+function pncpLink(ctrl){if(!ctrl)return '';var m=String(ctrl).match(/^(\d{14})-1-(\d{1,6})\/(\d{4})$/);if(!m)return '';return 'https://pncp.gov.br/app/editais/'+m[1]+'/'+m[3]+'/'+parseInt(m[2],10);}
 function propLink(id){return 'https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao='+encodeURIComponent(id);}
 function propIdFromUri(uri){var m=String(uri||'').match(/proposicoes\/(\d+)/);return m?m[1]:'';}
 function fail(id,msg){var el=document.getElementById(id);if(el)el.innerHTML='<p class="muted">'+msg+' <button class="btn ghost" onclick="location.reload()">Tentar de novo</button></p>';}
