@@ -163,6 +163,8 @@ function carregar(id){
     document.getElementById('loading').style.display='none';
     document.getElementById('erro').style.display='block';
     document.getElementById('erro-msg').textContent = e.message;
+    var portal='https://pncp.gov.br/app/editais?q='+encodeURIComponent(ID);
+    document.getElementById('erro-msg').innerHTML = esc(e.message)+'<br><br><a class="btn" href="'+portal+'" target="_blank" rel="noopener">Abrir esta contratação no portal do PNCP</a>';
   });
 }
 function addRow(dl, label, value){

@@ -138,19 +138,34 @@ app.get('/api/dou', function(req, res){
 });
 
 // ---- Detail pages (canonical URLs para SEO e compartilhamento) ----
-// Licitação PNCP (wildcard: numeroControlePNCP contém "/" — ex. 12345678000100-1-000001/2026)
+// Licitação PNCP (wildcard: numeroControlePNCP contém "/" — máscara CNPJ-1-SEQ/ANO).
+// Detalhe correto (doc PNCP): GET /v1/orgaos/{cnpj}/compras/{ano}/{sequencial} (+ /itens).
 app.get('/api/licitacao/*', function(req, res){
   var id = String((req.params&&req.params[0])||'').trim();
   if(!id) return res.status(400).json({erro:'Informe ID da licitação (numeroControlePNCP)'});
+  var linkPortal = 'https://pncp.gov.br/app/editais?q='+encodeURIComponent(id);
+  var m = id.match(/^(\d{14})-1-(\d{1,6})\/(\d{4})$/);
+  if(!m) return res.status(400).json({erro:'ID fora do padrão numeroControlePNCP (CNPJ-1-SEQ/ANO)', linkPortal:linkPortal});
+  var cnpj = m[1], seq = String(parseInt(m[2],10)), ano = m[3];
   var ck = 'lic_det_'+id;
   var hit = cacheGet(ck); if(hit) return res.json(hit);
-  // Busca no PNCP por numeroControlePNCP
-  getJSON('https://pncp.gov.br/api/consulta/v1/contratacoes/'+encodeURIComponent(id)).then(function(r){
-    var dados = r.data || (r.data && r.data.dados) || r.data;
-    if(!dados) return res.status(404).json({erro:'Licitação não encontrada'});
-    var out = {fonte:'PNCP', licitacao:dados, canonical:siteBase()+'/licitacao/'+encodeURIComponent(id), atualizadoEm:new Date().toISOString()};
-    cacheSet(ck, out, 3600000); res.json(out);
-  }).catch(function(e){ res.status(502).json({erro:'PNCP indisponível', detalhe:String((e&&e.message)||e).slice(0,160)}); });
+  var baseDet = 'https://pncp.gov.br/api/consulta/v1/orgaos/'+cnpj+'/compras/'+ano+'/'+seq;
+  getJSON(baseDet).then(function(r){
+    var dados = (r.data&&r.data.dados)||r.data;
+    if(!dados || (r.status!==200 && !dados.numeroControlePNCP && dados.sequencialCompra==null)) {
+      return res.status(502).json({erro:'PNCP não retornou o detalhe', detalhe:String((r.data&&r.data.message)||('HTTP '+r.status)).slice(0,160), linkPortal:linkPortal});
+    }
+    // Itens em paralelo (não fatal se falhar)
+    getJSON(baseDet+'/itens', {}, 10000).then(function(ri){
+      var itens = (ri.data&&ri.data.dados)||(Array.isArray(ri.data)?ri.data:[]);
+      if(itens&&itens.length) dados.itens = itens;
+      var out = {fonte:'PNCP', licitacao:dados, canonical:siteBase()+'/licitacao/'+encodeURIComponent(id), linkPortal:linkPortal, atualizadoEm:new Date().toISOString()};
+      cacheSet(ck, out, 3600000); res.json(out);
+    }).catch(function(){
+      var out = {fonte:'PNCP', licitacao:dados, canonical:siteBase()+'/licitacao/'+encodeURIComponent(id), linkPortal:linkPortal, atualizadoEm:new Date().toISOString()};
+      cacheSet(ck, out, 3600000); res.json(out);
+    });
+  }).catch(function(e){ res.status(502).json({erro:'PNCP indisponível', detalhe:String((e&&e.message)||e).slice(0,160), linkPortal:linkPortal}); });
 });
 
 // Proposição Câmara
