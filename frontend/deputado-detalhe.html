@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pg-title">Deputado — BrBRICS</title>
+<meta name="description" id="pg-desc" content="Perfil do deputado: gastos com cota parlamentar, presença em plenário e proposições">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="BrBRICS">
+<meta property="og:title" content="Deputado — BrBRICS">
+<meta property="og:description" content="Perfil do deputado: gastos com cota parlamentar, presença em plenário e proposições">
+<meta property="og:image" id="og-img" content="https://brbrics.onrender.com/logo-brics.png">
+<meta property="og:url" id="og-url" content="">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" id="canonical" href="">
+<script type="application/ld+json" id="jsonld"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+</header>
+<main class="wrap">
+  <nav class="breadcrumb" style="margin:16px 0"><a href="index.html">Início</a> / <a href="proposicoes.html">Congresso</a> / <span id="bc-title">Deputado</span></nav>
+  
+  <section class="card" id="loading" style="text-align:center;padding:40px">
+    <div class="skel" style="width:200px;height:24px;margin:0 auto 16px"></div>
+    <div class="skel" style="width:300px;height:16px;margin:0 auto"></div>
+  </section>
+  
+  <section class="card" id="detalhe" style="display:none">
+    <div class="card-h" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <img id="foto" src="" alt="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;background:#1a1a2e">
+      <div>
+        <h2 id="nome" style="margin:0"></h2>
+        <div id="partido-uf" class="muted" style="font-size:14px"></div>
+      </div>
+      <a class="btn ghost" id="btn-camara" target="_blank" rel="noopener" href="#" style="margin-left:auto">Ver na Câmara</a>
+    </div>
+    
+    <div class="grid3" style="margin-top:16px" id="kpis"></div>
+    
+    <div class="tabs" style="margin-top:16px">
+      <button class="tab-btn active" data-tab="gastos">Gastos (Cota)</button>
+      <button class="tab-btn" data-tab="presenca">Presença</button>
+      <button class="tab-btn" data-tab="proposicoes">Proposições</button>
+    </div>
+    
+    <div id="tab-gastos" class="tab-panel">
+      <div class="toolbar">
+        <label>Período</label>
+        <select id="gasto-ano"><option value="2026">2026</option><option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option></select>
+        <select id="gasto-mes"><option value="">Todos os meses</option><option value="01">Jan</option><option value="02">Fev</option><option value="03">Mar</option><option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option><option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option><option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option></select>
+        <button class="btn" id="btn-gastos">Atualizar</button>
+      </div>
+      <div class="grid2" style="margin-top:12px">
+        <div>
+          <h3>Por tipo de despesa</h3>
+          <div id="gastos-tipos" class="list"></div>
+        </div>
+        <div>
+          <h3>Detalhamento</h3>
+          <div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Tipo</th><th>Fornecedor</th><th>Valor</th></tr></thead><tbody id="tb-gastos"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="tab-presenca" class="tab-panel" style="display:none">
+      <h3>Presença em Plenário (últimas 30 sessões)</h3>
+      <div id="presenca-list" class="list"></div>
+    </div>
+    
+    <div id="tab-proposicoes" class="tab-panel" style="display:none">
+      <h3>Proposições de autoria (últimas 20)</h3>
+      <div id="prop-list" class="list"></div>
+    </div>
+  </section>
+  
+  <section class="card" id="erro" style="display:none;text-align:center">
+    <h3>Não foi possível carregar</h3>
+    <p class="muted" id="erro-msg"></p>
+    <button class="btn" onclick="location.reload()">Tentar novamente</button>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fonte: Câmara dos Deputados.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+var ID = new URLSearchParams(location.search).get('id') || (location.pathname.split('/').pop());
+if(!ID){ document.getElementById('loading').style.display='none'; document.getElementById('erro').style.display='block'; document.getElementById('erro-msg').textContent='ID não informado'; }
+else carregar(ID);
+
+var DEPUTADO = null;
+function carregar(id){
+  jget('/api/deputado/'+encodeURIComponent(id)).then(function(r){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('detalhe').style.display='block';
+    DEPUTADO = r.deputado;
+    if(!DEPUTADO){ throw new Error('Deputado não encontrado'); }
+    
+    // SEO meta
+    document.getElementById('pg-title').textContent = DEPUTADO.nome + ' — BrBRICS';
+    document.getElementById('pg-desc').content = 'Deputado ' + DEPUTADO.nome + ' (' + DEPUTADO.siglaPartido + '/' + DEPUTADO.siglaUf + ') - Gastos, presença e proposições';
+    document.getElementById('og-url').content = r.canonical || location.href;
+    document.getElementById('canonical').href = r.canonical || location.href;
+    if(DEPUTADO.urlFoto) document.getElementById('og-img').content = DEPUTADO.urlFoto;
+    var jsonld = {"@context":"https://schema.org","@type":"Person","name":DEPUTADO.nome,"identifier":DEPUTADO.id,"memberOf":{"@type":"GovernmentOrganization","name":"Câmara dos Deputados"},"politicalParty":DEPUTADO.siglaPartido,"jobTitle":"Deputado Federal","sameAs":["https://www.camara.leg.br/deputados/"+DEPUTADO.id],"url":r.canonical||location.href};
+    document.getElementById('jsonld').textContent = JSON.stringify(jsonld);
+    
+    document.getElementById('bc-title').textContent = DEPUTADO.nome;
+    document.getElementById('nome').textContent = DEPUTADO.nome;
+    document.getElementById('partido-uf').textContent = DEPUTADO.siglaPartido + ' / ' + DEPUTADO.siglaUf;
+    document.getElementById('foto').src = DEPUTADO.urlFoto || '';
+    document.getElementById('foto').alt = 'Foto de ' + DEPUTADO.nome;
+    document.getElementById('btn-camara').href = 'https://www.camara.leg.br/deputados/'+DEPUTADO.id;
+    
+    // KPIs
+    var g = r.gastos||{};
+    document.getElementById('kpis').innerHTML = 
+      '<div class="stat"><b>R$ '+Number(g.total||0).toLocaleString('pt-BR',{minimumFractionDigits:2})+'</b><span>Total gasto no período</span></div>' +
+      '<div class="stat"><b>'+(g.porTipo?.length||0)+'</b><span>Tipos de despesa</span></div>' +
+      '<div class="stat"><b>'+(g.detalhes?.length||0)+'</b><span>Lançamentos</span></div>';
+    
+    renderGastos(g);
+    renderPresenca(r.presenca||{presencas:[]});
+    renderProposicoes(r.proposicoes||[]);
+  }).catch(function(e){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('erro').style.display='block';
+    document.getElementById('erro-msg').textContent = e.message;
+  });
+}
+
+function renderGastos(g){
+  var gt = document.getElementById('gastos-tipos');
+  gt.innerHTML = (g.porTipo||[]).map(function(t){
+    var pct = g.total?Math.round(t.valor/g.total*100):0;
+    return '<div class="rank" style="align-items:center"><div style="flex:1"><div style="display:flex;justify-content:space-between"><span>'+esc(t.tipo)+'</span><b>R$ '+Number(t.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})+'</b></div><div style="height:6px;background:#1a1a2e;border-radius:3px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:var(--grad)"></div></div></div><small class="muted">'+pct+'%</small></div>';
+  }).join('') || '<p class="muted">Sem gastos no período.</p>';
+  
+  var tbg = document.getElementById('tb-gastos');
+  tbg.innerHTML = (g.detalhes||[]).slice(0,30).map(function(d){
+    return '<tr><td>'+esc(d.dataDocumento?d.dataDocumento.slice(0,10):'')+'</td><td>'+esc(d.tipoDespesa)+'</td><td>'+esc(d.nomeFornecedor||'')+'</td><td style="text-align:right"><b>R$ '+Number(d.valorLiquido||0).toLocaleString('pt-BR',{minimumFractionDigits:2})+'</b></td></tr>';
+  }).join('') || '<tr><td colspan="4" class="muted">Sem detalhes.</td></tr>';
+}
+
+function renderPresenca(pres){
+  var pl = document.getElementById('presenca-list');
+  var lista = (pres.presencas||[]).slice(0,30);
+  if(!lista.length){ pl.innerHTML = '<p class="muted">Dados de presença não disponíveis.</p>'; return; }
+  pl.innerHTML = lista.map(function(p){
+    var presStr = p.descricao||p.tipo||'Presente';
+    var cls = presStr.toLowerCase().includes('ausente')?'v-nao':'v-sim';
+    return '<article style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)"><div><small class="muted">'+esc(p.dataHora?p.dataHora.slice(0,10):'')+'</small><br><b>'+esc(p.descricaoEvento||p.evento||'Sessão')+'</b></div><span class="pill '+cls+'">'+esc(presStr)+'</span></article>';
+  }).join('');
+}
+
+function renderProposicoes(props){
+  var pl = document.getElementById('prop-list');
+  if(!props.length){ pl.innerHTML = '<p class="muted">Nenhuma proposição encontrada.</p>'; return; }
+  pl.innerHTML = props.slice(0,20).map(function(p){
+    return '<article style="padding:8px 0;border-bottom:1px solid var(--line)"><span class="tag">'+esc(p.siglaTipo)+' '+esc(p.numero)+'/'+esc(p.ano)+'</span><h4 style="margin:4px 0">'+esc(p.ementa||'')+'</h4><small class="muted">Apresentada em '+(p.dataApresentacao?new Date(p.dataApresentacao).toLocaleDateString('pt-BR'):'—')+'</small></article>';
+  }).join('');
+}
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(function(b){
+  b.onclick = function(){
+    document.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active');});
+    document.querySelectorAll('.tab-panel').forEach(function(x){x.style.display='none';});
+    b.classList.add('active');
+    document.getElementById('tab-'+b.dataset.tab).style.display='block';
+  };
+});
+
+document.getElementById('btn-gastos').onclick = function(){
+  var ano = document.getElementById('gasto-ano').value;
+  var mes = document.getElementById('gasto-mes').value;
+  jget('/api/deputado/'+encodeURIComponent(ID)+'?ano='+ano+(mes?'&mes='+mes:'')).then(function(r){
+    renderGastos(r.gastos||{});
+  }).catch(function(e){toast('Erro: '+e.message);});
+};
+</script>
+<style>
+.tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.tab-btn{background:none;border:none;color:var(--muted);padding:8px 12px;font-size:13px;cursor:pointer;border-radius:8px}
+.tab-btn.active{color:var(--yellow);background:rgba(255,196,0,.1)}
+.tab-panel{animation:fadein .2s}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.dl-grid{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:14px}
+.dl-grid dt{color:var(--muted);font-weight:500}
+.dl-grid dd{margin:0;color:var(--fg);word-break:break-word}
+</style>
+</body>
+</html>

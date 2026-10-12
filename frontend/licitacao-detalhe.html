@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pg-title">Licitação — BrBRICS</title>
+<meta name="description" id="pg-desc" content="Detalhes da licitação no PNCP - Portal Nacional de Contratações Públicas">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BrBRICS">
+<meta property="og:title" content="Licitação — BrBRICS">
+<meta property="og:description" content="Detalhes da licitação no PNCP - Portal Nacional de Contratações Públicas">
+<meta property="og:image" content="https://brbrics.onrender.com/logo-brics.png">
+<meta property="og:url" id="og-url" content="">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" id="canonical" href="">
+<script type="application/ld+json" id="jsonld"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+</header>
+<main class="wrap">
+  <nav class="breadcrumb" style="margin:16px 0"><a href="index.html">Início</a> / <a href="licitacoes.html">Licitações</a> / <span id="bc-title">Detalhe</span></nav>
+  
+  <section class="card" id="loading" style="text-align:center;padding:40px">
+    <div class="skel" style="width:200px;height:24px;margin:0 auto 16px"></div>
+    <div class="skel" style="width:300px;height:16px;margin:0 auto"></div>
+  </section>
+  
+  <section class="card" id="detalhe" style="display:none">
+    <div class="card-h">
+      <h2 id="det-title">Licitação</h2>
+      <a class="btn ghost" id="btn-pncp" target="_blank" rel="noopener" href="#">Ver no PNCP</a>
+    </div>
+    
+    <div class="grid2" style="margin-top:16px">
+      <div>
+        <h3>Informações principais</h3>
+        <dl class="dl-grid" id="info-principal"></dl>
+      </div>
+      <div>
+        <h3>Órgão / Entidade</h3>
+        <dl class="dl-grid" id="info-orgao"></dl>
+      </div>
+    </div>
+    
+    <div class="grid2" style="margin-top:16px">
+      <div>
+        <h3>Valores</h3>
+        <dl class="dl-grid" id="info-valores"></dl>
+      </div>
+      <div>
+        <h3>Datas / Prazos</h3>
+        <dl class="dl-grid" id="info-datas"></dl>
+      </div>
+    </div>
+    
+    <div style="margin-top:16px">
+      <h3>Objeto da licitação</h3>
+      <p id="objeto" class="muted"></p>
+    </div>
+    
+    <div id="itens" style="margin-top:16px;display:none">
+      <h3>Itens</h3>
+      <div style="overflow-x:auto"><table><thead><tr><th>Descrição</th><th>Quantidade</th><th>Valor unitário</th><th>Valor total</th></tr></thead><tbody id="tb-itens"></tbody></table></div>
+    </div>
+  </section>
+  
+  <section class="card" id="erro" style="display:none;text-align:center">
+    <h3>Não foi possível carregar</h3>
+    <p class="muted" id="erro-msg"></p>
+    <button class="btn" onclick="location.reload()">Tentar novamente</button>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fonte: PNCP.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+var ID = new URLSearchParams(location.search).get('id') || (function(){var m=location.pathname.match(/\/licitacao\/(.+)$/);return m?decodeURIComponent(m[1]):(location.pathname.split('/').pop());})();
+if(!ID){ document.getElementById('loading').style.display='none'; document.getElementById('erro').style.display='block'; document.getElementById('erro-msg').textContent='ID não informado'; }
+else carregar(ID);
+
+function carregar(id){
+  jget('/api/licitacao/'+encodeURIComponent(id)).then(function(r){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('detalhe').style.display='block';
+    var l = r.licitacao;
+    if(!l){ throw new Error('Licitação não encontrada'); }
+    
+    // SEO meta
+    var titulo = l.objetoCompra || 'Licitação '+id;
+    document.getElementById('pg-title').textContent = titulo.slice(0,80) + ' — BrBRICS';
+    document.getElementById('pg-desc').content = (l.objetoCompra||'').slice(0,160);
+    document.getElementById('og-url').content = r.canonical || location.href;
+    document.getElementById('canonical').href = r.canonical || location.href;
+    var jsonld = {"@context":"https://schema.org","@type":"GovernmentProcurement","name":titulo,"description":l.objetoCompra||"","url":r.canonical||location.href,"identifier":id,"offeredBy":{"@type":"GovernmentOrganization","name":l.orgaoEntidade?.razaoSocial||""},"validFrom":l.dataPublicacaoPncp,"validThrough":l.dataEncerramentoProposta};
+    document.getElementById('jsonld').textContent = JSON.stringify(jsonld);
+    
+    document.getElementById('bc-title').textContent = titulo.slice(0,60);
+    document.getElementById('det-title').textContent = titulo.slice(0,100);
+    document.getElementById('btn-pncp').href = 'https://pncp.gov.br/app/editais/'+(l.orgaoEntidade?.cnpj||'')+'/'+(l.sequencialCompra||'')+'/'+(l.anoCompra||'');
+    document.getElementById('objeto').textContent = l.objetoCompra || '—';
+    
+    // Info principal
+    var hp = document.getElementById('info-principal');
+    hp.innerHTML = '';
+    addRow(hp, 'Modalidade', l.modalidadeNome||'—');
+    addRow(hp, 'Situação', l.situacaoCompraNome||'—');
+    addRow(hp, 'Número PNCP', l.numeroControlePNCP||'—');
+    addRow(hp, 'Ano', l.anoCompra||'—');
+    addRow(hp, 'Processo', l.numeroProcesso||'—');
+    addRow(hp, 'Tipo', l.tipoInstrumentoNome||'—');
+    
+    // Órgão
+    var ho = document.getElementById('info-orgao');
+    ho.innerHTML = '';
+    var org = l.orgaoEntidade || {};
+    var unid = l.unidadeOrgao || {};
+    addRow(ho, 'Órgão', org.razaoSocial||'—');
+    addRow(ho, 'CNPJ', org.cnpj||'—');
+    addRow(ho, 'Poder', org.poder||'—');
+    addRow(ho, 'Esfera', org.esferaId||'—');
+    addRow(ho, 'Unidade', unid.nomeUnidade||'—');
+    addRow(ho, 'UF / Município', (unid.ufSigla||'')+' - '+(unid.municipioNome||''));
+    
+    // Valores
+    var hv = document.getElementById('info-valores');
+    hv.innerHTML = '';
+    addRow(hv, 'Valor estimado', l.valorTotalEstimado?('R$ '+Number(l.valorTotalEstimado).toLocaleString('pt-BR',{minimumFractionDigits:2})):'—');
+    addRow(hv, 'Valor homologado', l.valorGlobalHomologado?('R$ '+Number(l.valorGlobalHomologado).toLocaleString('pt-BR',{minimumFractionDigits:2})):'—');
+    
+    // Datas
+    var hd = document.getElementById('info-datas');
+    hd.innerHTML = '';
+    addRow(hd, 'Publicação PNCP', l.dataPublicacaoPncp?l.dataPublicacaoPncp.slice(0,10):'—');
+    addRow(hd, 'Abertura propostas', l.dataAberturaProposta?new Date(l.dataAberturaProposta).toLocaleString('pt-BR'):'—');
+    addRow(hd, 'Encerramento propostas', l.dataEncerramentoProposta?new Date(l.dataEncerramentoProposta).toLocaleString('pt-BR'):'—');
+    addRow(hd, 'Início vigência', l.dataInicioVigencia?new Date(l.dataInicioVigencia).toLocaleDateString('pt-BR'):'—');
+    addRow(hd, 'Fim vigência', l.dataFimVigencia?new Date(l.dataFimVigencia).toLocaleDateString('pt-BR'):'—');
+    
+    // Itens
+    if(l.itens && l.itens.length){
+      document.getElementById('itens').style.display='block';
+      var tbi = document.getElementById('tb-itens');
+      tbi.innerHTML = l.itens.slice(0,20).map(function(it){
+        return '<tr><td>'+esc(it.descricao||'')+'</td><td>'+esc(Number(it.quantidade||0).toLocaleString('pt-BR'))+'</td><td>'+(it.valorUnitarioEstimado?('R$ '+Number(it.valorUnitarioEstimado).toLocaleString('pt-BR',{minimumFractionDigits:2})):'—')+'</td><td>'+(it.valorTotalEstimado?('R$ '+Number(it.valorTotalEstimado).toLocaleString('pt-BR',{minimumFractionDigits:2})):'—')+'</td></tr>';
+      }).join('');
+    }
+  }).catch(function(e){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('erro').style.display='block';
+    document.getElementById('erro-msg').textContent = e.message;
+  });
+}
+function addRow(dl, label, value){
+  dl.innerHTML += '<dt>'+esc(label)+'</dt><dd>'+esc(value)+'</dd>';
+}
+</script>
+<style>
+.dl-grid{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:14px}
+.dl-grid dt{color:var(--muted);font-weight:500}
+.dl-grid dd{margin:0;color:var(--fg);word-break:break-word}
+</style>
+</body>
+</html>

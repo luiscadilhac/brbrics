@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pg-title">Proposição — BrBRICS</title>
+<meta name="description" id="pg-desc" content="Detalhes da proposição na Câmara dos Deputados - tramitação, votações e texto integral">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="BrBRICS">
+<meta property="og:title" content="Proposição — BrBRICS">
+<meta property="og:description" content="Detalhes da proposição na Câmara dos Deputados - tramitação, votações e texto integral">
+<meta property="og:image" content="https://brbrics.onrender.com/logo-brics.png">
+<meta property="og:url" id="og-url" content="">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" id="canonical" href="">
+<script type="application/ld+json" id="jsonld"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+</header>
+<main class="wrap">
+  <nav class="breadcrumb" style="margin:16px 0"><a href="index.html">Início</a> / <a href="proposicoes.html">Congresso</a> / <span id="bc-title">Detalhe</span></nav>
+  
+  <section class="card" id="loading" style="text-align:center;padding:40px">
+    <div class="skel" style="width:200px;height:24px;margin:0 auto 16px"></div>
+    <div class="skel" style="width:300px;height:16px;margin:0 auto"></div>
+  </section>
+  
+  <section class="card" id="detalhe" style="display:none">
+    <div class="card-h">
+      <h2 id="det-title">Proposição</h2>
+      <a class="btn ghost" id="btn-camara" target="_blank" rel="noopener" href="#">Ver na Câmara</a>
+    </div>
+    
+    <div class="tag-row" id="badges" style="margin-bottom:12px"></div>
+    <p class="muted" id="ementa"></p>
+    
+    <div class="grid2" style="margin-top:16px">
+      <div>
+        <h3>Identificação</h3>
+        <dl class="dl-grid" id="info-id"></dl>
+      </div>
+      <div>
+        <h3>Autoria</h3>
+        <dl class="dl-grid" id="info-autor"></dl>
+      </div>
+    </div>
+    
+    <div class="grid2" style="margin-top:16px">
+      <div>
+        <h3>Situação</h3>
+        <dl class="dl-grid" id="info-sit"></dl>
+      </div>
+      <div>
+        <h3>Tramitação</h3>
+        <dl class="dl-grid" id="info-tram"></dl>
+      </div>
+    </div>
+    
+    <div style="margin-top:16px">
+      <h3>Tramitação completa (linha do tempo)</h3>
+      <div id="timeline" class="list"></div>
+    </div>
+  </section>
+  
+  <section class="card" id="erro" style="display:none;text-align:center">
+    <h3>Não foi possível carregar</h3>
+    <p class="muted" id="erro-msg"></p>
+    <button class="btn" onclick="location.reload()">Tentar novamente</button>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fonte: Câmara dos Deputados.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=14"></script>
+<script>
+var ID = new URLSearchParams(location.search).get('id') || (location.pathname.split('/').pop());
+if(!ID){ document.getElementById('loading').style.display='none'; document.getElementById('erro').style.display='block'; document.getElementById('erro-msg').textContent='ID não informado'; }
+else carregar(ID);
+
+function carregar(id){
+  jget('/api/proposicao/'+encodeURIComponent(id)).then(function(r){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('detalhe').style.display='block';
+    var p = r.proposicao;
+    if(!p){ throw new Error('Proposição não encontrada'); }
+    
+    var sigla = p.siglaTipo||'', num = p.numero||'', ano = p.ano||'';
+    var titulo = sigla+' '+num+'/'+ano;
+    
+    // SEO meta
+    document.getElementById('pg-title').textContent = titulo + ' — BrBRICS';
+    document.getElementById('pg-desc').content = (p.ementa||'').slice(0,160);
+    document.getElementById('og-url').content = r.canonical || location.href;
+    document.getElementById('canonical').href = r.canonical || location.href;
+    var jsonld = {"@context":"https://schema.org","@type":"Legislation","name":titulo,"description":p.ementa||"","identifier":p.id,"legislationType":sigla,"legislationNumber":num+"/"+ano,"legislationDate":p.dataApresentacao,"legislativeBody":{"@type":"GovernmentOrganization","name":"Câmara dos Deputados"},"url":r.canonical||location.href};
+    document.getElementById('jsonld').textContent = JSON.stringify(jsonld);
+    
+    document.getElementById('bc-title').textContent = titulo;
+    document.getElementById('det-title').textContent = titulo;
+    document.getElementById('btn-camara').href = 'https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao='+p.id;
+    
+    document.getElementById('badges').innerHTML = '<span class="tag">'+esc(sigla)+' '+esc(num)+'/'+esc(ano)+'</span>' +
+      (p.statusProposicao?'<span class="tag" style="background:var(--line)">'+esc(p.statusProposicao.descricaoSituacao)+'</span>':'') +
+      (p.temaPrincipal?'<span class="tag" style="background:var(--line)">'+esc(p.temaPrincipal)+'</span>':'');
+    document.getElementById('ementa').textContent = p.ementa || '—';
+    
+    // Identificação
+    var ii = document.getElementById('info-id');
+    ii.innerHTML = '';
+    addRow(ii, 'ID', p.id);
+    addRow(ii, 'Tipo', sigla);
+    addRow(ii, 'Número', num);
+    addRow(ii, 'Ano', ano);
+    addRow(ii, 'Apresentação', p.dataApresentacao?new Date(p.dataApresentacao).toLocaleDateString('pt-BR'):'—');
+    addRow(ii, 'Regime', p.regimeTramitacao||'—');
+    
+    // Autoria
+    var ia = document.getElementById('info-autor');
+    ia.innerHTML = '';
+    var aut = p.autores||[];
+    if(aut.length){
+      aut.slice(0,5).forEach(function(a){
+        addRow(ia, a.tipoAutor||'Autor', a.nome||'');
+      });
+      if(aut.length>5) addRow(ia, '...', 'e mais '+(aut.length-5));
+    } else addRow(ia, '—', 'Não informado');
+    
+    // Situação
+    var is = document.getElementById('info-sit');
+    is.innerHTML = '';
+    var sit = p.statusProposicao||{};
+    addRow(is, 'Situação', sit.descricaoSituacao||'—');
+    addRow(is, 'Data', sit.dataSituacao?new Date(sit.dataSituacao).toLocaleDateString('pt-BR'):'—');
+    addRow(is, 'Casa', sit.descricaoOrgao||'—');
+    addRow(is, 'Última ação', p.ultimoDespacho||'—');
+    addRow(is, 'Data última ação', p.dataUltimoDespacho?new Date(p.dataUltimoDespacho).toLocaleDateString('pt-BR'):'—');
+    
+    // Tramitação resumo
+    var it = document.getElementById('info-tram');
+    it.innerHTML = '';
+    var tram = r.tramitacao||[];
+    addRow(it, 'Total de movimentos', tram.length);
+    if(tram.length){
+      var ult = tram[tram.length-1];
+      addRow(it, 'Último órgão', ult.siglaOrgao||ult.descricaoOrgao||'—');
+      addRow(it, 'Última ação', ult.descricaoTramitacao||ult.despacho||'—');
+      addRow(it, 'Data', ult.dataHora?new Date(ult.dataHora).toLocaleString('pt-BR'):'—');
+    }
+    
+    // Timeline completa
+    var tl = document.getElementById('timeline');
+    if(tram.length){
+      tl.innerHTML = tram.reverse().map(function(t){
+        return '<article><h4>'+esc(t.descricaoTramitacao||t.despacho||'-')+'</h4><small class="muted">'+esc(t.dataHora?new Date(t.dataHora).toLocaleString('pt-BR'):'')+(t.siglaOrgao?' · '+esc(t.siglaOrgao):'')+(t.descricaoOrgao?' · '+esc(t.descricaoOrgao):'')+'</small></article>';
+      }).join('');
+    } else {
+      tl.innerHTML = '<p class="muted">Sem tramitação registrada.</p>';
+    }
+  }).catch(function(e){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('erro').style.display='block';
+    document.getElementById('erro-msg').textContent = e.message;
+  });
+}
+function addRow(dl, label, value){
+  dl.innerHTML += '<dt>'+esc(label)+'</dt><dd>'+esc(value)+'</dd>';
+}
+</script>
+<style>
+.dl-grid{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:14px}
+.dl-grid dt{color:var(--muted);font-weight:500}
+.dl-grid dd{margin:0;color:var(--fg);word-break:break-word}
+</style>
+</body>
+</html>

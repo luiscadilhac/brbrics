@@ -74,6 +74,11 @@
     <p class="kicker">Resultados da busca</p>
     <h1><span id="busca-termo" class="hl">carregando…</span></h1>
     <p class="sub" id="busca-estats"></p>
+    <div class="toolbar" style="justify-content:center;margin-top:12px">
+      <input id="alerta-email" type="email" placeholder="Seu email para acompanhar este termo" style="min-width:240px">
+      <button class="btn" id="btn-alerta">Criar alerta</button>
+      <span class="muted" id="alerta-st"></span>
+    </div>
   </section>
 
   <section class="card">
@@ -179,6 +184,20 @@ function renderReg(data){
   document.getElementById('res-reg').innerHTML = html || '<p class="muted">Nenhum resultado.</p>';
   document.getElementById('cnt-reg').textContent = n+' resultados';
 }
+
+(function(){
+  var ba=document.getElementById('btn-alerta');
+  if(ba) ba.onclick=function(){
+    var em=(document.getElementById('alerta-email')||{}).value||'';
+    var st=document.getElementById('alerta-st');
+    if(st)st.textContent='Salvando...';
+    fetch('/api/alertas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({termo:q,email:em})})
+      .then(function(r){return r.json().then(function(b){return {ok:r.ok,b:b};});})
+      .then(function(x){
+        if(st)st.textContent=x.ok?('✓ '+(x.b.message||'Alerta criado')):('Erro: '+((x.b&&x.b.erro)||'verifique o email'));
+      }).catch(function(){if(st)st.textContent='Erro de rede.';});
+  };
+})();
 
 if(q){
   var total=0;

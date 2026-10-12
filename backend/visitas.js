@@ -44,7 +44,7 @@ function registrarVisitas(app){
   });
   // Resumo agregado (protegido por chave quando PAINEL_TOKEN definido)
   app.get('/api/visitas/resumo', function(req,res){
-    var token=process.env.PAINEL_TOKEN||'Xh6FlrjVfAIEKnxqk7zdy4ZB81sW';
+    var token=process.env.PAINEL_TOKEN||'';
     var aberto=!token;
     if(token&&String(req.query.chave||'')!==token){
       return res.status(403).json({erro:'acesso negado', dica:'informe ?chave= (defina PAINEL_TOKEN no servidor)'});

@@ -119,7 +119,8 @@ jget('/api/proposicoes').then(function(p){
 
 // ===== DOU =====
 jget('/api/dou').then(function(dou){
-  document.getElementById('manchetes').innerHTML='<article><span class="tag">DOU</span><h4>Edição de hoje no Diário Oficial</h4><p><a href="'+dou.linkBusca+'" target="_blank" rel="noopener">Abrir busca do dia '+esc(dou.data)+' na Imprensa Nacional</a></p></article>';
+  var el=document.getElementById('manchetes');if(!el)return;
+  el.innerHTML='<article><span class="tag">DOU</span><h4>Edição de hoje no Diário Oficial</h4><p><a href="'+dou.linkBusca+'" target="_blank" rel="noopener">Abrir busca do dia '+esc(dou.data)+' na Imprensa Nacional</a></p></article>';
 }).catch(function(e){fail('manchetes','DOU indisponivel no momento.');});
 
 // ===== Justiça (Tribunais) =====

@@ -34,6 +34,22 @@ function getJSON(url, opts, timeout){
     })
     .finally(function(){ clearTimeout(timer); });
 }
+
+// getJSON com timeout de conexão (Promise.race) — sem travar a rota se a fonte enrolar
+function getJSONFast(url, timeout){
+  timeout = timeout || 5000;
+  return Promise.race([
+    fetch(url, { headers: { 'Accept': 'application/json', 'User-Agent': 'BrBRICS/1.0' } })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ return { status: 200, data: d }; })
+      .catch(function(e){ return { status: 0, error: String(e) }; }),
+    new Promise(function(_, reject){
+      setTimeout(function(){ reject(new Error('Timeout '+timeout+'ms')); }, timeout);
+    })
+  ]);
+}
+// Base pública do site (Render + domínio próprio). Defina SITE_URL no Render.
+function siteBase(){ return (process.env.SITE_URL||'https://brbrics.onrender.com').replace(/\/+$/,''); }
 function addDays(d, n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
 function fmtPNCP(d){function p(n){return String(n).padStart(2,'0');}return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());}
 function fmtDOU(d){function p(n){return String(n).padStart(2,'0');}return p(d.getDate())+'-'+p(d.getMonth()+1)+'-'+d.getFullYear();}
@@ -65,12 +81,7 @@ app.get('/api/licitacoes', function(req, res){
   }).catch(function(e){ res.status(502).json({ erro: 'PNCP indisponivel', detalhe: String((e&&e.message)||e) }); });
 });
 
-// ---- Camara (com retry + fallback) ----
-var FALLBACK_PROP = [
-  { siglaTipo: 'PL', numero: 5539, ano: 2026, id: 2647402, ementa: 'Turismo pet friendly: regras de acesso e permanencia de caes e gatos em servicos turisticos.' },
-  { siglaTipo: 'PL', numero: 5538, ano: 2026, id: 2647400, ementa: 'Proposicao recente da Camara dos Deputados (fallback offline).' },
-  { siglaTipo: 'PEC', numero: 12, ano: 2026, id: 2647399, ementa: 'Proposta de Emenda a Constituicao em tramitacao (fallback offline).' }
-];
+// ---- Camara (sem dados inventados: se a API falhar, erro honesto + lista vazia) ----
 app.get('/api/proposicoes', function(req, res){
   var pagina = parseInt(req.query.pagina||'1',10)||1;
   var itens = parseInt(req.query.itens||'15',10)||15;
@@ -78,8 +89,7 @@ app.get('/api/proposicoes', function(req, res){
   var ck = 'prop_'+pagina+'_'+itens+'_'+q;
   var hit = cacheGet(ck); if(hit) return res.json(hit);
   getJSON('https://dadosabertos.camara.leg.br/api/v2/proposicoes?ordem=DESC&ordenarPor=id&itens='+Math.max(itens,50)+'&pagina='+pagina).then(function(r){
-    var dados = (r.data&&r.data.dados)?r.data.dados:r.data;
-    if(!dados || !dados.length) return res.json({ fonte: 'Camara (fallback)', offline: true, dados: FALLBACK_PROP });
+    var dados = (r.data&&r.data.dados)?r.data.dados:(Array.isArray(r.data)?r.data:[]);
     if(q){
       dados = dados.filter(function(x){
         var texto = (x.ementa||'')+' '+(x.siglaTipo||'')+' '+(x.numero||'')+' '+(x.ano||'');
@@ -88,7 +98,7 @@ app.get('/api/proposicoes', function(req, res){
     }
     var out = { fonte: 'Camara dos Deputados - Dados Abertos', dados: dados.slice(0,itens) };
     cacheSet(ck, out); res.json(out);
-  }).catch(function(){ res.json({ fonte: 'Camara (fallback)', offline: true, dados: FALLBACK_PROP }); });
+  }).catch(function(e){ res.status(502).json({ fonte: 'Camara dos Deputados - Dados Abertos', erro: 'Camara indisponivel', detalhe: String((e&&e.message)||e).slice(0,160), dados: [] }); });
 });
 
 // ---- Senado ----
@@ -108,9 +118,7 @@ app.get('/api/indicadores', function(req, res){
   function next(){
     if(i >= keys.length){
       var has = Object.keys(out).some(function(k){return out[k]&&out[k].length;});
-      if(!has) return res.json({ fonte: 'BCB (fallback)', offline: true, dados: {
-        ipca: [{ data: '01/09/2026', valor: '0.82' }], selic: [{ data: '10/10/2026', valor: '13.75' }],
-        cambio: [{ data: '10/10/2026', valor: '5.14' }], igpm: [{ data: '01/09/2026', valor: '1.57' }] } });
+      if(!has) return res.status(502).json({ fonte: 'Banco Central - SGS', erro: 'BCB indisponivel', dados: { ipca: [], selic: [], cambio: [], igpm: [] } });
       var ok = { fonte: 'Banco Central - SGS', series: SGS, dados: out };
       cacheSet('ind', ok); return res.json(ok);
     }
@@ -129,6 +137,46 @@ app.get('/api/dou', function(req, res){
   res.json({ fonte: 'Imprensa Nacional (DOU)', data: data, linkBusca: url });
 });
 
+// ---- Detail pages (canonical URLs para SEO e compartilhamento) ----
+// Licitação PNCP (wildcard: numeroControlePNCP contém "/" — ex. 12345678000100-1-000001/2026)
+app.get('/api/licitacao/*', function(req, res){
+  var id = String((req.params&&req.params[0])||'').trim();
+  if(!id) return res.status(400).json({erro:'Informe ID da licitação (numeroControlePNCP)'});
+  var ck = 'lic_det_'+id;
+  var hit = cacheGet(ck); if(hit) return res.json(hit);
+  // Busca no PNCP por numeroControlePNCP
+  getJSON('https://pncp.gov.br/api/consulta/v1/contratacoes/'+encodeURIComponent(id)).then(function(r){
+    var dados = r.data || (r.data && r.data.dados) || r.data;
+    if(!dados) return res.status(404).json({erro:'Licitação não encontrada'});
+    var out = {fonte:'PNCP', licitacao:dados, canonical:siteBase()+'/licitacao/'+encodeURIComponent(id), atualizadoEm:new Date().toISOString()};
+    cacheSet(ck, out, 3600000); res.json(out);
+  }).catch(function(e){ res.status(502).json({erro:'PNCP indisponível', detalhe:String((e&&e.message)||e).slice(0,160)}); });
+});
+
+// Proposição Câmara
+app.get('/api/proposicao/:id', function(req, res){
+  var id = String(req.params.id||'').replace(/\D/g,'');
+  if(!id) return res.status(400).json({erro:'Informe ID da proposição'});
+  var ck = 'prop_det_'+id;
+  var hit = cacheGet(ck); if(hit) return res.json(hit);
+  var base = 'https://dadosabertos.camara.leg.br/api/v2/proposicoes/'+id;
+  getJSON(base).then(function(r1){
+    var prop0 = (r1.data&&r1.data.dados)||null;
+    getJSON(base+'/tramitacoes').then(function(r2){
+      if(!prop0) return res.status(404).json({erro:'Proposição não encontrada'});
+      var out = {fonte:'Câmara dos Deputados', proposicao:prop0, tramitacao:((r2.data&&r2.data.dados)||[]).slice(-30), canonical:siteBase()+'/proposicao/'+id, atualizadoEm:new Date().toISOString()};
+      cacheSet(ck, out, 3600000); res.json(out);
+    }).catch(function(){
+      if(!prop0) return res.status(404).json({erro:'Proposição não encontrada'});
+      var out = {fonte:'Câmara dos Deputados', proposicao:prop0, tramitacao:[], canonical:siteBase()+'/proposicao/'+id, atualizadoEm:new Date().toISOString()};
+      cacheSet(ck, out, 3600000); res.json(out);
+    });
+  }).catch(function(e){ res.status(502).json({erro:'Câmara indisponível', detalhe:String((e&&e.message)||e).slice(0,160)}); });
+});
+
+// (Removido stub de /api/deputado/:id — a rota real vive em backend/deputados.js.
+ // O stub antigo reescrevia req.url sem responder e pendurava a requisição.)
+
 // ---- Edição Semanal - Destaques do DOU (via RSS feeds oficiais) ----
 app.get('/api/edicao/destaques', function(req, res){
   var hit = cacheGet('edicao_destaques');
@@ -143,7 +191,7 @@ app.get('/api/edicao/destaques', function(req, res){
   ];
   var Parser = null;
   try { Parser = require('rss-parser'); } catch(e){}
-  if(!Parser) return res.json({ fonte: 'IN/DOU (RSS)', periodo: periodo, secao1: [], secao3: [] });
+  if(!Parser) return res.json({ fonte: 'IN/DOU (RSS)', periodo: periodo, secao1: [], secao3: [], erro: 'rss-parser não instalado' });
   var parser = new Parser();
   var fetch = require('node-fetch');
   Promise.all(feeds.map(function(f){
@@ -159,7 +207,6 @@ app.get('/api/edicao/destaques', function(req, res){
             var link = item.link||'';
             var pub = item.pubDate || item.isoDate || '';
             var orgao = '';
-            // tenta extrair órgão do título (padrão DOU: "ÓRGÃO - Título")
             var m = title.match(/^([A-ZÇÃÕ\s\.\-]+?)\s*[-–—]\s*(.+)$/);
             if(m){ orgao = m[1].trim(); title = m[2].trim(); }
             return { secao: x.secao, tipo: x.tipo, titulo: title, link: link, data: pub ? new Date(pub).toLocaleDateString('pt-BR') : '', orgao: orgao };
@@ -171,24 +218,7 @@ app.get('/api/edicao/destaques', function(req, res){
   })).then(function(results){
     var sec1 = results.find(function(r){ return r.secao==='Seção 1'; }) || { items: [] };
     var sec3 = results.find(function(r){ return r.secao==='Seção 3'; }) || { items: [] };
-    // Fallback com dados de exemplo se RSS estiver vazio (demonstração da estrutura)
-    if(!sec1.items.length && !sec3.items.length){
-      var hojeStr = fmtDOU(hoje);
-      var ontemStr = fmtDOU(new Date(hoje.getTime()-86400000));
-      var anteontemStr = fmtDOU(new Date(hoje.getTime()-2*86400000));
-      sec1.items = [
-        { secao: 'Seção 1', tipo: 'normativo', titulo: 'Decreto nº 12.345, de 10 de outubro de 2026 — Regulamenta a Lei nº 14.133/2021, dispondo sobre contratações públicas emergenciais', link: 'https://www.in.gov.br/en/web/dou/-/decreto-n-12.345-2026', data: hojeStr, orgao: 'PRESIDÊNCIA DA REPÚBLICA' },
-        { secao: 'Seção 1', tipo: 'normativo', titulo: 'Portaria nº 5.678, de 9 de outubro de 2026 — Designa servidores para compor comissão de transição do novo marco regulatório de licitações', link: 'https://www.in.gov.br/en/web/dou/-/portaria-n-5.678-2026', data: ontemStr, orgao: 'MINISTÉRIO DA GESTÃO E DA INOVAÇÃO' },
-        { secao: 'Seção 1', tipo: 'normativo', titulo: 'Nomeação de Maria Silva Santos para o cargo de Diretora do Departamento de Fiscalização de Contratos', link: 'https://www.in.gov.br/en/web/dou/-/nomeacao-maria-silva-santos', data: anteontemStr, orgao: 'CONTROLADORIA-GERAL DA UNIÃO' },
-        { secao: 'Seção 1', tipo: 'normativo', titulo: 'Resolução nº 42/2026 — Aprova novo regimento interno da Comissão de Ética Pública', link: 'https://www.in.gov.br/en/web/dou/-/resolucao-n-42-2026', data: anteontemStr, orgao: 'COMISSÃO DE ÉTICA PÚBLICA' }
-      ];
-      sec3.items = [
-        { secao: 'Seção 3', tipo: 'edital', titulo: 'Edital de Pregão Eletrônico nº 78/2026 — Contratação de solução integrada de TI para expansão de data center', link: 'https://www.in.gov.br/en/web/dou/-/edital-pregao-78-2026', data: hojeStr, orgao: 'SECRETARIA DE SEGURANÇA PÚBLICA/SP' },
-        { secao: 'Seção 3', tipo: 'edital', titulo: 'Edital de Concorrência nº 12/2026 — Concessão de serviço público de abastecimento de água em 15 municípios', link: 'https://www.in.gov.br/en/web/dou/-/edital-concorrencia-12-2026', data: ontemStr, orgao: 'CAGECE - CEARÁ' },
-        { secao: 'Seção 3', tipo: 'edital', titulo: 'Aviso de Licitação — Pregão Eletrônico para aquisição de materiais hospitalares (SRP)', link: 'https://www.in.gov.br/en/web/dou/-/aviso-licitacao-hospitalares', data: ontemStr, orgao: 'MINISTÉRIO DA SAÚDE' },
-        { secao: 'Seção 3', tipo: 'edital', titulo: 'Extrato de Contrato nº 3.456/2026 — Prestação de serviços de vigilância armada', link: 'https://www.in.gov.br/en/web/dou/-/extrato-contrato-3.456-2026', data: anteontemStr, orgao: 'TRIBUNAL REGIONAL FEDERAL DA 1ª REGIÃO' }
-      ];
-    }
+    // SEM FALLBACK FAKE - retorna vazio se RSS falhar
     var out = { fonte: 'Imprensa Nacional — DOU (RSS oficial)', periodo: periodo, secao1: sec1.items, secao3: sec3.items, atualizadoEm: new Date().toISOString() };
     cacheSet('edicao_destaques', out, 3600000); // 1h cache
     res.json(out);
@@ -224,6 +254,11 @@ app.get('/api/status', function(req, res){
     { id: 'comex', nome: 'MDIC - ComexStat', url: base+'/api/comex/meta' },
     { id: 'fipe', nome: 'Tabela Fipe', url: base+'/api/fipe/marcas?tipo=carros' },
     { id: 'mercado', nome: 'Mercado (bolsa/cripto/ptax)', url: base+'/api/mercado/resumo' },
+    { id: 'proposicao', nome: 'Câmara - Detalhe proposição', url: base+'/api/proposicao/2647402' },
+    { id: 'deputados', nome: 'Câmara - Deputados', url: base+'/api/deputados' },
+    { id: 'emendas', nome: 'Emendas parlamentares', url: base+'/api/emendas' },
+    { id: 'repasses', nome: 'Repasses federais', url: base+'/api/repasses' },
+    { id: 'dou_edicao', nome: 'DOU - Edição da semana', url: base+'/api/edicao/destaques' },
     { id: 'sitemap', nome: 'SEO - Sitemap', url: base+'/sitemap.xml' },
     { id: 'rssgeral', nome: 'RSS geral', url: base+'/rss.xml' }
   ];
@@ -241,17 +276,11 @@ app.get('/api/status', function(req, res){
 function preaquecer(){
   var base = 'http://localhost:'+PORT;
   ['/api/licitacoes','/api/proposicoes','/api/indicadores','/api/focus','/api/tribunais/noticias','/api/reguladores','/api/manchetes','/api/ibge/noticias','/api/ibge/estados','/api/fipe/marcas?tipo=carros','/api/mercado/resumo','/sitemap.xml',
-   '/api/biomas/cobertura','/api/biomas/alertas','/api/biomas/fogo','/api/biomas/estatisticas','/api/biomas/saldo','/api/biomas/ranking',
-   '/api/minerais/processos','/api/minerais/substancias','/api/minerais/producao','/api/minerais/barragens','/api/minerais/cfem',
-   '/api/satelites/tle/25544','/api/satelites/populares','/api/satelites/ativos','/api/satelites/focos','/api/satelites/focos?bbox=-50,-20,-40,-10&sensor=viirs_snpp&dias=1',
-   '/api/satelites/ativos','/api/satelites/tle/ISS','/api/satelites/passagem/25544?lat=-23.55&lon=-46.63','/api/satelites/focos?bbox=-50,-20,-40,-10&sensor=viirs_snpp&dias=1',
-   '/api/minerais/processos','/api/minerais/substancias','/api/minerais/producao','/api/minerais/barragens','/api/minerais/cfem',
-   '/api/biomas/cobertura','/api/biomas/alertas','/api/biomas/fogo','/api/biomas/estatisticas','/api/biomas/saldo','/api/biomas/ranking',
-   '/api/minerais/processos','/api/minerais/substancias','/api/minerais/producao','/api/minerais/barragens','/api/minerais/cfem',
-   '/api/satelites/tle/25544','/api/satelites/populares','/api/satelites/ativos','/api/satelites/focos','/api/satelites/focos?bbox=-50,-20,-40,-10&sensor=viirs_snpp&dias=1',
-   '/api/satelites/ativos','/api/satelites/tle/ISS','/api/satelites/passagem/25544?lat=-23.55&lon=-46.63'].forEach(function(p){
-    getJSON(base+p, {}, 20000).catch(function(){});
-  });
+   '/api/legislacao/votacoes','/api/legislacao/agenda','/api/legislacao/senado',
+   '/api/dou','/api/edicao/destaques',
+   '/api/emendas','/api/repasses','/api/deputados','/api/deputados/gastos/ranking'].forEach(function(p){
+     getJSON(base+p, {}, 20000).catch(function(){});
+   });
 }
 setTimeout(preaquecer, 3000);
 
@@ -268,12 +297,6 @@ try {
   var comex = require('./comex');
   var fipe = require('./fipe');
   var mercado = require('./mercado');
-var biomas = require('./biomas');
-var minerais = require('./minerais');
-var satelites = require('./satelites');
-var biomas = require('./biomas');
-var minerais = require('./minerais');
-var satelites = require('./satelites');
   trib.registrarTribunais(app, cacheGet, cacheSet);
   not.registrarNoticias(app, cacheGet, cacheSet);
   not.registrarReguladores(app, cacheGet, cacheSet);
@@ -285,26 +308,84 @@ var satelites = require('./satelites');
   energia.registrarEnergia(app, cacheGet, cacheSet, getJSON);
   comex.registrarComex(app, cacheGet, cacheSet, getJSON);
   fipe.registrarFipe(app, cacheGet, cacheSet, getJSON);
-mercado.registrarMercado(app, cacheGet, cacheSet, getJSON);
-  try {
-    var biomas = require('./biomas');
-    biomas.registrarBiomas(app, cacheGet, cacheSet, getJSON);
-    console.log('Biomas module loaded');
-  } catch(e) { console.log('Erro ao carregar biomas:', e.message); }
-  try {
-    var minerais = require('./minerais');
-    minerais.registrarMinerais(app, cacheGet, cacheSet, getJSON);
-    console.log('Minerais module loaded');
-  } catch(e) { console.log('Erro ao carregar minerais:', e.message); }
-  try {
-    var satelites = require('./satelites');
-    satelites.registrarSatelites(app, cacheGet, cacheSet, getJSON);
-    console.log('Satelites module loaded');
-  } catch(e) { console.log('Erro ao carregar satelites:', e.message); }
+  mercado.registrarMercado(app, cacheGet, cacheSet, getJSON);
   var seo = require('./seo');
   var visitas = require('./visitas');
+  var emendas = require('./emendas');
+  var repasses = require('./repasses');
+  var deputados = require('./deputados');
   seo.registrarSEO(app, cacheGet, cacheSet);
   visitas.registrarVisitas(app);
+  // (legislacao registrada uma única vez acima via `leg`; sem duplicar rotas)
+  emendas.registrarEmendas(app, cacheGet, cacheSet, getJSON);
+  repasses.registrarRepasses(app, cacheGet, cacheSet, getJSON);
+  deputados.registrarDeputados(app, cacheGet, cacheSet, getJSON, getJSONFast);
 } catch(e){ console.log('Modulo tribunais indisponivel:', e.message); }
+
+// ---- Canonical HTML pages (SEO + social cards) ----
+// /licitacao/<numeroControlePNCP> (wildcard: o id do PNCP contém "/")
+app.get('/licitacao/*', function(req, res){
+  var id = String((req.params&&req.params[0])||'').trim();
+  if(!id) return res.redirect(301, '/licitacoes.html');
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'licitacao-detalhe.html'));
+});
+
+// /proposicao/:id.html
+app.get('/proposicao/:id', function(req, res){
+  var id = String(req.params.id||'').replace(/\D/g,'');
+  if(!id) return res.redirect(301, '/proposicoes.html');
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'proposicao-detalhe.html'));
+});
+
+// /deputado/:id.html
+app.get('/deputado/:id', function(req, res){
+  var id = String(req.params.id||'').replace(/\D/g,'');
+  if(!id) return res.redirect(301, '/proposicoes.html');
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'deputado-detalhe.html'));
+});
+
+// Newsletter subscription (+ alerta de busca). Arquivos em dados/ (efêmero no plano free).
+var DADOS_DIR = path.join(__dirname, '..', 'dados');
+var NEWSLETTER_FILE = path.join(DADOS_DIR, 'newsletter.json');
+var ALERTAS_FILE = path.join(DADOS_DIR, 'alertas.json');
+function lerListaJSON(f){
+  var fs = require('fs');
+  try{
+    if(!fs.existsSync(f)) return [];
+    var v = JSON.parse(fs.readFileSync(f,'utf8'));
+    return Array.isArray(v)?v:[];
+  }catch(e){ return []; }
+}
+function salvarListaJSON(f, list){
+  var fs = require('fs');
+  try{
+    if(!fs.existsSync(DADOS_DIR)) fs.mkdirSync(DADOS_DIR, {recursive:true});
+    fs.writeFileSync(f, JSON.stringify(list, null, 2));
+    return true;
+  }catch(e){ return false; }
+}
+app.post('/api/newsletter', function(req, res){
+  var email = String((req.body&&req.body.email)||'').trim().toLowerCase();
+  if(!email || email.indexOf('@')<0 || email.length>120) return res.status(400).json({erro:'Email inválido'});
+  var list = lerListaJSON(NEWSLETTER_FILE);
+  if(list.indexOf(email)<0){ list.push(email); }
+  if(!salvarListaJSON(NEWSLETTER_FILE, list)) return res.status(500).json({erro:'Falha ao salvar (disco indisponível)'});
+  res.json({ok:true, message:'Inscrito com sucesso', total:list.length});
+});
+app.get('/api/newsletter/total', function(req, res){
+  res.json({total: lerListaJSON(NEWSLETTER_FILE).length});
+});
+
+// Search alerts (salva busca para alerta futuro)
+app.post('/api/alertas', function(req, res){
+  var termo = String((req.body&&req.body.termo)||'').trim().toLowerCase().slice(0,80);
+  var email = String((req.body&&req.body.email)||'').trim().toLowerCase();
+  if(!termo || !email || email.indexOf('@')<0) return res.status(400).json({erro:'Informe termo + email válido'});
+  var list = lerListaJSON(ALERTAS_FILE);
+  var key = email+'|'+termo;
+  if(list.indexOf(key)<0){ list.push(key); }
+  if(!salvarListaJSON(ALERTAS_FILE, list)) return res.status(500).json({erro:'Falha ao salvar alerta'});
+  res.json({ok:true, message:'Alerta criado para "'+termo+'"'});
+});
 
 app.listen(PORT, function(){ console.log('BrBRICS em http://localhost:'+PORT); });
