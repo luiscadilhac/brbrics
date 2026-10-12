@@ -132,7 +132,7 @@ function renderLic(data){
     var org=o.orgaoEntidade?esc(o.orgaoEntidade.razaoSocial):'';
     var uf=o.unidadeOrgao?esc(o.unidadeOrgao.ufSigla||''):'';
     var meta=[esc(o.modalidadeNome||''),esc(o.situacaoCompraNome||''),org,(uf?('UF '+uf):'')].filter(Boolean).join(' · ');
-    html+='<article'+(link?' data-lnk="'+link+'" onclick="if(event.target.tagName!==\'A\'&&event.target.tagName!==\'BUTTON\')window.open(this.dataset.lnk,\'_blank\')"':'')+'><span class="tag">PNCP</span><h4>'+(link?'<a href="'+link+'" target="_blank" rel="noopener">'+tit+'</a>':tit)+'</h4><small class="muted">'+meta+'</small></article>';
+    html+='<article'+(link?' data-lnk="'+escA(link)+'" onclick="if(event.target.tagName!==\'A\'&&event.target.tagName!==\'BUTTON\')window.open(this.dataset.lnk,\'_blank\',\'noopener\')"':'')+'><span class="tag">PNCP</span><h4>'+(link?'<a href="'+link+'" target="_blank" rel="noopener">'+tit+'</a>':tit)+'</h4><small class="muted">'+meta+'</small></article>';
   });
   document.getElementById('res-lic').innerHTML = html || '<p class="muted">Nenhum resultado.</p>';
   document.getElementById('cnt-lic').textContent = itens.length+' resultados';

@@ -102,7 +102,7 @@ jget('/api/licitacoes').then(function(lic){
     var uf=o.unidadeOrgao?esc(o.unidadeOrgao.ufSigla||''):'';
     var valor=o.valorTotalEstimado?('R$ '+Number(o.valorTotalEstimado).toLocaleString('pt-BR',{maximumFractionDigits:2})):'';
     var meta=[esc(o.modalidadeNome||''),esc(o.situacaoCompraNome||''),org,(uf?('UF '+uf):''),esc(valor),(o.numeroControlePNCP?esc(o.numeroControlePNCP):'')].filter(function(x){return x;}).join(' · ');
-    html+='<article class="lic-card"'+(link?' data-lnk="'+link+'" onclick="if(event.target.tagName!==\'A\'&&event.target.tagName!==\'BUTTON\')window.open(this.dataset.lnk,\'_blank\')"':'')+'><span class="tag">PNCP</span><h4>'+(link?'<a href="'+link+'" target="_blank" rel="noopener">'+tit+'</a>':tit)+'</h4><small class="muted">'+meta+'</small>'+(link?'<div class="toolbar" style="margin-top:8px"><a class="btn ghost" href="'+link+'" target="_blank" rel="noopener">Abrir edital no PNCP</a></div>':'')+'</article>';
+    html+='<article class="lic-card"'+(link?' data-lnk="'+escA(link)+'" onclick="if(event.target.tagName!==\'A\'&&event.target.tagName!==\'BUTTON\')window.open(this.dataset.lnk,\'_blank\',\'noopener\')"':'')+'><span class="tag">PNCP</span><h4>'+(link?'<a href="'+link+'" target="_blank" rel="noopener">'+tit+'</a>':tit)+'</h4><small class="muted">'+meta+'</small>'+(link?'<div class="toolbar" style="margin-top:8px"><a class="btn ghost" href="'+link+'" target="_blank" rel="noopener">Abrir edital no PNCP</a></div>':'')+'</article>';
   });
   document.getElementById('licitacoes').innerHTML=html||'<p class="muted">Sem registros no período.</p>';
   var st=document.getElementById('st-lic');if(st&&lic.total)st.textContent=Number(lic.total).toLocaleString('pt-BR');
