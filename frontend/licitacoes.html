@@ -14,8 +14,8 @@
 <meta property="og:url" content="https://brbrics.onrender.com/licitacoes.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.png" type="image/png">
-<link rel="stylesheet" href="style.css?v=14">
-<link rel="stylesheet" href="pro.css?v=14">
+<link rel="stylesheet" href="style.css?v=15">
+<link rel="stylesheet" href="pro.css?v=15">
 </head>
 <body>
 <header class="topbar">
@@ -87,11 +87,13 @@
 
   <section class="card">
     <div class="toolbar">
+      <input id="buscaPNCP" placeholder="Buscar no PNCP (objeto, órgão, nº controle)…" style="min-width:280px;flex:1">
+      <button class="btn" id="btn-buscar">Buscar</button>
+      <button class="btn ghost" id="btn-limpar" title="Limpar busca">✕</button>
       <select id="uf"><option value="">Todas as UFs</option></select>
       <label class="muted">Itens/pág.</label>
       <select id="tam"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select>
-      <input id="filtro" placeholder="Filtrar na página atual…">
-      <button class="btn" id="btn-carregar">Atualizar</button>
+      <button class="btn ghost" id="btn-carregar">Atualizar</button>
       <button class="btn ghost" id="btn-csv">Exportar CSV</button>
       <span class="muted" id="status"></span>
     </div>
@@ -110,7 +112,7 @@
 <div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=14"></script>
+<script src="common.js?v=15"></script>
 <script>
 var UFS=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 UFS.forEach(function(u){var o=document.createElement('option');o.value=u;o.textContent=u;document.getElementById('uf').appendChild(o);});
@@ -142,7 +144,7 @@ function renderPager(){
 function carregar(){
   var st=document.getElementById('status');st.textContent='Buscando PNCP (página '+_pg+')...';
   var uf=document.getElementById('uf').value;
-  var q = document.getElementById('filtro').value || '';
+  var q = (document.getElementById('buscaPNCP')||{}).value || '';
   jget('/api/licitacoes?pagina='+_pg+'&tamanhoPagina='+_tam+'&q='+encodeURIComponent(q)).then(function(d1){
     _totalPg=(d1.totalPaginas&&d1.totalPaginas>0)?d1.totalPaginas:1;
     var all=Array.isArray(d1.dados)?d1.dados.slice():[];
@@ -174,9 +176,14 @@ document.getElementById('btn-carregar').onclick=carregar;
 document.getElementById('btn-csv').onclick=exportCSV;
 (function(){var bo=document.getElementById('btn-ordem');if(bo)bo.onclick=ordenarPorData;})();
 (function(){var sel=document.getElementById('tam');if(sel){sel.value=String(_tam);sel.onchange=function(){_tam=parseInt(sel.value,10)||20;_pg=1;carregar();};}})();
-document.getElementById('filtro').oninput=function(e){
-  if(window._lic)renderLic(window._lic.filter(function(o){return (o.objetoCompra||'').toLowerCase().indexOf(e.target.value.toLowerCase())>=0;}));
-};
+(function(){
+  var bb=document.getElementById('btn-buscar');
+  if(bb)bb.onclick=function(){_pg=1;carregar();};
+  var bl=document.getElementById('btn-limpar');
+  if(bl)bl.onclick=function(){var i=document.getElementById('buscaPNCP');if(i)i.value='';_pg=1;carregar();};
+  var bi=document.getElementById('buscaPNCP');
+  if(bi)bi.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();_pg=1;carregar();}};
+})();
 carregar();
 </script>
 </body>

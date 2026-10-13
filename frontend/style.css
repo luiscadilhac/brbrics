@@ -1,6 +1,6 @@
 :root{
   --bg:#0c0c0e; --bg2:#131316; --card:#17171c; --card2:#1e1e24;
-  --ink:#93c5fd; --paper:#93c5fd; --muted:#a7a7b3; --line:#2a2a32;
+  --ink:#e8ecf3; --paper:#e8ecf3; --muted:#a7a7b3; --line:#2a2a32;
   --yellow:#FFC400; --orange:#FF7A00;
   --grad:linear-gradient(135deg,#FFC400,#FF7A00);
   --radius:16px;
