@@ -97,11 +97,11 @@ function navIco(key){
 var BRBRICS_NAV=[
   {t:'Início',h:'index.html',ic:'home'},
   {t:'Diário Oficial',h:'edicao.html',ic:'file',sub:[{t:'Edição da Semana',h:'edicao.html',ic:'calendar'},{t:'Manchetes do Dia',h:'manchetes.html',ic:'news'},{t:'Buscar no DOU',h:'busca.html?q=dou',ic:'search'}]},
-  {t:'Licitações',h:'licitacoes.html',ic:'clipcheck',sub:[{t:'Todas (PNCP)',h:'licitacoes.html',ic:'file'},{t:'Por Órgão/UF',h:'diretorios.html',ic:'pin'}]},
+  {t:'Licitações',h:'licitacoes.html',ic:'clipcheck',sub:[{t:'Todas (PNCP)',h:'licitacoes.html',ic:'file'}]},
   {t:'Congresso',h:'proposicoes.html',ic:'landmark',sub:[{t:'Proposições Recentes',h:'proposicoes.html',ic:'clock'},{t:'Busca Avançada',h:'legislacao.html',ic:'sliders'},{t:'Buscar no Congresso',h:'busca.html?q=proposicao',ic:'search'}]},
   {t:'Indicadores',h:'indicadores.html',ic:'chart',sub:[{t:'Séries BCB',h:'indicadores.html',ic:'chart'},{t:'Boletim Focus 2026',h:'indicadores.html',ic:'trend'},{t:'Bolsa e cripto',h:'index.html#mercado'},{t:'IPCA 12m & Desemprego',h:'indicadores.html',ic:'users'}]},
   {t:'Tribunais',h:'tribunais.html',ic:'scale',sub:[{t:'Consulta Processual (DataJud)',h:'tribunais.html',ic:'search'},{t:'Jurisprudência por Tema',h:'tribunais.html',ic:'book'},{t:'Notícias dos Tribunais',h:'tribunais.html',ic:'news'}]},
-  {t:'Notícias',h:'manchetes.html',ic:'news',sub:[{t:'Manchetes',h:'manchetes.html',ic:'news'},{t:'Agências & Ministérios',h:'reguladores.html',ic:'building'},{t:'Diretórios Oficiais',h:'diretorios.html',ic:'folder'}]},
+  {t:'Notícias',h:'manchetes.html',ic:'news',sub:[{t:'Manchetes',h:'manchetes.html',ic:'news'},{t:'Agências & Ministérios',h:'reguladores.html',ic:'building'},{t:'Diretórios Oficiais',h:'diretorios.html',ic:'folder'},{t:'Por Órgão/UF',h:'diretorios.html',ic:'pin'}]},
   {t:'Mais dados',h:'territorio.html',ic:'globe',sub:[{t:'Território (IBGE)',h:'territorio.html',ic:'pin'},{t:'Clima nas capitais',h:'clima.html',ic:'clima'},{t:'Contas públicas',h:'contas.html',ic:'banknote'},{t:'Energia',h:'energia.html',ic:'zap'},{t:'Comércio exterior',h:'comex.html',ic:'trend'},{t:'Guia Fipe',h:'fipe.html',ic:'car'},{t:'Agro e safra',h:'agro.html',ic:'leaf'}]},
   {t:'Sobre',h:'sobre.html',ic:'info'}
 ];
