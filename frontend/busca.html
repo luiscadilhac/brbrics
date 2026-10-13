@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Busca — BrBRICS</title>
 <meta name="description" content="Busca global no BrBRICS: licitações, proposições, indicadores, tribunais e Diário Oficial.">
-<link rel="stylesheet" href="style.css?v=14">
-<link rel="stylesheet" href="pro.css?v=14">
+<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="pro.css?v=16">
 </head>
 <body>
 <header class="topbar">
@@ -75,9 +75,8 @@
     <h1><span id="busca-termo" class="hl">carregando…</span></h1>
     <p class="sub" id="busca-estats"></p>
     <div class="toolbar" style="justify-content:center;margin-top:12px">
-      <input id="alerta-email" type="email" placeholder="Seu email para acompanhar este termo" style="min-width:240px">
-      <button class="btn" id="btn-alerta">Criar alerta</button>
-      <span class="muted" id="alerta-st"></span>
+      <input id="busca-termo-input" type="search" placeholder="Digite o que procura (ex: medicamento, escola, obra)…" style="min-width:300px;flex:1;max-width:460px">
+      <button class="btn" id="btn-buscar">Buscar</button>
     </div>
   </section>
 
@@ -114,7 +113,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=14"></script>
+<script src="common.js?v=16"></script>
 <script>
 function pncpLink(ctrl){if(!ctrl)return '';var m=String(ctrl).match(/^(\d{14})-1-(\d{1,6})\/(\d{4})$/);if(!m)return '';return '/licitacao/'+encodeURIComponent(String(ctrl));}
 function propLink(id){return 'https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao='+encodeURIComponent(id);}
@@ -186,17 +185,15 @@ function renderReg(data){
 }
 
 (function(){
-  var ba=document.getElementById('btn-alerta');
-  if(ba) ba.onclick=function(){
-    var em=(document.getElementById('alerta-email')||{}).value||'';
-    var st=document.getElementById('alerta-st');
-    if(st)st.textContent='Salvando...';
-    fetch('/api/alertas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({termo:q,email:em})})
-      .then(function(r){return r.json().then(function(b){return {ok:r.ok,b:b};});})
-      .then(function(x){
-        if(st)st.textContent=x.ok?('✓ '+(x.b.message||'Alerta criado')):('Erro: '+((x.b&&x.b.erro)||'verifique o email'));
-      }).catch(function(){if(st)st.textContent='Erro de rede.';});
-  };
+  var bi=document.getElementById('busca-termo-input');
+  if(bi){ bi.value=q||''; }
+  function irBuscar(){
+    var t=((document.getElementById('busca-termo-input')||{}).value||'').trim();
+    location.href='busca.html'+(t?('?q='+encodeURIComponent(t)):'');
+  }
+  var bb=document.getElementById('btn-buscar');
+  if(bb)bb.onclick=irBuscar;
+  if(bi)bi.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();irBuscar();}};
 })();
 
 if(q){
