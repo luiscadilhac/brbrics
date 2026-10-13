@@ -97,7 +97,7 @@ function navIco(key){
 var BRBRICS_NAV=[
   {t:'Início',h:'index.html',ic:'home'},
   {t:'Diário Oficial',h:'edicao.html',ic:'file',sub:[{t:'Edição da Semana',h:'edicao.html',ic:'calendar'},{t:'Manchetes do Dia',h:'manchetes.html',ic:'news'},{t:'Buscar no DOU',h:'busca.html?q=dou',ic:'search'}]},
-  {t:'Licitações',h:'licitacoes.html',ic:'clipcheck',sub:[{t:'Todas (PNCP)',h:'licitacoes.html',ic:'file'},{t:'Buscar Licitações',h:'licitacoes.html',ic:'search'},{t:'Por Órgão/UF',h:'diretorios.html',ic:'pin'}]},
+  {t:'Licitações',h:'licitacoes.html',ic:'clipcheck',sub:[{t:'Todas (PNCP)',h:'licitacoes.html',ic:'file'},{t:'Por Órgão/UF',h:'diretorios.html',ic:'pin'}]},
   {t:'Congresso',h:'proposicoes.html',ic:'landmark',sub:[{t:'Proposições Recentes',h:'proposicoes.html',ic:'clock'},{t:'Busca Avançada',h:'legislacao.html',ic:'sliders'},{t:'Buscar no Congresso',h:'busca.html?q=proposicao',ic:'search'}]},
   {t:'Indicadores',h:'indicadores.html',ic:'chart',sub:[{t:'Séries BCB',h:'indicadores.html',ic:'chart'},{t:'Boletim Focus 2026',h:'indicadores.html',ic:'trend'},{t:'Bolsa e cripto',h:'index.html#mercado'},{t:'IPCA 12m & Desemprego',h:'indicadores.html',ic:'users'}]},
   {t:'Tribunais',h:'tribunais.html',ic:'scale',sub:[{t:'Consulta Processual (DataJud)',h:'tribunais.html',ic:'search'},{t:'Jurisprudência por Tema',h:'tribunais.html',ic:'book'},{t:'Notícias dos Tribunais',h:'tribunais.html',ic:'news'}]},
