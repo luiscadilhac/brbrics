@@ -1,10 +1,10 @@
-# Atlas Clone — portal de transparência (estilo Atlas Público)
+# BrBRICS (Projeto BRICS) — portal de transparência
 
 Clone educacional com **dados públicos reais** via backend próprio.
 
 ## Rodar
 ```powershell
-cd "$env:USERPROFILE\Desktop\atlas-clone"
+cd "$env:USERPROFILE\Desktop\projeto brics"
 npm install
 npm start
 # abrir http://localhost:3000
