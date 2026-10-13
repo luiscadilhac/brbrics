@@ -69,13 +69,32 @@ app.get('/api/licitacoes', function(req, res){
   var url = 'https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial='+ini+'&dataFinal='+fim+'&codigoModalidadeContratacao='+modalidade+'&pagina='+pagina+'&tamanhoPagina='+Math.max(tamanho,50);
   getJSON(url).then(function(r){
     var dados=(r.data&&r.data.data)?r.data.data:(Array.isArray(r.data)?r.data:[]);
+    var totalPNCP=(r.data&&r.data.totalRegistros!=null)?r.data.totalRegistros:((r.data&&r.data.totalElementos!=null)?r.data.totalElementos:dados.length);
     if(q){
-      dados = dados.filter(function(o){
-        var texto = (o.objetoCompra||'')+' '+(o.orgaoEntidade&&o.orgaoEntidade.razaoSocial||'')+' '+(o.unidadeOrgao&&o.unidadeOrgao.nomeUnidade||'')+' '+(o.numeroControlePNCP||'');
-        return texto.toLowerCase().indexOf(q) !== -1;
-      });
+      // Filtro local nos 50 itens da página atual; se zerar, tenta páginas 2..6 (PNCP não busca por palavra-chave)
+      var filtrar = function(lista){
+        return lista.filter(function(o){
+          var texto = (o.objetoCompra||'')+' '+(o.orgaoEntidade&&o.orgaoEntidade.razaoSocial||'')+' '+(o.unidadeOrgao&&o.unidadeOrgao.nomeUnidade||'')+' '+(o.numeroControlePNCP||'');
+          return texto.toLowerCase().indexOf(q) !== -1;
+        });
+      };
+      var achados = filtrar(dados);
+      var baseUrl = 'https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial='+ini+'&dataFinal='+fim+'&codigoModalidadeContratacao='+modalidade+'&tamanhoPagina='+Math.max(tamanho,50)+'&pagina=';
+      var pags = [2,3,4,5,6];
+      (function prox(k){
+        if(achados.length>=tamanho || k>=pags.length){
+          var out = { fonte: 'PNCP', periodo: { ini: ini, fim: fim }, modalidade: modalidade, pagina: pagina, tamanhoPagina: tamanho, total: totalPNCP, totalPaginas: totalPNCP?Math.ceil(totalPNCP/tamanho):1, dados: achados.slice(0,tamanho), busca: q, paginasVarridas: 1+k };
+          cacheSet(ck, out); return res.json(out);
+        }
+        getJSON(baseUrl+pags[k]).then(function(r2){
+          var d2=(r2.data&&r2.data.data)?r2.data.data:(Array.isArray(r2.data)?r2.data:[]);
+          achados = achados.concat(filtrar(d2));
+          prox(k+1);
+        }).catch(function(){ prox(k+1); });
+      })(0);
+      return;
     }
-    var total=(r.data&&r.data.totalRegistros!=null)?r.data.totalRegistros:((r.data&&r.data.totalElementos!=null)?r.data.totalElementos:dados.length);
+    var total=totalPNCP;
     var out = { fonte: 'PNCP', periodo: { ini: ini, fim: fim }, modalidade: modalidade, pagina: pagina, tamanhoPagina: tamanho, total: total, totalPaginas: total?Math.ceil(total/tamanho):1, dados: dados.slice(0,tamanho) };
     cacheSet(ck, out); res.json(out);
   }).catch(function(e){ res.status(502).json({ erro: 'PNCP indisponivel', detalhe: String((e&&e.message)||e) }); });
