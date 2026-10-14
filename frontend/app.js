@@ -163,6 +163,7 @@ jget('/api/manchetes').then(function(r){
   // Ticker: mercado + últimas manchetes (breaking, com links)
   window._tickerHeads=items.slice(0,5).map(function(n){return {titulo:n.titulo,link:n.link};});
   renderTicker();
+  setInterval(function(){renderTicker();},3000);
 }).catch(function(){document.getElementById('home-car-loading').textContent='Erro ao carregar manchetes.';});
 
 
