@@ -312,4 +312,9 @@ function buildFooter(){
     +'</div><div class="wrap foot-base"><small class="muted">© '+new Date().getFullYear()+' BrBRICS · Dados públicos com link de conferência na fonte.</small></div>';
   }
 }
-buildNav();buildFooter();initHamburger();initLogoHome();setActiveNav();initSearch();initBackTop();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();initVisita();
+  if(!document.getElementById('ticker-in')){
+    var h=document.querySelector('header');
+    if(h){h.insertAdjacentHTML('beforeend','<div class="ticker"><div class="ticker-track" id="ticker-in">BrBRICS — carregando mercado...</div></div>  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado...</span></div></div>');}
+  }
+  if(typeof renderTicker==='function'){renderTicker();}
+  buildNav();buildFooter();initHamburger();initLogoHome();setActiveNav();initSearch();initBackTop();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();initVisita();
