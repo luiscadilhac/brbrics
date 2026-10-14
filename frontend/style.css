@@ -292,3 +292,5 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
   .carousel{margin:0 -16px 12px}
   .car-track{height:260px}
 }
+
+#mais-lidas{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start;}

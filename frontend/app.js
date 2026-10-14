@@ -93,7 +93,7 @@ html+='<div class="kpi">'+kpiIco(k)+'<b>'+k.toUpperCase()+'</b> - '+(v?esc(v.val
 
 // ===== Licitações =====
 jget('/api/licitacoes').then(function(lic){
-  var itens=Array.isArray(lic.dados)?lic.dados.slice(0,3):[];
+  var itens=Array.isArray(lic.dados)?lic.dados.slice(0,2):[];
   var html='';
   itens.forEach(function(o){
     var link=pncpLink(o.numeroControlePNCP);
@@ -127,7 +127,7 @@ jget('/api/dou').then(function(dou){
 jget('/api/tribunais/noticias').then(function(r){
   var html='';var n=0;
   (r.tribunais||[]).forEach(function(t){(t.noticias||[]).slice(0,2).forEach(function(x){
-    if(n<6){n++;
+    if(n<3){n++;
       var vd=x.video||'';var src=x.imagem||(vd?ytThumb(ytId(vd)):'');
       var img = src ? '<div class="rss-img vid-wrap" style="margin:6px 0"><a class="vid-link" href="'+esc(vd||x.link)+'" target="_blank" rel="noopener" title="Abrir matéria original"><img src="'+esc(src)+'" alt="" style="width:100%;height:auto;border-radius:8px;max-height:160px;object-fit:cover">'+(vd?playIco():'')+'</a></div>' : '';
       var rel=tempoRel(x.data);
@@ -156,10 +156,10 @@ jget('/api/manchetes').then(function(r){
   document.getElementById('home-car-loading').style.display='none';
   var items=(r.manchetes||[]).map(function(n){ if(!n.imagem&&n.video){n.imagem=ytThumb(ytId(n.video));} return n; });
   var comImg=items.filter(function(n){return n.imagem;});
-  var paraCarrossel=comImg.slice(0,5);
+  var paraCarrossel=comImg.slice(0,3);
   if(paraCarrossel.length<3)paraCarrossel=items.slice(0,5);
   if(paraCarrossel.length){_homeMontarCar(paraCarrossel);}
-  _homeRenderGrid(comImg.slice(0,12));
+  _homeRenderGrid(comImg.slice(0,3));
   // Ticker: mercado + últimas manchetes (breaking, com links)
   window._tickerHeads=items.slice(0,5).map(function(n){return {titulo:n.titulo,link:n.link};});
   renderTicker();
