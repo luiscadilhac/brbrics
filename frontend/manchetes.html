@@ -72,7 +72,7 @@
     </div>
   </div>
 </header>
-<div class="ticker"><div class="ticker-track" id="ticker-in">BrBRICS — carregando mercado...</div></div>  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado...</span></div></div>
+<div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 <main class="wrap">
   <section class="hero" style="padding:28px 0;text-align:center">
     <p class="kicker">Notícias Oficiais em Tempo Real</p>
@@ -119,7 +119,7 @@
 <div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=14"></script>
+<script src="common.js?v=24"></script>
 <script>
 function limpar(t){return String(t==null?'':t).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');}
 function fmtData(d){if(!d)return '';try{return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
@@ -234,6 +234,6 @@ document.body.addEventListener('click',function(e){
 });
 carregar();
 </script>
-<script src="app.js?v=14"></script>
+<script src="app.js?v=24"></script>
 </body>
 </html>

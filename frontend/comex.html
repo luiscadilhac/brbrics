@@ -18,7 +18,7 @@
       <input id="busca" type="search" placeholder="Buscar no portal...">
     </div>
   </div>
-  <div class="ticker"><div class="ticker-track" id="ticker-in">BrBRICS — carregando mercado...</div></div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
 </header>
 <main class="wrap">
   <section class="hero" style="padding:28px 0;text-align:center">
@@ -59,7 +59,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=14"></script>
+<script src="common.js?v=24"></script>
 <script>
 function bi(v){return 'US$ '+Number(v||0).toLocaleString('pt-BR');}
 function barras(items, fmt){
@@ -103,6 +103,6 @@ jget('/api/comex/meta').then(function(r){
 }).catch(function(){});
 carregarResumo();
 </script>
-<script src="app.js?v=14"></script>
+<script src="app.js?v=24"></script>
 </body>
 </html>

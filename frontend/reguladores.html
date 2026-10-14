@@ -59,7 +59,7 @@
     </div>
   </div>
 </header>
-<div class="ticker"><div class="ticker-track" id="ticker-in">BrBRICS — carregando mercado...</div></div>  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado...</span></div></div>
+<div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 <main class="wrap">
 <section class="hero" style="padding:28px 0;text-align:center">
 <p class="kicker">RSS oficial gov.br</p>
@@ -70,7 +70,7 @@
 <div class="toolbar" id="tabs" style="gap:8px;margin-bottom:6px"><button class="btn ghost active" data-cat="">Todos</button><button class="btn ghost" data-cat="reg">Agências reguladoras</button><button class="btn ghost" data-cat="min">Ministérios</button></div>
 <div class="toolbar" id="filtros" style="gap:8px;margin-bottom:14px"></div>
 <div id="carousel" class="carousel" style="display:none"><div class="car-track" id="car-track"></div><button class="car-nav prev" id="car-prev" aria-label="Anterior">&#10094;</button><button class="car-nav next" id="car-next" aria-label="Próxima">&#10095;</button><div class="car-dots" id="car-dots"></div></div><div id="feed" class="list"><p class="muted">Clique em carregar.</p></div></main>
-<script src="common.js?v=14">
+<script src="common.js?v=24">
 // ===== Carrossel (fotos do /api/manchetes, reg+min) =====
 var _carItems=[],_carIdx=0,_carTimer=null;
 function _fmtData(d){if(!d)return '';try{return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
@@ -182,5 +182,5 @@ carregar();
 <div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="app.js?v=14"></script>
+<script src="app.js?v=24"></script>
 </body></html>

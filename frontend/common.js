@@ -315,40 +315,57 @@ function buildFooter(){
   if(!document.getElementById('ticker-in')){
     var h=document.querySelector('header');
     if(h){
-      // Cria os 2 feed do header: NEWS (manchetes) e FINANCEIRO (mercado)
-      h.insertAdjacentHTML('beforeend','<div class="ticker"><div class="ticker-track" id="ticker-in"><span class="muted">Carregando manchetes...</span></div></div>  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">B3 • Câmbio • Cripto • Atualizado</span></div></div>');
+      h.insertAdjacentHTML('beforeend','<div class="ticker"><div class="ticker-track" id="ticker-in"><span class="muted">Iniciando...</span></div></div>  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">B3 • Câmbio • Cripto • Atualizado</span></div></div>');
     }
   }
+  var _tickBusy=false;
   function carregarFeed(){
-    jget('/api/manchetes').then(function(m){
-      var itens='';
-      (m.manchetes||[]).slice(0,6).forEach(function(n){
-        var t=String(n.titulo||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});
-        itens+='<span class="tick-sep">///</span><a href="'+escA(n.link)+'" target="_blank" rel="noopener"><span class="tick-ico">●</span>'+escA(t.slice(0,110))+'</a>';
-      });
-      if(!itens)itens='<span class="muted">Sem manchetes.</span>';
-      var e=document.getElementById('ticker-in');
-      if(e){e.innerHTML='<div style="display:inline-block;white-space:nowrap">'+itens+'</div>';}
-    }).catch(function(){var e=document.getElementById('ticker-in');if(e)e.innerHTML='<span class="muted">Manchetes indisponíveis.</span>';});
-    jget('/api/mercado/resumo').then(function(m){
-      var h='';
-      var b=m.bolsa&&m.bolsa.papeis&&m.bolsa.papeis.slice(0,3);
-      b.forEach(function(p){var v=(p.varPct||0).toFixed(2);var c=v>=0?'mkt-up':(v<=0?'mkt-down':'mkt-flat');h+='<span class="tick-sep">///</span><a href="https://www.google.com/finance/quote/'+escA(p.symbol)+':BVMF" target="_blank" rel="noopener"><span class="tick-ico">●</span>'+esc(p.symbol)+' <b>R$ '+esc(String(p.preco||'').slice(0,6))+'</b><small class="'+c+'">'+esc(v)+'%</small></a>';});
-      var c=(m.cripto&&m.cripto.moedas||[]).slice(0,3);
-      c.forEach(function(x){var v=(x.varUsd||0).toFixed(2);var cls=v>=0?'mkt-up':(v<=0?'mkt-down':'mkt-flat');h+='<span class="tick-sep">///</span><a href="https://www.coingecko.com/en/coins/'+escA(x.id)+'" target="_blank" rel="noopener"><span class="tick-ico">●</span>'+esc(x.sigla)+' <b>R$ '+esc(String(x.brl||'').slice(0,6))+'</b><small class="'+cls+'">'+esc(v)+'%</small></a>';});
-      var px=m.ptax;
-      if(px&&px.venda)h+='<span class="tick-sep">///</span><a href="indicadores.html" target="_blank" rel="noopener"><span class="tick-ico">●</span>Dólar R$ '+esc(String(px.venda||'').slice(0,7))+'</a>';
-      if(!h)h='<span class="muted">Mercado indisponível.</span>';
-      var e=document.getElementById('ticker-mkt');
-      if(e){e.innerHTML='<div style="display:inline-block;white-space:nowrap">'+h+'<span class="muted" style="margin-left:6px">'+esc(String(m.atualizadoEm||'').slice(0,16))+'</span></div>';}
-    }).catch(function(){var e=document.getElementById('ticker-mkt');if(e)e.innerHTML='<span class="muted">Mercado indisponível.</span>';});
+    if(_tickBusy)return; _tickBusy=true;
+    // NOTÍCIAS + FINANCEIRO em paralelo (Promise.all) — resposta mais rápida
+    Promise.all([
+      jget('/api/manchetes').catch(function(){return null;}),
+      jget('/api/mercado/resumo').catch(function(){return null;})
+    ]).then(function(rs){
+      _tickBusy=false;
+      var m=rs[0];
+      if(m){
+        var itens='';
+        (m.manchetes||[]).slice(0,6).forEach(function(n){
+          itens+='<span class="tick-sep">///</span><a href="'+escA(n.link)+'" target="_blank" rel="noopener"><span class="tick-ico">●</span>'+escA(String(n.titulo||'').slice(0,110))+'</a>';
+        });
+        if(!itens)itens='<span class="muted">Sem manchetes.</span>';
+        var e1=document.getElementById('ticker-in');
+        if(e1)e1.innerHTML='<div style="display:inline-block;white-space:nowrap">'+itens+'</div>';
+      } else {
+        var e1b=document.getElementById('ticker-in');
+        if(e1b&&!e1b.querySelector('a'))e1b.innerHTML='<span class="muted">Manchetes indisponíveis.</span>';
+      }
+      var mkt=rs[1];
+      if(mkt){
+        var h2='';
+        var b=mkt.bolsa&&mkt.bolsa.papeis||[];
+        b.slice(0,3).forEach(function(p){
+          var v=Number(p.varPct||0).toFixed(2);
+          var c=v>=0?'mkt-up':'mkt-down';
+          h2+='<span class="tick-sep">///</span><a href="https://www.google.com/finance/quote/'+escA(p.symbol)+':BVMF" target="_blank" rel="noopener"><span class="tick-ico">●</span>'+esc(p.symbol)+' <b>R$ '+esc(String(p.preco!=null?p.preco:'—'))+'</b> <small class="'+c+'">'+esc(v)+'%</small></a>';
+        });
+        var cc=mkt.cripto&&mkt.cripto.moedas||[];
+        cc.slice(0,3).forEach(function(x){
+          var v=Number(x.varUsd||0).toFixed(2);
+          var cls=v>=0?'mkt-up':'mkt-down';
+          h2+='<span class="tick-sep">///</span><a href="https://www.coingecko.com/en/coins/'+escA(x.id)+'" target="_blank" rel="noopener"><span class="tick-ico">●</span>'+esc(x.sigla)+' <b>R$ '+esc(String(x.brl!=null?x.brl:'—'))+'</b> <small class="'+cls+'">'+esc(v)+'%</small></a>';
+        });
+        var px=mkt.ptax;
+        if(px&&px.venda)h2+='<span class="tick-sep">///</span><a href="indicadores.html"><span class="tick-ico">●</span>Dólar R$ '+esc(String(px.venda))+'</a>';
+        if(!h2)h2='<span class="muted">Mercado indisponível.</span>';
+        var e2=document.getElementById('ticker-mkt');
+        if(e2)e2.innerHTML='<div style="display:inline-block;white-space:nowrap">'+h2+'</div>';
+      } else {
+        var e2b=document.getElementById('ticker-mkt');
+        if(e2b&&!e2b.querySelector('a'))e2b.innerHTML='<span class="muted">Mercado indisponível.</span>';
+      }
+    }).catch(function(){_tickBusy=false;});
   }
-  if(!document.getElementById('ticker-in')){
-    var h=document.querySelector('header');
-    if(h){
-      h.insertAdjacentHTML('beforeend','<div class="ticker"><div class="ticker-track" id="ticker-in"><span class="muted">Carregando manchetes...</span></div></div>  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">B3 • Câmbio • Cripto • Atualizado</span></div></div>');
-      carregarFeed();
-      setInterval(carregarFeed,180000);
-    }
-  }
+  carregarFeed();
+  setInterval(carregarFeed,120000);
   buildNav();buildFooter();initHamburger();initLogoHome();setActiveNav();initSearch();initBackTop();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();initVisita();
