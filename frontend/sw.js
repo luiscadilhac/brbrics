@@ -1,7 +1,7 @@
 // BrBRICS - Service Worker (rede primeiro em tudo; cache serve so como fallback offline)
 // Incrementar CACHE_NAME junto de qualquer mudanca em .js/.css/.html: o activate apaga o nome antigo.
-var CACHE_NAME = 'brbrics-v37';
-var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/style.css?v=26','/pro.css?v=26','/common.js?v=26','/app.js?v=26','/tribunais-page.js?v=26','/legislacao-page.js?v=26','/areas.js?v=26','/logo-brics.png','/favicon.ico','/favicon.png','/manifest.json'];
+var CACHE_NAME = 'brbrics-v38';
+var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/style.css?v=27','/pro.css?v=27','/common.js?v=27','/app.js?v=27','/tribunais-page.js?v=27','/legislacao-page.js?v=27','/areas.js?v=27','/logo-brics.png','/favicon.ico','/favicon.png','/manifest.json'];
 self.addEventListener('install', function(e){
   self.skipWaiting();
   // addAll() e tudo-ou-nada: um 404 derruba o precache inteiro. Um por um, falha isolada.
@@ -43,7 +43,7 @@ self.addEventListener('fetch', function(e){
     return;
   }
   // Estaticos (css/js/img): REDE PRIMEIRO. Cache-first entregava JS velho para sempre,
-  // porque a chave (?v=26) nunca mudava e o navegador nunca pedia a versao nova.
+  // porque a chave (?v=27) nunca mudava e o navegador nunca pedia a versao nova.
   e.respondWith(
     fetch(req).then(function(r){
       if(r && r.ok){ var cp = r.clone(); caches.open(CACHE_NAME).then(function(c){ c.put(req, cp); }); }
