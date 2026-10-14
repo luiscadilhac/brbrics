@@ -166,6 +166,22 @@ jget('/api/manchetes').then(function(r){
 }).catch(function(){document.getElementById('home-car-loading').textContent='Erro ao carregar manchetes.';});
 
 
+
+// ===== Reguladores Home =====
+jget('/api/reguladores').then(function(r){
+  var html='';var count=0;
+  (r.orgaos||[]).forEach(function(t){
+    if(t.erro)return;
+    (t.noticias||[]).slice(0,1).forEach(function(n){
+      if(count>=3)return;count++;
+      var vd=n.video||'';var src=n.imagem||(vd?ytThumb(ytId(vd)):'' );
+      var img = src ? '<div class="rss-img vid-wrap" style="margin:6px 0"><a class="vid-link" href="'+esc(vd||n.link)+'" target="_blank" rel="noopener" title="Abrir matéria original"><img src="'+esc(src)+'" alt="" style="width:100%;height:auto;border-radius:8px;max-height:140px;object-fit:cover">'+(vd?playIco():'')+'</a></div>' : '';
+      var rel=tempoRel(n.data);
+      html+='<article>'+img+'<div class="tag-row"><span class="tag">'+esc(t.sigla)+'</span>'+(vd?'<span class="tag">Vídeo</span>':'')+favBtnHTML(n.link,n.titulo)+'</div><h4><a href="'+esc(vd||n.link)+'" target="_blank" rel="noopener">'+esc((n.titulo||'').slice(0,110))+'</a></h4><small class="muted">'+(rel?esc(rel):_homeFmtData(n.data))+' · '+esc(t.sigla)+' · '+tempoLeitura(n.resumo)+'</small>'+shareHTML(n.link,n.titulo)+'</article>';
+    });
+  });
+  document.getElementById('reguladores-home').innerHTML=html||emptyHTML('Sem atualizações no momento','Atualize em alguns minutos.');
+}).catch(function(){document.getElementById('reguladores-home').innerHTML='<p class="muted">Feed de reguladores indisponível.</p>';});
 // ===== Carousel Navigation =====
 document.getElementById('home-car-prev').onclick=function(){_homeIrCar(_homeCarIdx-1);_homeIniciarAuto();};
 document.getElementById('home-car-next').onclick=function(){_homeIrCar(_homeCarIdx+1);_homeIniciarAuto();};

@@ -159,7 +159,7 @@ tbody tr:hover{background:rgba(255,196,0,.04)}
 
 /* ===== Toast & Backtop ===== */
 .toast{position:fixed;bottom:22px;right:22px;background:#141419;border:1px solid var(--yellow);color:var(--paper);padding:12px 18px;border-radius:12px;display:none;z-index:50}
-.backtop{position:fixed;bottom:22px;left:22px;background:var(--grad);border:none;width:46px;height:46px;border-radius:50%;font-size:20px;cursor:pointer;display:none;z-index:50;color:#141414}
+.backtop{position:fixed;bottom:22px;right:22px;background:var(--grad);border:none;width:46px;height:46px;border-radius:50%;font-size:20px;cursor:pointer;display:none;z-index:50;color:#141414}
 /* ===== Icones em titulos ===== */
 .card-h h2 .nav-ico,.kicker .nav-ico,.f-col h4 .nav-ico{margin-left:0;margin-right:8px;vertical-align:-3px}
 .card-h h2 .nav-ico svg{width:18px;height:18px}
