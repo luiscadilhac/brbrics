@@ -1,6 +1,6 @@
 // BrBRICS - Service Worker (rede primeiro em tudo; cache serve so como fallback offline)
 // Incrementar CACHE_NAME junto de qualquer mudanca em .js/.css/.html: o activate apaga o nome antigo.
-var CACHE_NAME = 'brbrics-v31';
+var CACHE_NAME = 'brbrics-v32';
 var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/style.css?v=21','/pro.css?v=21','/common.js?v=21','/app.js?v=21','/tribunais-page.js?v=21','/legislacao-page.js?v=21','/areas.js?v=21','/logo-brics.png','/favicon.ico','/favicon.png','/manifest.json'];
 self.addEventListener('install', function(e){
   self.skipWaiting();

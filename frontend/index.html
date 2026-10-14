@@ -172,16 +172,6 @@
     </div>
   </section>
 
-  <section class="card" id="newsletter">
-    <div class="card-h"><h2>Newsletter — resumo da semana</h2><span class="tag" id="nl-count"></span></div>
-    <p class="muted">Um email por semana com licitações, DOU e Congresso. Sem spam, cancele quando quiser.</p>
-    <div class="toolbar">
-      <input id="nl-email" type="email" placeholder="seu@email.com" style="min-width:240px">
-      <button class="btn" id="nl-btn">Assinar</button>
-      <span class="muted" id="nl-st"></span>
-    </div>
-  </section>
-
   <section class="grid2">
     <div class="card">
       <div class="card-h"><h2>Mais lidas</h2><a href="manchetes.html">Manchetes</a></div>
@@ -204,23 +194,5 @@
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
 <script src="common.js?v=14"></script>
 <script src="app.js?v=14"></script>
-<script>
-(function(){
-  var b=document.getElementById('nl-btn');if(!b)return;
-  fetch('/api/newsletter/total').then(function(r){return r.json();}).then(function(d){
-    var c=document.getElementById('nl-count');if(c&&d.total)c.textContent=d.total+' inscritos';
-  }).catch(function(){});
-  b.onclick=function(){
-    var em=(document.getElementById('nl-email')||{}).value||'';
-    var st=document.getElementById('nl-st');if(st)st.textContent='Assinando...';
-    fetch('/api/newsletter',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em})})
-      .then(function(r){return r.json().then(function(x){return {ok:r.ok,x:x};});})
-      .then(function(o){
-        if(st)st.textContent=o.ok?('✓ '+(o.x.message||'Inscrito')):('Erro: '+((o.x&&o.x.erro)||'email inválido'));
-        if(o.ok){var c=document.getElementById('nl-count');if(c&&o.x.total!=null)c.textContent=o.x.total+' inscritos';}
-      }).catch(function(){if(st)st.textContent='Erro de rede.';});
-  };
-})();
-</script>
 </body>
 </html>
