@@ -217,7 +217,7 @@ jget('/api/mercado/resumo').then(function(m){
   var elC=document.getElementById('mercado-cambio');
   if(elC)elC.innerHTML=px.venda?('<div class="kpis"><div class="kpi"><b>Dólar comercial (PTAX)</b> — R$ '+Number(px.venda).toLocaleString('pt-BR',{minimumFractionDigits:4})+' <span class="muted">('+esc(String(px.data||'').slice(0,10))+')</span></div><small class="muted">Compra R$ '+Number(px.compra).toLocaleString('pt-BR',{minimumFractionDigits:4})+' · Fonte: '+esc(px.fonte||'BCB')+'</small></div>'):emptyHTML('Câmbio indisponível','Tente mais tarde.');
   var cs=((m.cripto&&m.cripto.moedas)||[]);
-  var hc=cs.map(function(c){
+  var hc=cs.slice(0,3).map(function(c){
     return '<tr><td><span class="mkt-sym">'+esc(c.sigla)+'</span> <small class="muted">'+esc(c.nome)+'</small></td>'
     +'<td style="text-align:right">US$ '+(c.usd!=null?Number(c.usd).toLocaleString('pt-BR',{maximumFractionDigits:2}):'—')+'<br><small class="muted">R$ '+(c.brl!=null?Number(c.brl).toLocaleString('pt-BR',{maximumFractionDigits:2}):'—')+'</small></td>'
     +'<td style="text-align:right">'+mktVar(c.varUsd)+'</td></tr>';
