@@ -93,7 +93,7 @@ html+='<div class="kpi">'+kpiIco(k)+'<b>'+k.toUpperCase()+'</b> - '+(v?esc(v.val
 
 // ===== Licitações =====
 jget('/api/licitacoes').then(function(lic){
-  var itens=Array.isArray(lic.dados)?lic.dados.slice(0,6):[];
+  var itens=Array.isArray(lic.dados)?lic.dados.slice(0,3):[];
   var html='';
   itens.forEach(function(o){
     var link=pncpLink(o.numeroControlePNCP);
@@ -110,7 +110,7 @@ jget('/api/licitacoes').then(function(lic){
 
 // ===== Congresso =====
 jget('/api/proposicoes').then(function(p){
-  var itens=(p.dados||[]).slice(0,6);var html='';
+  var itens=(p.dados||[]).slice(0,3);var html='';
   itens.forEach(function(x){var tit=esc((x.ementa||'Proposição').slice(0,150));
   html+='<article><span class="tag">'+esc(x.siglaTipo)+' '+esc(x.numero)+'</span><h4><a href="'+propLink(x.id)+'" target="_blank" rel="noopener">'+tit+'</a></h4></article>';});
   document.getElementById('congresso').innerHTML=html||'<p class="muted">Sem dados.</p>';
