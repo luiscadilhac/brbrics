@@ -264,6 +264,27 @@ function initFonte(){
     })((function(){var s=document.createElement('span');s.className='font-ctl';acts[i].appendChild(s);return s;})(),nv);
   }
 }
+function initLogoHome(){
+  // Clicar na logo (banner) sempre carrega o conteúdo de INÍCIO:
+  // - se já está no início, recarrega + volta ao topo (novo conteúdo das APIs)
+  // - se está em outra página, navega para index.html
+  var brands=document.querySelectorAll('a.brand');
+  for(var i=0;i<brands.length;i++){
+    (function(a){
+      if(a.getAttribute('data-home-bound')==='1')return; a.setAttribute('data-home-bound','1');
+      a.setAttribute('href','index.html');
+      a.addEventListener('click',function(e){
+        var cur='';
+        try{cur=(location.pathname.split('/').pop()||'index.html').split('?')[0];}catch(err){cur='';}
+        if(cur===''||cur==='/'||cur==='index.html'){
+          e.preventDefault();
+          try{location.reload();}catch(err){location.href='index.html';}
+          try{window.scrollTo({top:0,behavior:'smooth'});}catch(err2){window.scrollTo(0,0);}
+        }
+      });
+    })(brands[i]);
+  }
+}
 function initVisita(){
   try{
     var ua=navigator.userAgent||'';
@@ -291,4 +312,4 @@ function buildFooter(){
     +'</div><div class="wrap foot-base"><small class="muted">© '+new Date().getFullYear()+' BrBRICS · Dados públicos com link de conferência na fonte.</small></div>';
   }
 }
-buildNav();buildFooter();initHamburger();setActiveNav();initSearch();initBackTop();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();initVisita();
+buildNav();buildFooter();initHamburger();initLogoHome();setActiveNav();initSearch();initBackTop();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();initVisita();
