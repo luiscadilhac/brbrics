@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contato — BrBRICS</title>
+<meta name="description" content="Fale com a equipe do BrBRICS: dúvidas, correções de dados, sugestões de fontes e parcerias.">
+<link rel="icon" href="favicon.ico" type="image/x-icon"><link rel="icon" href="favicon.png" type="image/png" sizes="64x64">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="pro.css?v=14">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav">
+      <a href="index.html">Início</a>
+      <a href="sobre.html">Sobre</a>
+      <a href="contato.html">Contato</a>
+    </nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">Atendimento</p>
+    <h1>Fale <span class="hl">conosco</span></h1>
+    <p class="sub">Dúvidas, correções de dados, sugestões de fontes ou parcerias. Respondemos em até 5 dias úteis.</p>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Email</h2></div>
+    <p><b>E-mail oficial:</b> <a href="mailto:contato@brbrics.com.br" style="color:#FFC400">contato@brbrics.com.br</a></p>
+    <p class="muted">Prefere escrever direto? Use o botão abaixo — abre seu aplicativo de email com o assunto pronto.</p>
+    <div class="toolbar">
+      <input id="ct-assunto" type="text" placeholder="Assunto (ex: correção de dado)" style="min-width:240px;flex:1">
+    </div>
+    <div class="toolbar">
+      <textarea id="ct-msg" rows="5" placeholder="Escreva sua mensagem aqui..." style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0f0f12;color:var(--paper)"></textarea>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="ct-enviar">Abrir email</button>
+      <span class="muted" id="ct-st"></span>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-h"><h2>Antes de escrever</h2></div>
+      <ul class="muted">
+        <li><b>Erro em número?</b> Cada dado tem link de conferência na fonte oficial — confira lá primeiro e nos diga qual.</li>
+        <li><b>Fonte nova?</b> Diga o nome do órgão e o link da API/RSS oficial.</li>
+        <li><b>Não pedimos dados pessoais</b> — nunca envie CPF, senhas ou documentos.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Outros canais</h2></div>
+      <p><b>Sobre o projeto:</b> <a href="sobre.html" style="color:#FFC400">Como produzimos</a></p>
+      <p><b>Privacidade:</b> <a href="privacidade.html" style="color:#FFC400">Política de privacidade (LGPD)</a></p>
+      <p class="muted">O BrBRICS é um portal independente de transparência de dados públicos, sem vínculo com governos ou partidos.</p>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fontes: PNCP, Câmara, Senado, BCB, CNJ, IN/DOU.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="privacidade.html">Privacidade (LGPD)</a><a href="contato.html">Contato</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=26"></script>
+<script>
+document.getElementById('ct-enviar').onclick=function(){
+  var a=(document.getElementById('ct-assunto')||{}).value||'';
+  var m=(document.getElementById('ct-msg')||{}).value||'';
+  var st=document.getElementById('ct-st');
+  if(!m.trim()){if(st)st.textContent='Escreva a mensagem primeiro.';return;}
+  location.href='mailto:contato@brbrics.com.br?subject='+encodeURIComponent('[BrBRICS] '+(a||'Contato'))+'&body='+encodeURIComponent(m);
+  if(st)st.textContent='Abrindo seu email...';
+};
+</script>
+</body>
+</html>

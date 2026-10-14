@@ -108,13 +108,13 @@
 <footer>
   <div class="wrap foot">
     <div><b>BrBRICS</b> — transparência de dados do setor público. Fontes: Câmara, Senado.</div>
-    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="privacidade.html">Privacidade (LGPD)</a><a href="contato.html">Contato</a></div>
   </div>
 </footer>
 <div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=25"></script>
+<script src="common.js?v=26"></script>
 <script>
 function propLink(id){return 'https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao='+encodeURIComponent(id);}
 function verTramitacao(id){
@@ -153,6 +153,6 @@ function renderSen(data){
 jget('/api/proposicoes').then(renderCam).catch(function(){document.getElementById('l-cam').innerHTML='<p class="muted">Erro ao carregar Câmara.</p>';});
 jget('/api/legislacao/senado').then(renderSen).catch(function(){document.getElementById('l-sen').innerHTML='<p class="muted">Erro ao carregar Senado.</p>';});
 </script>
-<script src="app.js?v=25"></script>
+<script src="app.js?v=26"></script>
 </body>
 </html>

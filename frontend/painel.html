@@ -64,12 +64,12 @@
 <footer>
   <div class="wrap foot">
     <div><b>BrBRICS</b> — transparência de dados do setor público.</div>
-    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a></div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="privacidade.html">Privacidade (LGPD)</a><a href="contato.html">Contato</a></div>
   </div>
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=25"></script>
+<script src="common.js?v=26"></script>
 <script>
 try{var qk=new URLSearchParams(location.search).get('chave');if(qk){document.getElementById('chave').value=qk;try{sessionStorage.setItem('brbrics_painel',qk);}catch(e){}}}catch(e){}
 try{var sk=sessionStorage.getItem('brbrics_painel');if(sk)document.getElementById('chave').value=sk;}catch(e){}
@@ -124,6 +124,6 @@ document.getElementById('btn-csv').onclick=function(){
 document.getElementById('chave').addEventListener('keydown',function(e){if(e.key==='Enter')carregarPainel();});
 if(document.getElementById('chave').value)carregarPainel();
 </script>
-<script src="app.js?v=25"></script>
+<script src="app.js?v=26"></script>
 </body>
 </html>

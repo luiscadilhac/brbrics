@@ -6,7 +6,8 @@ var PAGINAS=[
   ['/busca.html','weekly'],['/diretorios.html','monthly'],['/sobre.html','monthly'],
   ['/areas.html','weekly'],['/territorio.html','weekly'],['/clima.html','daily'],
   ['/contas.html','weekly'],['/energia.html','weekly'],['/comex.html','weekly'],
-  ['/fipe.html','monthly'],['/agro.html','weekly'],['/painel.html','monthly']
+  ['/fipe.html','monthly'],['/agro.html','weekly'],['/painel.html','monthly'],
+  ['/contato.html','monthly'],['/privacidade.html','monthly']
 ];
 function escX(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function base(req){return req.protocol+'://'+req.get('host');}
@@ -78,5 +79,11 @@ function registrarSEO(app, cacheGet, cacheSet){
   }
   app.get('/rss.xml',rss);
   app.get('/feed',rss);
+  // ads.txt: autoriza Google AdSense a exibir anúncios neste domínio.
+  // O Google gera seu próprio ID após aprovar a conta — edite o ID abaixo.
+  app.get('/ads.txt', function(req,res){
+    res.set('Content-Type','text/plain; charset=utf-8');
+    res.send('google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0\n');
+  });
 }
 module.exports={registrarSEO:registrarSEO};
