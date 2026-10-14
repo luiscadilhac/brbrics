@@ -314,7 +314,9 @@ function buildFooter(){
 }
   if(!document.getElementById('ticker-in')){
     var h=document.querySelector('header');
-    if(h){h.insertAdjacentHTML('beforeend','<div class="ticker"><div class="ticker-track" id="ticker-in">BrBRICS — carregando mercado...</div></div>  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado...</span></div></div>');}
+    if(h){
+      var track='<span class="tick-market">BrBRICS</span><span class="tick-sep"> /// </span><a href="manchetes.html" target="_blank" rel="noopener"><span class="tick-ico">●</span>Portal de Transparência — dados em tempo real</a>';
+      h.insertAdjacentHTML('beforeend','<div class="ticker"><div class="ticker-track" id="ticker-in">'+track+track+'</div></div>  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">B3 • Câmbio • Cripto • Atualizado</span></div></div>');
+    }
   }
-  if(typeof renderTicker==='function'){renderTicker();}
   buildNav();buildFooter();initHamburger();initLogoHome();setActiveNav();initSearch();initBackTop();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();initVisita();
