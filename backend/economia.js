@@ -6,7 +6,7 @@ function limparOlinda(txt){ return txt.replace(/^\/\*/,'').replace(/\*\/$/,'').t
 // getJSONP: usa o mesmo getJSON mas remove o wrapper /* */ antes do parse
 function getFocus(getJSON, indicador){
   var url = FOCUS_BASE+'?$format=json&$filter='+encodeURIComponent("Indicador eq '"+indicador+"' and DataReferencia eq '2026'")+'&$top=2&$orderby=Data%20desc';
-  return getJSON(url, { 'Accept': 'application/json' }, 20000).then(function(r){
+  return getJSON(url, { 'Accept': 'application/json' }, 10000).then(function(r){
     var arr = null;
     try { arr = JSON.parse(limparOlinda(typeof r.data==='string'?r.data:JSON.stringify(r.data))); } catch(e){}
     var v = (arr && arr.value) || [];
@@ -42,7 +42,7 @@ function registrarEconomia(app, cacheGet, cacheSet, getJSON){
           ipca: rs[0], selic: rs[1], cambio: rs[2], pib: rs[3]
         }
       };
-      cacheSet('focus', out, 60000); res.json(out);
+      cacheSet('focus', out, 600000); res.json(out);
     }).catch(function(e){
       res.status(502).json({ erro: 'Focus indisponivel', detalhe: String((e&&e.message)||e) });
     });
@@ -53,11 +53,11 @@ function registrarEconomia(app, cacheGet, cacheSet, getJSON){
     var hit = cacheGet('economia');
     if(hit) return res.json(hit);
     var base = 'http://localhost:'+(process.env.PORT||3000);
-    var ipca12 = getJSON('https://api.bcb.gov.br/dados/serie/bcdata.sgs.13522/dados/ultimos/2?formato=json', {}, 20000)
+    var ipca12 = getJSON('https://api.bcb.gov.br/dados/serie/bcdata.sgs.13522/dados/ultimos/2?formato=json', {}, 10000)
       .then(function(r){ return Array.isArray(r.data)?r.data:[]; }).catch(function(){ return []; });
-    var desemp = getJSON('https://api.bcb.gov.br/dados/serie/bcdata.sgs.24356/dados/ultimos/2?formato=json', {}, 25000)
+    var desemp = getJSON('https://api.bcb.gov.br/dados/serie/bcdata.sgs.24356/dados/ultimos/2?formato=json', {}, 10000)
       .then(function(r){ return Array.isArray(r.data)?r.data:[]; }).catch(function(){ return []; });
-    var focus = getJSON(base+'/api/focus', {}, 20000)
+    var focus = getJSON(base+'/api/focus', {}, 12000)
       .then(function(r){ return r.data; }).catch(function(){ return null; });
 
     Promise.allSettled([focus, ipca12, desemp]).then(function(r){
@@ -75,7 +75,7 @@ function registrarEconomia(app, cacheGet, cacheSet, getJSON){
         ipca12m: i12.length ? { valor: i12[i12.length-1].valor, data: i12[i12.length-1].data, variacaoPP: variacaoPP(i12) } : null,
         desemprego: des.length ? { valor: des[des.length-1].valor, data: des[des.length-1].data, variacaoPP: variacaoPP(des) } : null
       };
-      cacheSet('economia', out, 60000); res.json(out);
+      cacheSet('economia', out, 600000); res.json(out);
     });
   });
 }

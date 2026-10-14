@@ -1,5 +1,5 @@
 // BrBRICS - biblioteca compartilhada (usada em todas as páginas)
-function jget(url){return fetch(url).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();});}
+function jget(url){return fetch(url).then(function(r){if(!r.ok){return r.json().then(function(b){throw new Error((b&&b.erro)||('HTTP '+r.status));}).catch(function(){throw new Error('HTTP '+r.status);});}return r.json();});}
 function esc(s){var m={'&':'&','<':'<','>':'>'};return String(s==null?'':s).replace(/[&<>]/g,function(c){return m[c];});}
 function toast(m){var t=document.getElementById('toast');if(!t){alert(m);return;}t.textContent=m;t.style.display='block';clearTimeout(t._x);t._x=setTimeout(function(){t.style.display='none';},3200);}
 function last(a){return (Array.isArray(a)&&a.length)?a[a.length-1]:null;}

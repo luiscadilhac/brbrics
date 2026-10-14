@@ -186,14 +186,15 @@ function registrarTribunais(app, cacheGet, cacheSet){
     if(termo.length<3) return res.status(400).json({ erro: 'Informe ao menos 3 letras (ex: tributario, consumidor, previdenciario).' });
     var ck = 'dj_tema_'+t.alias+'_'+termo.toLowerCase()+'_'+qtd+'_'+pagina;
     var hit = cacheGet(ck); if(hit) return res.json(hit);
-    var body = { size: qtd, from: (pagina-1)*qtd, sort: [{ dataAjuizamento: { order: 'desc' } }], query: { multi_match: { query: termo, fields: ['classe.nome^3','assuntos.nome^2','movimentos.nome'] } } };
-    datajudPost(t.alias, body).then(function(r){
+    // multi_match apenas em classe/assuntos (movimentos.nome deixa a query no DataJud lenta e estoura timeout)
+    var body = { size: qtd, from: (pagina-1)*qtd, sort: [{ dataAjuizamento: { order: 'desc' } }], query: { multi_match: { query: termo, fields: ['classe.nome^3','assuntos.nome^2'] } } };
+    datajudPost(t.alias, body, 25000).then(function(r){
       var hits = (r.data&&r.data.hits&&r.data.hits.hits)||[];
       var tot = (r.data&&r.data.hits&&r.data.hits.total)||{};
       var totalAprox = (tot&&tot.value!=null)?tot.value:hits.length;
       var out = { fonte: 'CNJ DataJud', tribunal: t, tema: termo, pagina: pagina, qtd: qtd, totalAprox: totalAprox, totalPaginas: totalAprox?Math.min(200, Math.ceil(totalAprox/qtd)):1, processos: hits.map(function(h){return resumoProcesso(h, t.sigla);}) };
-      cacheSet(ck, out); res.json(out);
-    }).catch(function(e){ res.status(502).json({ erro: 'DataJud indisponivel', detalhe: String((e&&e.message)||e) }); });
+      cacheSet(ck, out, 600000); res.json(out);
+    }).catch(function(e){ res.status(504).json({ erro: 'DataJud demorou demais ou esta indisponivel. Tente novamente.', detalhe: String((e&&e.message)||e) }); });
   });
   // Detalhe do processo com movimentacoes (andamento estilo Jusbrasil)
   app.get('/api/tribunais/detalhe', function(req, res){

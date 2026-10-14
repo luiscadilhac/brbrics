@@ -90,7 +90,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=24"></script>
+<script src="common.js?v=25"></script>
 <script>
 var ID = new URLSearchParams(location.search).get('id') || (function(){var m=location.pathname.match(/\/licitacao\/(.+)$/);return m?decodeURIComponent(m[1]):(location.pathname.split('/').pop());})();
 if(!ID){ document.getElementById('loading').style.display='none'; document.getElementById('erro').style.display='block'; document.getElementById('erro-msg').textContent='ID não informado'; }
@@ -182,6 +182,6 @@ function addRow(dl, label, value){
 .dl-grid dt{color:var(--muted);font-weight:500}
 .dl-grid dd{margin:0;color:var(--fg);word-break:break-word}
 </style>
-<script src="app.js?v=24"></script>
+<script src="app.js?v=25"></script>
 </body>
 </html>
