@@ -35,17 +35,7 @@ function initLightbox(){
   if(lb)lb.addEventListener('click',function(e){if(e.target.id==='lightbox')lb.classList.remove('on');});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'){var l2=document.getElementById('lightbox');if(l2)l2.classList.remove('on');}});
 }
-function initStatus(){
-  jget('/api/status').then(function(r){
-    var ok=(r.fontes||[]).filter(function(f){return f.online;}).length;
-    var tot=(r.fontes||[]).length;
-    var html=(r.fontes||[]).map(function(f){
-      return '<span class="dot '+(f.online?'on':'off')+'"></span> '+esc(f.nome)+(f.online?'':' (off)');
-    }).join(' &nbsp; ');
-    var els=document.querySelectorAll('.st-fontes');
-    for(var i=0;i<els.length;i++)els[i].innerHTML=ok+'/'+tot+' fontes online: '+html;
-  }).catch(function(){});
-}
+// (initStatus removido: lista Fontes Ativas retirada da abertura e do rodapé)
 // Service Worker: network-first + força atualização
 if('serviceWorker' in navigator && location.protocol!=='file:'){
   var __brbrics_reloading = false;
@@ -293,7 +283,7 @@ function buildFooter(){
   var fts=document.querySelectorAll('footer');
   for(var i=0;i<fts.length;i++){
     fts[i].innerHTML='<div class="wrap foot-grid">'
-    +'<div class="f-brand"><img src="logo-brics.png" alt="BrBRICS"><div><b>BrBRICS</b><p class="muted">Transparência de dados do setor público — direto das fontes oficiais, sem intermediários.</p><div class="st-fontes" style="font-size:12px">Verificando fontes...</div></div></div>'
+    +'<div class="f-brand"><img src="logo-brics.png" alt="BrBRICS"><div><b>BrBRICS</b><p class="muted">Transparência de dados do setor público — direto das fontes oficiais, sem intermediários.</p></div></div>'
     +'<div class="f-col"><h4>Seções</h4><a href="index.html">Início</a><a href="edicao.html">Diário Oficial</a><a href="licitacoes.html">Licitações</a><a href="proposicoes.html">Congresso</a><a href="indicadores.html">Indicadores</a><a href="tribunais.html">Tribunais</a></div>'
     +'<div class="f-col"><h4>Mais dados</h4><a href="territorio.html">Território</a><a href="clima.html">Clima</a><a href="contas.html">Contas públicas</a><a href="energia.html">Energia</a><a href="comex.html">Comércio exterior</a><a href="fipe.html">Guia Fipe</a><a href="agro.html">Agro</a></div>'
     +'<div class="f-col"><h4>Institucional</h4><a href="sobre.html">Sobre</a><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="sobre.html">Privacidade (LGPD)</a><a href="painel.html">Painel de visitas</a><a href="/rss.xml">RSS</a></div>'
@@ -301,4 +291,4 @@ function buildFooter(){
     +'</div><div class="wrap foot-base"><small class="muted">© '+new Date().getFullYear()+' BrBRICS · Dados públicos com link de conferência na fonte.</small></div>';
   }
 }
-buildNav();buildFooter();initHamburger();setActiveNav();initSearch();initBackTop();initStatus();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();initVisita();
+buildNav();buildFooter();initHamburger();setActiveNav();initSearch();initBackTop();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();initVisita();

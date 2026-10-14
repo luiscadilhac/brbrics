@@ -155,11 +155,7 @@ tbody tr:hover{background:rgba(255,196,0,.04)}
 .lb-cap a{color:var(--yellow);font-weight:600}
 
 /* ===== Status fontes ===== */
-.st-fontes{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;font-size:12px}
-.st-fontes span{display:flex;align-items:center;gap:5px}
-.st-fontes .dot{width:8px;height:8px;border-radius:50%;background:#3a3a45}
-.st-fontes .dot.on{background:#22c55e;box-shadow:0 0 8px #22c55e}
-.st-fontes .dot.off{background:#ef4444}
+/* (st-fontes removido: lista Fontes Ativas retirada) */
 
 /* ===== Toast & Backtop ===== */
 .toast{position:fixed;bottom:22px;right:22px;background:#141419;border:1px solid var(--yellow);color:var(--paper);padding:12px 18px;border-radius:12px;display:none;z-index:50}
