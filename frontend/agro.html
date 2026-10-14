@@ -18,7 +18,7 @@
       <input id="busca" type="search" placeholder="Buscar no portal...">
     </div>
   </div>
-  <div class="ticker"><div class="ticker-track" id="ticker-in"><span class="tick-market">BrBRICS</span><span class="tick-sep"> /// </span><a href="manchetes.html" target="_blank" rel="noopener"><span class="tick-ico">●</span>Portal de Transparência — dados em tempo real</a><span class="tick-sep"> /// </span><span class="tick-market">BrBRICS</span><span class="tick-sep"> /// </span><a href="manchetes.html" target="_blank" rel="noopener"><span class="tick-ico">●</span>Portal de Transparência — dados em tempo real</a></div></div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">BrBRICS — carregando mercado...</div></div>
 </header>
 <main class="wrap">
   <section class="hero" style="padding:28px 0;text-align:center">
@@ -112,5 +112,6 @@ jget('/api/reguladores').then(function(r){
 }).catch(function(){document.getElementById('res-mapa').innerHTML='<p class="muted">Feed indisponível.</p>';});
 document.getElementById('btn-pam').click();
 </script>
+<script src="app.js?v=14"></script>
 </body>
 </html>
