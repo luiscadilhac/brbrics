@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9633564064128096" crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Território — BrBRICS</title>
 <meta name="description" content="Municípios, população, nomes mais comuns e notícias do IBGE. O Brasil em dados territoriais.">
@@ -61,7 +62,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=26"></script>
+<script src="common.js?v=27"></script>
 <script>
 jget('/api/ibge/estados').then(function(r){
   var sel=document.getElementById('uf');
@@ -115,6 +116,6 @@ jget('/api/ibge/noticias?qtd=6').then(function(r){
   document.getElementById('res-news').innerHTML=html||emptyHTML('Sem notícias','Tente mais tarde.');
 }).catch(function(){document.getElementById('res-news').innerHTML='<p class="muted">Feed indisponível.</p>';});
 </script>
-<script src="app.js?v=26"></script>
+<script src="app.js?v=27"></script>
 </body>
 </html>

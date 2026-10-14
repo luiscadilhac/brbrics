@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9633564064128096" crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contas Públicas — BrBRICS</title>
 <meta name="description" content="RREO e RGF de estados e municípios (Tesouro SICONFI) + Bolsa Família e convênios (CGU).">
@@ -58,7 +59,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=26"></script>
+<script src="common.js?v=27"></script>
 <script>
 jget('/api/contas/status').then(function(r){
   document.getElementById('cgu-status').textContent=r.cguToken?'token ativo':'sem token';
@@ -100,6 +101,6 @@ document.getElementById('btn-bf').onclick=function(){
   }).catch(function(e){document.getElementById('res-bf').innerHTML='<p class="muted">'+esc(e.message)+' — veja <a href="https://portaldatransparencia.gov.br/api-de-dados" target="_blank" rel="noopener">como obter o token</a>.</p>';});
 };
 </script>
-<script src="app.js?v=26"></script>
+<script src="app.js?v=27"></script>
 </body>
 </html>

@@ -80,10 +80,9 @@ function registrarSEO(app, cacheGet, cacheSet){
   app.get('/rss.xml',rss);
   app.get('/feed',rss);
   // ads.txt: autoriza Google AdSense a exibir anúncios neste domínio.
-  // O Google gera seu próprio ID após aprovar a conta — edite o ID abaixo.
   app.get('/ads.txt', function(req,res){
     res.set('Content-Type','text/plain; charset=utf-8');
-    res.send('google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0\n');
+    res.send('google.com, pub-9633564064128096, DIRECT, f08c47fec0942fa0\n');
   });
 }
 module.exports={registrarSEO:registrarSEO};
