@@ -38,7 +38,13 @@ function tituloRuim(t){
   if(t.length<8)return true;
   return /\.(png|jpe?g|gif|svg|webp|pdf|mp4)$/i.test(t);
 }
+// HSTS: força HTTPS no navegador (evita downgrade e melhora segurança no iOS)
+function hstsMiddleware(req, res, next) {
+  res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  next();
+}
 function registrarSEO(app, cacheGet, cacheSet){
+  app.use(hstsMiddleware);
   app.get('/robots.txt', function(req,res){
     res.set('Content-Type','text/plain');
     res.send('User-agent: *\nAllow: /\nSitemap: '+base(req)+'/sitemap.xml\n');

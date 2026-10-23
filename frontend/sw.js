@@ -1,10 +1,8 @@
-// BrBRICS - Service Worker (rede primeiro em tudo; cache serve so como fallback offline)
-// Incrementar CACHE_NAME junto de qualquer mudanca em .js/.css/.html: o activate apaga o nome antigo.
-var CACHE_NAME = 'brbrics-v38';
-var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/style.css?v=27','/pro.css?v=27','/common.js?v=27','/app.js?v=27','/tribunais-page.js?v=27','/legislacao-page.js?v=27','/areas.js?v=27','/logo-brics.png','/favicon.ico','/favicon.png','/manifest.json'];
+// BrBRICS - Service Worker (rede primeiro em tudo; cache so como fallback offline)
+// iOS Safari: sem skipWaiting/clients.claim para evitar travamento
+var CACHE_NAME = 'brbrics-v40';
+var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/style.css?v=28','/pro.css?v=28','/common.js?v=28','/app.js?v=28','/tribunais-page.js?v=28','/legislacao-page.js?v=28','/areas.js?v=28','/logo-brics.png','/favicon.ico','/favicon.png','/manifest.json'];
 self.addEventListener('install', function(e){
-  self.skipWaiting();
-  // addAll() e tudo-ou-nada: um 404 derruba o precache inteiro. Um por um, falha isolada.
   e.waitUntil(caches.open(CACHE_NAME).then(function(c){
     return Promise.all(CORE.map(function(u){
       return fetch(u).then(function(r){ if(r && r.ok) return c.put(u, r); }).catch(function(){});
@@ -14,10 +12,7 @@ self.addEventListener('install', function(e){
 self.addEventListener('activate', function(e){
   e.waitUntil(caches.keys().then(function(ks){
     return Promise.all(ks.map(function(k){ if(k!==CACHE_NAME) return caches.delete(k); }));
-  }).then(function(){ return self.clients.claim(); }));
-});
-self.addEventListener('message', function(e){
-  if(e.data && e.data.type === 'SKIP_WAITING'){ self.skipWaiting(); }
+  }));
 });
 self.addEventListener('fetch', function(e){
   var req = e.request;
@@ -35,20 +30,13 @@ self.addEventListener('fetch', function(e){
       fetch(req).then(function(r){
         var cp = r.clone();
         caches.open(CACHE_NAME).then(function(c){ c.put(req, cp); });
-        return r;
-      }).catch(function(){
-        return caches.match(req).then(function(h){ return h || caches.match('/index.html'); });
-      })
-    );
+        return r;      }).catch(function(){
+        return caches.match(req).then(function(h){ return h || caches.match('/index.html'); });      })    );
     return;
   }
-  // Estaticos (css/js/img): REDE PRIMEIRO. Cache-first entregava JS velho para sempre,
-  // porque a chave (?v=27) nunca mudava e o navegador nunca pedia a versao nova.
+  // Estaticos (css/js/img): REDE PRIMEIRO.
   e.respondWith(
     fetch(req).then(function(r){
       if(r && r.ok){ var cp = r.clone(); caches.open(CACHE_NAME).then(function(c){ c.put(req, cp); }); }
-      return r;
-    }).catch(function(){ return caches.match(req); })
-  );
+      return r;    }).catch(function(){ return caches.match(req); })  );
 });
-

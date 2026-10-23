@@ -36,18 +36,20 @@ function initLightbox(){
   document.addEventListener('keydown',function(e){if(e.key==='Escape'){var l2=document.getElementById('lightbox');if(l2)l2.classList.remove('on');}});
 }
 // (initStatus removido: lista Fontes Ativas retirada da abertura e do rodapé)
-// Service Worker: network-first + força atualização
+// Service Worker: network-first + força atualização (iOS friendly)
 if('serviceWorker' in navigator && location.protocol!=='file:'){
   var __brbrics_reloading = false;
   navigator.serviceWorker.addEventListener('controllerchange', function(){
     if(__brbrics_reloading) return; __brbrics_reloading = true; location.reload();
   });
   navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then(function(reg){
-    function __urge(){ if(reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
-    if(reg.waiting) __urge();
+    // Força verificação de atualização no carregamento (iOS precisa)
+    reg.update().catch(function(){});
     reg.addEventListener('updatefound', function(){
       var nw = reg.installing;
-      if(nw) nw.addEventListener('statechange', function(){ if(nw.state==='installed' && navigator.serviceWorker.controller) __urge(); });
+      if(nw) nw.addEventListener('statechange', function(){
+        if(nw.state==='installed' && navigator.serviceWorker.controller) location.reload();
+      });
     });
   }).catch(function(){});
 }
