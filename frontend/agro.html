@@ -64,7 +64,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=31"></script>
+<script src="common.js?v=32"></script>
 <script>
 jget('/api/ibge/estados').then(function(r){
   var sel=document.getElementById('pam-uf');
@@ -113,6 +113,6 @@ jget('/api/reguladores').then(function(r){
 }).catch(function(){document.getElementById('res-mapa').innerHTML='<p class="muted">Feed indisponível.</p>';});
 document.getElementById('btn-pam').click();
 </script>
-<script src="app.js?v=31"></script>
+<script src="app.js?v=32"></script>
 </body>
 </html>

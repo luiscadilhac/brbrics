@@ -44,6 +44,7 @@
       <div class="osm-embed" style="max-width:100%;aspect-ratio:16/9;border:1px solid #ddd;border-radius:8px;overflow:hidden;background:#eee;">
         <iframe width="100%" height="100%" style="border:0" loading="lazy" allowfullscreen src="https://www.openstreetmap.org/export/embed.html?boundary=-56.0,-35.0,-35.0,5.0&amp;layer=mapnik"></iframe>
       </div>
+      <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Como mudar o local:</strong> acesse <a href="https://openstreetmap.org" target="_blank" rel="noopener">openstreetmap.org</a>, busque a cidade, clique em <em>Compartilhar → HTML</em> e cole o código aqui.</p>
     </div>
   </section>
 
@@ -54,6 +55,7 @@
       <div class="gmm-embed" style="max-width:100%;aspect-ratio:16/9;border:1px solid #ddd;border-radius:8px;overflow:hidden;background:#eee;display:flex;align-items:center;justify-content:center;color:#999;font-size:14px">
         📍 Cole aqui o iframe do Google Meu Mapas (Incorporar no meu site)
       </div>
+      <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Passo a passo:</strong> 1) Acesse mymaps.google.com → 2) Crie um novo mapa → 3) Adicione pontos/linhas/áreas → 4) Clique em <em>Compartilhar → Incorporar no meu site</em> → 5) Cole o código aqui.</p>
     </div>
   </section>
   <section class="card">
@@ -64,6 +66,7 @@
         <a href="https://worldview.earthdata.nasa.gov" target="_blank" rel="noopener" class="btn">🌎 Abrir NASA Worldview</a>
         <p class="muted" style="margin:0">Dica: escolha camadas e data sobre o Brasil, use Compartilhar para gerar link ou baixar imagem/GIF.</p>
       </div>
+      <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Passo a passo:</strong> 1) Acesse worldview.earthdata.nasa.gov → 2) No menu de camadas, adicione ex: <em>Focos de incêndio (VIIRS)</em>, <em>Fumaça</em> ou <em>Temperatura da superfície</em> → 3) Navegue até o Brasil → 4) Escolha a data → 5) Clique em <em>Compartilhar</em> e copie o link ou baixe a imagem.</p>
     </div>
   </section>
   <section class="card">
@@ -74,6 +77,7 @@
         <a href="https://apps.sentinel-hub.com/eo-browser/" target="_blank" rel="noopener" class="btn">🛰️ Abrir EO Browser</a>
         <p class="muted" style="margin:0">Navegue por uma área do Brasil, escolha a data, baixe a imagem ou crie timelapse.</p>
       </div>
+      <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Passo a passo:</strong> 1) Acesse apps.sentinel-hub.com/eo-browser/ → 2) Cadastro gratuito (se pedir) → 3) Busque uma cidade ou desenhe um polígono no Brasil → 4) Escolha Sentinel-2 e a data → 5) Baixe a imagem ou crie um timelapse → 6) Publique a imagem/vídeo aqui.</p>
     </div>
   </section>
 
@@ -97,6 +101,7 @@
         <a href="https://flourish.studio/" target="_blank" rel="noopener" class="btn ghost">🎨 Criar mapa no Flourish</a>
         <p class="muted" style="margin:0">Importe o GeoJSON do IBGE, gere o mapa e cole o código de incorporação (embed) aqui.</p>
       </div>
+      <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Passo a passo:</strong> 1) Baixe o GeoJSON de estados/municípios em <a href="https://servicodados.ibge.gov.br/" target="_blank" rel="noopener">servicodados.ibge.gov.br</a> → 2) Acesse Datawrapper.de ou Flourish.studio (conta gratuita) → 3) Importe o GeoJSON → 4) Escolha cor por estado/município (ex: população, número de empresas) → 5) Publique e copie o código <em>Embed</em> → 6) Cole aqui.</p>
     </div>
   </section>
 
@@ -108,6 +113,7 @@
         <a href="https://earthengine.google.com/timelapse/" target="_blank" rel="noopener" class="btn">⏯️ Ver Timelapse</a>
         <p class="muted" style="margin:0">Compartilhe o link ou baixe o vídeo/GIF e publique aqui.</p>
       </div>
+      <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Passo a passo:</strong> 1) Acesse earthengine.google.com/timelapse/ → 2) No campo de busca, digite "Amazônia" ou "Desmatamento Brasil" → 3) A linha do tempo vai de 1984 a hoje → 4) Clique em <em>Compartilhar</em> para copiar o link ou baixar o vídeo/GIF → 5) Publique aqui.</p>
     </div>
   </section>
 
@@ -115,6 +121,19 @@
     <div class="card-h"><h2>ℹ️ Ferramentas que exigem programação</h2></div>
     <div class="toolbar">
       <p class="muted" style="margin:0">Leaflet, OpenLayers, MapLibre GL JS, deck.gl, CesiumJS, leafmap/geemap e TorchGeo são bibliotecas para desenvolvedores. Não estão implementadas aqui porque exigem código. Caso queira adicionar futuramente, avise que gero o código pronto para colar.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>📋 Como colocar qualquer mapa no seu site</h2></div>
+    <div class="toolbar">
+      <ol style="margin:0; padding-left:20px; text-align:left; line-height:1.8">
+        <li>Gere o código de incorporação (<em>embed</em>/iframe) na ferramenta escolhida (OpenStreetMap, Google Meu Mapas, Datawrapper, etc.).</li>
+        <li>Copie todo o código que começa com <code>&lt;iframe ...</code> ou <code>&lt;div ...</code>.</li>
+        <li>Cole o código no lugar dos blocos marcados com <em>📍 Cole aqui ...</em> nesta página.</li>
+        <li>Salve o arquivo <code>mapas.html</code> e envie para o GitHub → o Render atualiza automaticamente em ~2 min.</li>
+      </ol>
+      <p class="muted" style="margin:8px 0 0 0">Não precisa de programação. Só copiar e colar.</p>
     </div>
   </section>
 </main>
@@ -126,8 +145,8 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=31"></script>
-<script src="app.js?v=31"></script>
+<script src="common.js?v=32"></script>
+<script src="app.js?v=32"></script>
 </body>
 </html>
 

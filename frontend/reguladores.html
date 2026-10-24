@@ -71,7 +71,7 @@
 <div class="toolbar" id="tabs" style="gap:8px;margin-bottom:6px"><button class="btn ghost active" data-cat="">Todos</button><button class="btn ghost" data-cat="reg">Agências reguladoras</button><button class="btn ghost" data-cat="min">Ministérios</button></div>
 <div class="toolbar" id="filtros" style="gap:8px;margin-bottom:14px"></div>
 <div id="carousel" class="carousel" style="display:none"><div class="car-track" id="car-track"></div><button class="car-nav prev" id="car-prev" aria-label="Anterior">&#10094;</button><button class="car-nav next" id="car-next" aria-label="Próxima">&#10095;</button><div class="car-dots" id="car-dots"></div></div><div id="feed" class="list"><p class="muted">Clique em carregar.</p></div></main>
-<script src="common.js?v=31">
+<script src="common.js?v=32">
 // ===== Carrossel (fotos do /api/manchetes, reg+min) =====
 var _carItems=[],_carIdx=0,_carTimer=null;
 function _fmtData(d){if(!d)return '';try{return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
@@ -183,5 +183,5 @@ carregar();
 <div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="app.js?v=31"></script>
+<script src="app.js?v=32"></script>
 </body></html>
