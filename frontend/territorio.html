@@ -62,7 +62,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=33"></script>
+<script src="common.js?v=34"></script>
 <script>
 jget('/api/ibge/estados').then(function(r){
   var sel=document.getElementById('uf');
@@ -116,6 +116,6 @@ jget('/api/ibge/noticias?qtd=6').then(function(r){
   document.getElementById('res-news').innerHTML=html||emptyHTML('Sem notícias','Tente mais tarde.');
 }).catch(function(){document.getElementById('res-news').innerHTML='<p class="muted">Feed indisponível.</p>';});
 </script>
-<script src="app.js?v=33"></script>
+<script src="app.js?v=34"></script>
 </body>
 </html>
