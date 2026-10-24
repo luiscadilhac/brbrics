@@ -4,6 +4,214 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9633564064128096" crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapas Interativos — BrBRICS</title>
+<meta name="description" content="Mapas geoespaciais interativos com dados governamentais brasileiros: valores de licitações, processos judiciais e indicadores por município.">
+<link rel="icon" href="favicon.ico" type="image/x-icon"><link rel="icon" href="favicon.png" type="image/png" sizes="64x64">
+<link rel="manifest" href="manifest.json">
+<link rel="alternate" type="application/rss+xml" title="BrBRICS - Manchetes oficiais" href="/rss.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BrBRICS">
+<meta property="og:title" content="Mapas Interativos — BrBRICS">
+<meta property="og:description" content="Mapas geoespaciais com dados governamentais oficiais: licitações, valores por município e processos judiciais.">
+<meta property="og:image" content="https://brbrics.onrender.com/logo-brics.png">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://brbrics.onrender.com/mapas.html">
+<link rel="stylesheet" href="style.css?v=35">
+<link rel="stylesheet" href="pro.css?v=35">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet.heat.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css">
+
+<style>
+/* ========== ESTILOS BÁSICOS ========= */
+.map-container {
+  position: relative;
+  height: 600px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+/* ========== PAINEL DE CONTROLES ========= */
+.controls-panel {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.controls-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: end;
+  margin-bottom: 15px;
+}
+
+.control-group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.control-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 5px;
+}
+
+.control-group select,
+.control-group input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.control-group button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.control-group button:hover {
+  background: #1d4ed8;
+}
+
+/* ========== ESTATÍSTICAS SUPERIORES ========= */
+.stats-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: #2563eb;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+/* ========== PAINEL DE DETALHES ========= */
+.detail-panel {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  display: none;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.detail-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.detail-meta {
+  text-align: right;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ========== GRÁFICOS ========= */
+.chart-container {
+  position: relative;
+  height: 300px;
+  margin-top: 20px;
+}
+
+/* ========== LEGENDA ========= */
+.legend {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-top: 20px;
+}
+
+.legend-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+/* ========== RESPONSIVO ========= */
+@media (max-width: 768px) {
+  .controls-row {
+    flex-direction: column;
+  }
+  
+  .map-container {
+    height: 400px;
+  }
+  
+  .stats-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9633564064128096" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapas e Satélite — BrBRICS</title>
 <meta name="description" content="Visualizações geoespaciais oficiais sem programar: OpenStreetMap, NASA Worldview, Copernicus Sentinel-2, IBGE, Google Earth Timelapse e mais.">
 <link rel="icon" href="favicon.ico" type="image/x-icon"><link rel="icon" href="favicon.png" type="image/png" sizes="64x64">
@@ -132,6 +340,42 @@
       <p class="muted" style="margin:8px 0 0 0">Não precisa de programação. Só copiar e colar.</p>
     </div>
   </section>
+
+  <section style="max-width:1100px;margin:0 auto;padding:20px">
+    <h2>Dados Governamentais — incorporados diretamente (sem sair do site)</h2>
+    <p>Buscas diretas via fetch para APIs públicas: BrasilAPI, PNCP, IBGE, Querido Diário (feed). Nenhum link externo obrigatório.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px;margin-bottom:20px">
+      <div style="background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.08)">
+        <h3 style="margin-top:0">BrasilAPI — CEP exemplo</h3>
+        <div id="brasilapi-box">Carregando...</div>
+      </div>
+      <div style="background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.08)">
+        <h3 style="margin-top:0">PNCP — licitações recentes</h3>
+        <div id="pncp-box">Carregando...</div>
+      </div>
+      <div style="background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.08)">
+        <h3 style="margin-top:0">Querido Diário — feed</h3>
+        <p style="font-size:12px;color:#6b7280">Diários oficiais pesquisáveis de 5.000+ cidades. Para incorporação direta, use feed de uma cidade específica.</p>
+        <a href="https://queridodiario.ok.org.br/" target="_blank" rel="noopener" style="font-size:12px">Acessar feed (opcional)</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:1100px;margin:0 auto;padding:0 20px 20px">
+    <h2>Mapa Interativo — Base IBGE + Leaflet</h2>
+    <p>Malha oficial de estados (IBGE) + exemplo de choropleth por valor de licitação. Para municípios, use versão simplificada (<strong>tilacog/br-atlas</strong>, <strong>cristoferluch/GeoDadosBrasil</strong>).</p>
+    <div style="position:relative;height:600px;border-radius:8px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:20px"><div id="map-implantao" style="height:100%;width:100%"></div></div>
+
+    <div style="padding:12px;background:#fffbeb;border-left:4px solid #f59e0b;border-radius:6px;font-size:12px;color:#92400e">
+      <strong>Sugestões implementadas / fontes</strong><br>
+      • Base geográfica: IBGE (API oficial) + OpenStreetMap tiles.<br>
+      • Repositórios de referência: tilacog/br-atlas (BSD 3-Clause), cristoferluch/GeoDadosBrasil, ggondim/ibge-cidades-com-poligonos, 0e1/localidades (ODbL — citar fonte), igorjba/malha (referência de classificação).<br>
+      • Dados governamentais: jxnxts/mcp-brasil (catálogo APIs Câmara, Senado, PNCP, TCU, DataJud, IBGE, INPE); BrasilAPI (CEP/CNPJ/câmbio); Querido Diário (diários oficiais — Open Knowledge Brasil).<br>
+      • Para Google Sites: publique via GitHub Pages e incorpore com <em>Inserir → Incorporar → URL</em>; use TopoJSON/GeoJSON simplificado para celular.<br>
+      • Licenças confirmadas: BSD 3-Clause, MIT, ODbL (exige atribuição). Sempre confira antes de republicar.
+    </div>
+  </section>
+
 </main>
 <footer>
   <div class="wrap foot">
@@ -143,5 +387,25 @@
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
 <script src="common.js?v=34"></script>
 <script src="app.js?v=34"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function(){
+  const m = L.map('map-implantao').setView([-14.2,-51.9],4);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap',maxZoom:18}).addTo(m);
+  const sim = {'11':'R$ 3,2bi','12':'R$ 1,8bi','13':'R$ 4,5bi','21':'R$ 6,0bi','26':'R$ 9,2bi','35':'R$ 8,9bi','41':'R$ 4,0bi'};
+  fetch('https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json').then(r=>r.json()).then(geo=>{
+    L.geoJSON(geo,{style:f=>{const id=f.properties.id||f.properties.CO_UF||'';return{color:'#fff',weight:1,fillColor:sim[id]?'#2563eb':'#e5e7eb',fillOpacity:0.7};},onEachFeature:(f,l)=>{const id=f.properties.id||f.properties.CO_UF||'';l.bindPopup('<b>'+(f.properties.nome||'Estado')+'</b><br>'+ (sim[id]||'—'));}}).addTo(m);
+  });
+})();
+</script>
+<script>
+fetch('https://brasilapi.com.br/api/cep/v1/01310100').then(r=>r.json()).then(d=>{
+  document.getElementById('brasilapi-box').innerHTML='<b>'+ (d.cep||d.cep_code||'—') +'</b> — '+ (d.logradouro||d.street||'') + ', '+ (d.bairro||d.neighborhood||'') + '<br><small>Cidade: '+ (d.cidade||d.city||'') + ' / UF: '+ (d.uf||d.state||'') + '</small>';
+}).catch(e=>{document.getElementById('brasilapi-box').innerHTML='<small>BrasilAPI: erro/CORS — recarregue.</small>';});
+fetch('https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial=01/01/2026').then(r=>r.json()).then(d=>{
+  const items = (d.contratacoes||d||[]).slice(0,3);
+  document.getElementById('pncp-box').innerHTML = items.map(x=>'<div><b>'+ (x.numero||x.id||'?') + '</b> — '+ (x.uasg||x.orgao||'') + '<br><small>'+ (x.objeto||x.descricao||'') + '</small></div>').join('') || '<small>Nenhum resultado direto via CORS; use backend.</small>';
+}).catch(e=>{document.getElementById('pncp-box').innerHTML='<small>PNCP: falha CORS — dados via backend/serve.</small>';});
+</script>
 </body>
 </html>
