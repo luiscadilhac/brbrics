@@ -5,19 +5,19 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9633564064128096" crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapas e Satélite — BrBRICS</title>
-<meta name="description" content="Visualizações geoespaciais oficiais sem programar: OpenStreetMap, NASA Worldview, Copernicus Sentinel-2, IBGE, Google Earth Timelapse e mais.">
+<meta name="description" content="Visualizacoes geoespaciais oficiais sem programar: OpenStreetMap, NASA Worldview, Copernicus Sentinel-2, IBGE, Google Earth Timelapse e mais.">
 <link rel="icon" href="favicon.ico" type="image/x-icon"><link rel="icon" href="favicon.png" type="image/png" sizes="64x64">
 <link rel="manifest" href="manifest.json">
 <link rel="alternate" type="application/rss+xml" title="BrBRICS - Manchetes oficiais" href="/rss.xml">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="BrBRICS">
-<meta property="og:title" content="Mapas e Satélite — BrBRICS">
-<meta property="og:description" content="Mapas e imagens de satélite oficiais para acompanhar o território brasileiro.">
+<meta property="og:title" content="Mapas e Satelite — BrBRICS">
+<meta property="og:description" content="Mapas e imagens de satelite oficiais para acompanhar o territorio brasileiro.">
 <meta property="og:image" content="https://brbrics.onrender.com/logo-brics.png">
 <meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://brbrics.onrender.com/mapas.html">
-<link rel="stylesheet" href="style.css?v=29">
-<link rel="stylesheet" href="pro.css?v=29">
+<link rel="stylesheet" href="style.css?v=33">
+<link rel="stylesheet" href="pro.css?v=33">
 </head>
 <body>
 <header class="topbar">
@@ -28,15 +28,12 @@
       <input id="busca" type="search" placeholder="Buscar no portal...">
     </div>
   </div>
-  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando noticias...</div></div>
 </header>
 <main class="wrap">
   <section class="hero" style="padding:28px 0;text-align:center">
-    <p class="kicker">Mapas e Satélite — sem programar</p>
-    <h1>O território brasileiro <span class="hl">de cima</span></h1>
-    <p class="sub">Mapas de ruas, imagens de satélite e dados territoriais oficiais. Todas as ferramentas abaixo funcionam sem código — basta copiar e colar.</p>
-  </section>
-
+    <p class="kicker">Mapas e Satelite — sem programar</p>
+    <h1>O territorio brasileiro <span class="hl">de cima</span></h1>
   <section class="card">
     <div class="card-h"><h2>🗺️ Mapa de ruas — OpenStreetMap</h2><a href="https://openstreetmap.org" target="_blank" rel="noopener">Ver no site oficial</a></div>
     <div class="toolbar" style="flex-wrap:wrap;gap:10px">
@@ -47,15 +44,17 @@
       <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Como mudar o local:</strong> acesse <a href="https://openstreetmap.org" target="_blank" rel="noopener">openstreetmap.org</a>, busque a cidade, clique em <em>Compartilhar → HTML</em> e cole o código aqui.</p>
     </div>
   </section>
-
+    <p class="sub">Mapas de ruas, imagens de satelite e dados territoriais oficiais. Todas as ferramentas abaixo funcionam sem codigo — basta copiar e colar.</p>
+  </section>
   <section class="card">
     <div class="card-h"><h2>📌 Pontos oficiais — Google Meu Mapas</h2><a href="https://mymaps.google.com" target="_blank" rel="noopener">Criar mapa no Google</a></div>
     <div class="toolbar" style="flex-wrap:wrap;gap:10px">
       <p class="muted" style="margin:0 0 10px 0">Desenhe pontos, linhas e áreas no mapa (órgãos públicos, tribunais, fiscais, etc.) e incorpore no site.</p>
-      <div class="gmm-embed" style="max-width:100%;aspect-ratio:16/9;border:1px solid #ddd;border-radius:8px;overflow:hidden;background:#eee;display:flex;align-items:center;justify-content:center;color:#999;font-size:14px">
-        📍 Cole aqui o iframe do Google Meu Mapas (Incorporar no meu site)
+      <div style="display:flex;align-items:center;justify-content:center;max-width:100%;aspect-ratio:16/9;border:1px solid #ddd;border-radius:8px;overflow:hidden;background:#f7f7f7;color:#666;font-size:13px;line-height:1.5;padding:12px;text-align:center">
+        📍 <b>Cole aqui o iframe do Google Meu Mapas</b><br>
+        <span style="font-size:12px;color:#999">Passo: mymaps.google.com → Criar mapa → adicionar pontos → Compartilhar → Incorporar no meu site → copiar código.</span>
       </div>
-      <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Passo a passo:</strong> 1) Acesse mymaps.google.com → 2) Crie um novo mapa → 3) Adicione pontos/linhas/áreas → 4) Clique em <em>Compartilhar → Incorporar no meu site</em> → 5) Cole o código aqui.</p>
+      <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Passo a passo:</strong> 1) Acesse <a href="https://mymaps.google.com" target="_blank" rel="noopener">mymaps.google.com</a> → 2) Crie um novo mapa → 3) Adicione pontos/linhas/áreas → 4) Clique em <em>Compartilhar → Incorporar no meu site</em> → 5) Cole o código aqui.</p>
     </div>
   </section>
   <section class="card">
@@ -80,7 +79,6 @@
       <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Passo a passo:</strong> 1) Acesse apps.sentinel-hub.com/eo-browser/ → 2) Cadastro gratuito (se pedir) → 3) Busque uma cidade ou desenhe um polígono no Brasil → 4) Escolha Sentinel-2 e a data → 5) Baixe a imagem ou crie um timelapse → 6) Publique a imagem/vídeo aqui.</p>
     </div>
   </section>
-
   <section class="card">
     <div class="card-h"><h2>☁️ Mosaico sem nuvens — Sentinel-2 Cloudless</h2><a href="https://s2maps.eu" target="_blank" rel="noopener">Acessar s2maps.eu</a></div>
     <div class="toolbar" style="flex-wrap:wrap;gap:10px">
@@ -91,7 +89,6 @@
       </div>
     </div>
   </section>
-
   <section class="card">
     <div class="card-h"><h2>🇧🇷 Mapas temáticos — Dados do IBGE</h2><a href="https://servicodados.ibge.gov.br/" target="_blank" rel="noopener">Dados abertos IBGE</a></div>
     <div class="toolbar" style="flex-wrap:wrap;gap:10px">
@@ -104,7 +101,6 @@
       <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Passo a passo:</strong> 1) Baixe o GeoJSON de estados/municípios em <a href="https://servicodados.ibge.gov.br/" target="_blank" rel="noopener">servicodados.ibge.gov.br</a> → 2) Acesse Datawrapper.de ou Flourish.studio (conta gratuita) → 3) Importe o GeoJSON → 4) Escolha cor por estado/município (ex: população, número de empresas) → 5) Publique e copie o código <em>Embed</em> → 6) Cole aqui.</p>
     </div>
   </section>
-
   <section class="card">
     <div class="card-h"><h2>⏱️ Mudanças ao longo do tempo — Google Earth Timelapse</h2><a href="https://earthengine.google.com/timelapse/" target="_blank" rel="noopener">Acessar Timelapse</a></div>
     <div class="toolbar" style="flex-wrap:wrap;gap:10px">
@@ -116,14 +112,12 @@
       <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Passo a passo:</strong> 1) Acesse earthengine.google.com/timelapse/ → 2) No campo de busca, digite "Amazônia" ou "Desmatamento Brasil" → 3) A linha do tempo vai de 1984 a hoje → 4) Clique em <em>Compartilhar</em> para copiar o link ou baixar o vídeo/GIF → 5) Publique aqui.</p>
     </div>
   </section>
-
   <section class="card">
     <div class="card-h"><h2>ℹ️ Ferramentas que exigem programação</h2></div>
     <div class="toolbar">
       <p class="muted" style="margin:0">Leaflet, OpenLayers, MapLibre GL JS, deck.gl, CesiumJS, leafmap/geemap e TorchGeo são bibliotecas para desenvolvedores. Não estão implementadas aqui porque exigem código. Caso queira adicionar futuramente, avise que gero o código pronto para colar.</p>
     </div>
   </section>
-
   <section class="card">
     <div class="card-h"><h2>📋 Como colocar qualquer mapa no seu site</h2></div>
     <div class="toolbar">
@@ -145,8 +139,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=32"></script>
-<script src="app.js?v=32"></script>
+<script src="common.js?v=33"></script>
+<script src="app.js?v=33"></script>
 </body>
 </html>
-

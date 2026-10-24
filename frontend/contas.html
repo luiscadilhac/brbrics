@@ -59,7 +59,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=32"></script>
+<script src="common.js?v=33"></script>
 <script>
 jget('/api/contas/status').then(function(r){
   document.getElementById('cgu-status').textContent=r.cguToken?'token ativo':'sem token';
@@ -101,6 +101,6 @@ document.getElementById('btn-bf').onclick=function(){
   }).catch(function(e){document.getElementById('res-bf').innerHTML='<p class="muted">'+esc(e.message)+' — veja <a href="https://portaldatransparencia.gov.br/api-de-dados" target="_blank" rel="noopener">como obter o token</a>.</p>';});
 };
 </script>
-<script src="app.js?v=32"></script>
+<script src="app.js?v=33"></script>
 </body>
 </html>

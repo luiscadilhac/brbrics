@@ -70,7 +70,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=32"></script>
+<script src="common.js?v=33"></script>
 <script>
 try{var qk=new URLSearchParams(location.search).get('chave');if(qk){document.getElementById('chave').value=qk;try{sessionStorage.setItem('brbrics_painel',qk);}catch(e){}}}catch(e){}
 try{var sk=sessionStorage.getItem('brbrics_painel');if(sk)document.getElementById('chave').value=sk;}catch(e){}
@@ -125,6 +125,6 @@ document.getElementById('btn-csv').onclick=function(){
 document.getElementById('chave').addEventListener('keydown',function(e){if(e.key==='Enter')carregarPainel();});
 if(document.getElementById('chave').value)carregarPainel();
 </script>
-<script src="app.js?v=32"></script>
+<script src="app.js?v=33"></script>
 </body>
 </html>
