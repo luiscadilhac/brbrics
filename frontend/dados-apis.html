@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Dados Governamentais Diretos — BrBRICS</title>
+<link rel="stylesheet" href="style.css?v=35">
+<style>
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-top:24px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,.05)}
+.card h2{font-size:1.25rem;margin-top:0;padding-bottom:10px;border-bottom:2px solid #2563eb;color:#1e293b}
+.tag{display:inline-block;padding:3px 8px;border-radius:12px;font-size:.75rem;font-weight:600;background:#dbeafe;color:#1e40af}
+pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:8px;overflow-x:auto;font-size:.85rem}
+</style>
+</head>
+<body>
+<main style="max-width:1200px;margin:0 auto;padding:24px">
+<h1>Dados Governamentais — incorporados diretamente</h1>
+<p>Nenhum link obrigatório. As APIs são consumidas por <strong>fetch</strong> direto no navegador (CORS permitido quando houver). Se falhar, o backend pode fazer proxy.</p>
+
+<div class="grid-4">
+  <div class="card">
+    <h2>BrasilAPI <span class="tag">CEP • CNPJ • Bancos</span></h2>
+    <p>Dados abertos de CEP, CNPJ, instituições financeiras, câmbio. Útil para enriquecer registros de fornecedores.</p>
+    <div id="box-brasilapi"><strong>Carregando...</strong></div>
+    <p class="small">Fonte: <code>brasilapi.com.br</code> — sem chave necessária para consultas simples.</p>
+  </div>
+
+  <div class="card">
+    <h2>PNCP — Licitações <span class="tag">Contratações públicas</span></h2>
+    <p>Portal Nacional de Contratações Públicas. Últimas publicações de pregão eletrônico.</p>
+    <div id="box-pncp"><strong>Carregando...</strong></div>
+    <p class="small">Fonte: <code>pncp.gov.br/api</code>. Pode exigir proxy se CORS bloquear.</p>
+  </div>
+
+  <div class="card">
+    <h2>IBGE — Malhas + Dados <span class="tag">Geográfico + Indicadores</span></h2>
+    <p>Mapa de estados/municípios (GeoJSON) e indicadores (IPCA, PIB, população).</p>
+    <div id="box-ibge"><strong>Carregando estados...</strong></div>
+    <p class="small">Fonte: <code>servicodados.ibge.gov.br</code> — BSD/uso público.</p>
+  </div>
+
+  <div class="card">
+    <h2>Querido Diário <span class="tag">Diários oficiais</span></h2>
+    <p>Diários oficiais de 5.000+ cidades e da União, pesquisáveis. Entra como feed de atos municipais.</p>
+    <p><strong>Para incorporação direta:</strong> escolha uma cidade (ex: São Paulo) e use o feed de buscas.</p>
+    <a href="https://queridodiario.ok.org.br/" target="_blank" rel="noopener">Acessar plataforma →</a>
+    <p class="small">Open Knowledge Brasil — ODbL (atribuir).</p>
+  </div>
+</div>
+
+<div class="card" style="margin-top:24px">
+  <h2>Catálogo de APIs — jxnxts/mcp-brasil</h2>
+  <p>Repositório não é site, mas o README é um bom catálogo: <strong>Câmara, Senado, Portal da Transparência, TCU, PNCP/ComprasNet, DataJud/CNJ, STF/STJ/TST, TSE, IBGE, TCEs estaduais, INPE</strong>. A maioria não exige chave.</p>
+  <pre>Exemplo de consumo direto (Câmara): fetch('https://dadosabertos.camara.leg.br/api/v2/proposicoes?itens=5')</pre>
+</div>
+</main>
+
+<script>
+fetch('https://brasilapi.com.br/api/cep/v1/01310100').then(r=>r.json()).then(d=>{
+  document.getElementById('box-brasilapi').innerHTML='<b>'+d.cep+'</b> — '+d.street+', '+d.neighborhood+'<br><small>'+d.city+'/'+d.state+'</small>';
+}).catch(e=>{document.getElementById('box-brasilapi').innerHTML='<small>BrasilAPI: falha CORS — recarregue ou use proxy.</small>'});
+fetch('https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial=01/01/2026').then(r=>r.json()).then(d=>{
+  const list = (d.contratacoes||[]).slice(0,2);
+  document.getElementById('box-pncp').innerHTML = list.map(x=>'<div><b>'+ (x.numero||'?') + '</b> '+ (x.uasg||x.orgao||'') + '<br><small>'+ (x.objeto||'') + '</small></div>').join('') || '<small>Nenhum dado direto; use backend.</small>';
+}).catch(e=>{document.getElementById('box-pncp').innerHTML='<small>PNCP: falha CORS — dados disponíveis via backend.</small>'});
+fetch('https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json').then(r=>r.json()).then(geo=>{
+  document.getElementById('box-ibge').innerHTML='<b>Estados carregados:</b> '+geo.features.length+' malhas — IBGE oficial.';
+}).catch(e=>{document.getElementById('box-ibge').innerHTML='<small>IBGE: falha.</small>'});
+</script>
+</body>
+</html>
