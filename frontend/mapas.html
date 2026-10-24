@@ -376,6 +376,56 @@
     </div>
   </section>
 
+  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+    <h2>1. Bases Geográficas — todos os repositórios</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+      <div style="background:#fff;padding:18px;border-radius:10px;border:1px solid #e2e8f0"><h3>tilacog/br-atlas</h3><p class="small">TopoJSON/GeoJSON do IBGE. BSD 3-Clause. Gera Brasil, estados e municípios.</p></div>
+      <div style="background:#fff;padding:18px;border-radius:10px;border:1px solid #e2e8f0"><h3>cristoferluch/GeoDadosBrasil</h3><p class="small">GeoJSON 3 níveis: mínimo (leve), intermediário, máximo. Escolha o leve para mapa rápido.</p></div>
+      <div style="background:#fff;padding:18px;border-radius:10px;border:1px solid #e2e8f0"><h3>ggondim/ibge-cidades-com-poligonos</h3><p class="small">Municípios já cruzados com polígonos. Liga código do município a licitação/despesa.</p></div>
+      <div style="background:#fff;padding:18px;border-radius:10px;border:1px solid #e2e8f0"><h3>0e1/localidades</h3><p class="small">Coordenadas, bandeiras, gentílicos das UFs. <strong>ODbL — exige citar fonte.</strong></p></div>
+      <div style="background:#fff;padding:18px;border-radius:10px;border:1px solid #e2e8f0"><h3>igorjba/malha</h3><p class="small">5.570 municípios com indicadores IBGE. Referência de 5 métodos de classificação de cores.</p></div>
+    </div>
+  </section>
+
+  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+    <h2>2. Mapa de calor — exemplo Leaflet + dados por município</h2>
+    <p>Combine qualquer base acima com <strong>Leaflet</strong> (mapas) e <strong>Chart.js</strong> (gráficos). Exemplo de uso: valor de licitações por município. Use a versão <strong>simplificada ou TopoJSON</strong> do GeoDadosBrasil para não travar no celular.</p>
+    <div style="background:#0f172a;color:#e2e8f0;padding:20px;border-radius:10px;font-family:monospace;font-size:.85rem;overflow-x:auto">
+      // Exemplo de estilo por valor (choropleth)<br>
+      color: valor > 1000000 ? '#1e3a8a' : '#60a5fa';<br>
+      // Para 5.570 municípios, carregue a malha simplificada e filtre por UF.<br>
+      // Fonte: br-atlas / GeoDadosBrasil nível mínimo
+    </div>
+  </section>
+
+  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+    <h2>3. Fontes de Dados — incorporadas diretamente</h2>
+    <div class="grid-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>jxnxts/mcp-brasil</h3><p class="small"><strong>Catálogo de APIs.</strong> Câmara, Senado, Portal Transparência, TCU, PNCP/ComprasNet, DataJud/CNJ, STF/STJ/TST, TSE, IBGE, TCEs, INPE. Não exige chave na maioria.</p></div>
+      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>BrasilAPI</h3><p class="small">CEP, CNPJ, bancos, câmbio. Útil para enriquecer registros de fornecedores.</p></div>
+      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>Querido Diário (OK Brasil)</h3><p class="small">5.000+ diários oficiais, pesquisáveis. Entra como feed de atos municipais.</p></div>
+    </div>
+  </section>
+
+  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+    <h2>4. Google Sites — incorporação</h2>
+    <p>O Google Sites não roda código do GitHub. <strong>Publique o mapa/painel no GitHub Pages</strong> (grátis, repositório <code>luiscadilhac/brbrics</code>) e incorpore via <strong>Inserir → Incorporar → URL</strong>. Os GeoJSON pesados devem ser substituídos pela versão simplificada para não travar no celular.</p>
+  </section>
+
+  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+    <h2>5. Licenças — verifique antes de usar</h2>
+    <p><strong>BSD 3-Clause</strong> (br-atlas), <strong>MIT</strong> (outros), <strong>ODbL</strong> (0e1/localidades, Querido Diário — exige citações). Do BrasilAPI e Querido Diário só confirmei as fontes; abra os repositórios para ver o estado atual antes de republicar.</p>
+  </section>
+
+  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+    <h2>6. Painéis incorporados — funcionando no site</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>Mapa interativo IBGE</h3><p>Malha oficial de estados + cor por licitação.</p><a href="mapa-brasil.html">Ver →</a></div>
+      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>Dados de APIs</h3><p>BrasilAPI, PNCP, IBGE, Querido Diário — fetch direto.</p><a href="dados-apis.html">Ver →</a></div>
+      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>Fontes e Licenças</h3><p>Tabela completa + como encaixar no Google Sites.</p><a href="fontes-licencas.html">Ver →</a></div>
+    </div>
+  </section>
+
 </main>
 <footer>
   <div class="wrap foot">
