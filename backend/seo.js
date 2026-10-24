@@ -7,7 +7,7 @@ var PAGINAS=[
   ['/areas.html','weekly'],['/territorio.html','weekly'],['/clima.html','daily'],
   ['/contas.html','weekly'],['/energia.html','weekly'],['/comex.html','weekly'],
   ['/fipe.html','monthly'],['/agro.html','weekly'],['/painel.html','monthly'],
-  ['/contato.html','monthly'],['/privacidade.html','monthly']
+  ['/contato.html','monthly'],['/privacidade.html','monthly'],['/mapas.html','weekly']
 ];
 function escX(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function base(req){return req.protocol+'://'+req.get('host');}

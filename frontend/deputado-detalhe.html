@@ -99,7 +99,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=30"></script>
+<script src="common.js?v=31"></script>
 <script>
 var ID = new URLSearchParams(location.search).get('id') || (location.pathname.split('/').pop());
 if(!ID){ document.getElementById('loading').style.display='none'; document.getElementById('erro').style.display='block'; document.getElementById('erro-msg').textContent='ID não informado'; }
@@ -206,6 +206,6 @@ document.getElementById('btn-gastos').onclick = function(){
 .dl-grid dt{color:var(--muted);font-weight:500}
 .dl-grid dd{margin:0;color:var(--fg);word-break:break-word}
 </style>
-<script src="app.js?v=30"></script>
+<script src="app.js?v=31"></script>
 </body>
 </html>

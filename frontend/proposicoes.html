@@ -115,7 +115,7 @@
 <div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=30"></script>
+<script src="common.js?v=31"></script>
 <script>
 function propLink(id){return 'https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao='+encodeURIComponent(id);}
 function verTramitacao(id){
@@ -154,6 +154,6 @@ function renderSen(data){
 jget('/api/proposicoes').then(renderCam).catch(function(){document.getElementById('l-cam').innerHTML='<p class="muted">Erro ao carregar Câmara.</p>';});
 jget('/api/legislacao/senado').then(renderSen).catch(function(){document.getElementById('l-sen').innerHTML='<p class="muted">Erro ao carregar Senado.</p>';});
 </script>
-<script src="app.js?v=30"></script>
+<script src="app.js?v=31"></script>
 </body>
 </html>
