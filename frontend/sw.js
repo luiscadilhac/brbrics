@@ -1,7 +1,7 @@
 // BrBRICS - Service Worker (rede primeiro em tudo; cache so como fallback offline)
 // iOS Safari: sem skipWaiting/clients.claim para evitar travamento
-var CACHE_NAME = 'brbrics-v40';
-var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/style.css?v=28','/pro.css?v=28','/common.js?v=28','/app.js?v=28','/tribunais-page.js?v=28','/legislacao-page.js?v=28','/areas.js?v=28','/logo-brics.png','/favicon.ico','/favicon.png','/manifest.json'];
+var CACHE_NAME = 'brbrics-v42';
+var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/style.css?v=30','/pro.css?v=30','/common.js?v=30','/app.js?v=30','/tribunais-page.js?v=30','/legislacao-page.js?v=30','/areas.js?v=30','/logo-brics.png','/favicon.ico','/favicon.png','/manifest.json'];
 self.addEventListener('install', function(e){
   e.waitUntil(caches.open(CACHE_NAME).then(function(c){
     return Promise.all(CORE.map(function(u){

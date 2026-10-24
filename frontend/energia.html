@@ -50,7 +50,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=28"></script>
+<script src="common.js?v=30"></script>
 <script>
 jget('/api/energia/bandeiras').then(function(r){
   var a=r.atual||{};
@@ -71,6 +71,6 @@ jget('/api/energia/siga').then(function(r){
   }).join('')||emptyHTML('Sem dados de geração','Tente mais tarde.');
 }).catch(function(e){document.getElementById('res-siga').innerHTML='<p class="muted">Erro: '+esc(e.message)+'</p>';});
 </script>
-<script src="app.js?v=28"></script>
+<script src="app.js?v=30"></script>
 </body>
 </html>
