@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa do Brasil — BrBRICS</title>
+<meta name="description" content="Mapa interativo do Brasil com malha oficial do IBGE, estados e municípios. Camadas de satélite e focos de calor do INPE.">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="style.css?v=40">
+<link rel="stylesheet" href="pro.css?v=40">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  #map { height: 70vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
+  .layer-panel { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+  .layer-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+  .layer-row label { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .layer-row input { accent-color: var(--yellow); }
+  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  .btn-sm:hover { transform: translateY(-1px); }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--yellow); }
+  .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">🇧🇷 Mapa Base do Brasil — IBGE</p>
+    <h1>Território Brasileiro por Estado</h1>
+    <p class="sub">Malha geográfica oficial do IBGE com limites de estados. Sobreponha camadas de satélite e focos de calor do INPE.</p>
+  </section>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-val" id="stat-estados">27</div><div class="stat-lab">Unidades da federação</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-municipios">5.570</div><div class="stat-lab">Municípios</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última atualização</div></div>
+  </div>
+
+  <div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--muted)">
+    <strong>📍 Fonte:</strong> malha oficial do IBGE (servicodados.ibge.gov.br) e focos de calor do INPE/BDQueimadas. Dados públicos do governo federal.
+  </div>
+
+  <div class="layer-panel">
+    <div class="layer-row"><strong style="color:var(--paper)">Camadas:</strong></div>
+    <div class="layer-row">
+      <label><input type="checkbox" id="lyr-osm" checked> OpenStreetMap</label>
+      <label><input type="checkbox" id="lyr-satelite"> Satélite (Esri)</label>
+      <label><input type="checkbox" id="lyr-estados" checked> Limites IBGE (estados)</label>
+      <label><input type="checkbox" id="lyr-focos"> Focos de calor INPE</label>
+    </div>
+    <div class="layer-row" style="margin-top:8px">
+      <button class="btn-sm" id="btn-carregar">Recarregar dados</button>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <section class="card">
+    <div class="card-h"><h2>🔗 Outros mapas do portal</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+      <a href="mapa-satelite.html" class="btn" style="text-align:center;display:block">🛰️ Satélite e focos de calor</a>
+      <a href="mapa-avioes.html" class="btn ghost" style="text-align:center;display:block">✈️ Aviões (ADS-B)</a>
+      <a href="mapa-embarcacoes.html" class="btn ghost" style="text-align:center;display:block">🚢 Embarcações (AIS)</a>
+      <a href="mapa-cameras.html" class="btn ghost" style="text-align:center;display:block">📹 Câmeras online</a>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — malha IBGE, focos INPE/BDQueimadas, NASA, Copernicus e OpenStreetMap.</div>
+    <div class="flinks"><a href="mapa-satelite.html">Satélite</a><a href="mapa-avioes.html">Aviões</a><a href="mapa-embarcacoes.html">Embarcações</a><a href="mapa-cameras.html">Câmeras</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=40"></script>
+<script src="app.js?v=40"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Estado
+var map = null;
+var layers = {};
+var estadosLayer = null;
+var focosLayer = null;
+
+function initMap() {
+  map = L.map('map').setView([-14.2, -51.9], 4);
+
+  layers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  layers.satelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; Esri, Maxar, Earthstar Geographics'
+  });
+
+  estadosLayer = L.layerGroup().addTo(map);
+  focosLayer = L.layerGroup().addTo(map);
+}
+
+function toggleLayer(id, layer) {
+  var cb = document.getElementById(id);
+  if (!cb) return;
+  if (cb.checked) {
+    if (!map.hasLayer(layer)) layer.addTo(map);
+  } else {
+    map.removeLayer(layer);
+  }
+}
+
+function carregarEstadosIBGE() {
+  estadosLayer.clearLayers();
+  fetch('https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json')
+    .then(function(r){ return r.json(); }).then(function(geo) {
+      L.geoJSON(geo, {
+        style: { color: '#fff', weight: 1.5, fillColor: '#6366f1', fillOpacity: 0.2 },
+        onEachFeature: function(f, l) {
+          var nome = f.properties.nome || f.properties.NOME || 'Estado';
+          var id = f.properties.id || f.properties.CO_UF || '';
+          l.bindPopup('<b>' + nome + '</b><br><small>Código IBGE: ' + id + '</small>');
+        }
+      }).addTo(estadosLayer);
+      document.getElementById('stat-estados').textContent = (geo.features || []).length;
+      document.getElementById('stat-atualizacao').textContent = new Date().toLocaleString('pt-BR').slice(0,16);
+    }).catch(function(){});
+}
+
+function carregarFocos(uf) {
+  var url = '/api/mapas/satelite' + (uf ? '?estado=' + encodeURIComponent(uf) : '');
+  fetch(url).then(function(r){ return r.json(); }).then(function(d) {
+    focosLayer.clearLayers();
+    (d.focos || []).slice(0, 500).forEach(function(f) {
+      if (f.lat == null || f.lon == null) return;
+      var cor = f.intensidade && String(f.intensidade).toLowerCase().indexOf('alto') >= 0 ? '#dc2626' : '#f97316';
+      L.circleMarker([f.lat, f.lon], { radius: 5, color: cor, fillColor: cor, fillOpacity: 0.8, weight: 1 })
+        .bindPopup('<b>' + (f.municipio || 'Local') + ' — ' + (f.uf || '') + '</b><br><small>Satélite: ' + (f.satelite || '—') + '</small><br><small>Data: ' + (f.datahora || '—') + '</small>')
+        .addTo(focosLayer);
+    });
+  }).catch(function(){});
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initMap();
+
+  document.getElementById('lyr-osm').onchange = function() { toggleLayer('lyr-osm', layers.osm); };
+  document.getElementById('lyr-satelite').onchange = function() { toggleLayer('lyr-satelite', layers.satelite); };
+  document.getElementById('lyr-estados').onchange = function() { toggleLayer('lyr-estados', estadosLayer); };
+  document.getElementById('lyr-focos').onchange = function() { toggleLayer('lyr-focos', focosLayer); };
+
+  carregarEstadosIBGE();
+
+  document.getElementById('btn-carregar').onclick = function() {
+    carregarFocos('');
+  };
+
+  carregarFocos('');
+});
+
+if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; }
+</script>
+</body>
+</html>

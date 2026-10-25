@@ -348,6 +348,8 @@ try {
   var emendas = require('./emendas');
   var repasses = require('./repasses');
   var deputados = require('./deputados');
+  var mapas = require('./mapas');
+  mapas.registrarMapas(app, cacheGet, cacheSet, getJSON);
   seo.registrarSEO(app, cacheGet, cacheSet);
   visitas.registrarVisitas(app);
   // (legislacao registrada uma única vez acima via `leg`; sem duplicar rotas)

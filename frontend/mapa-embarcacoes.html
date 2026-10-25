@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa de Embarcações — BrBRICS</title>
+<meta name="description" content="Rastreamento de embarcações e navios na costa brasileira via AIS (Automatic Identification System).">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="style.css?v=40">
+<link rel="stylesheet" href="pro.css?v=40">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  #map { height: 70vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
+  .layer-panel { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+  .layer-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+  .layer-row label { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .layer-row input { accent-color: var(--yellow); }
+  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  .btn-sm:hover { transform: translateY(-1px); }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--yellow); }
+  .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">🚢 Embarcações — AIS (Automatic Identification System)</p>
+    <h1>Rastreamento de Navios na Costa Brasileira</h1>
+    <p class="sub">Posições de embarcações via AIS. Fontes públicas exigem cadastro para dados em tempo real completo.</p>
+  </section>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Embarcações detectadas</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última atualização</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-fonte">—</div><div class="stat-lab">Fonte de dados</div></div>
+  </div>
+
+  <div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--muted)">
+    <strong>⚠️ Sobre os dados AIS:</strong> Fontes gratuitas de AIS (MarineTraffic, VesselFinder, AIS Hub) exigem API key para dados em tempo real.
+    Cadastre-se gratuitamente, obtenha a chave e informe no backend <code>backend/mapas.js</code> (rota <code>/api/mapas/embarcacoes</code>) para ativar o rastreio ao vivo.
+  </div>
+
+  <div class="layer-panel">
+    <div class="layer-row"><strong style="color:var(--paper)">Camadas:</strong></div>
+    <div class="layer-row">
+      <label><input type="checkbox" id="lyr-osm" checked> OpenStreetMap</label>
+      <label><input type="checkbox" id="lyr-satelite"> Satélite (Esri)</label>
+      <label><input type="checkbox" id="lyr-navios" checked> Embarcações (markers)</label>
+    </div>
+    <div class="layer-row" style="margin-top:8px">
+      <button class="btn-sm" id="btn-atualizar">Atualizar agora</button>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <div id="lista-navios" style="display:none;max-height:300px;overflow-y:auto;background:var(--card2);border-radius:10px;padding:12px;margin-bottom:16px;border:1px solid var(--line)"></div>
+
+  <section class="card">
+    <div class="card-h"><h2>🔗 Fontes públicas de dados AIS</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--yellow)">MarineTraffic</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Rastreamento de navios global. Plano gratuito com dados atrasados.</p>
+        <a href="https://www.marinetraffic.com/" target="_blank" rel="noopener" style="color:var(--yellow);font-size:12px">MarineTraffic →</a>
+      </div>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--yellow)">VesselFinder</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Posições AIS em tempo real de embarcações mundo afora.</p>
+        <a href="https://www.vesselfinder.com/" target="_blank" rel="noopener" style="color:var(--yellow);font-size:12px">VesselFinder →</a>
+      </div>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--yellow)">AIS Hub</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Rede comunitária de receptores AIS com dados públicos.</p>
+        <a href="https://www.aishub.net/" target="_blank" rel="noopener" style="color:var(--yellow);font-size:12px">AIS Hub →</a>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — dados AIS de embarcações e OpenStreetMap.</div>
+    <div class="flinks"><a href="mapa-satelite.html">Satélite</a><a href="mapa-avioes.html">Aviões</a><a href="mapa-brasil.html">Mapa Brasil</a><a href="mapa-cameras.html">Câmeras</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=40"></script>
+<script src="app.js?v=40"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Estado
+var map = null;
+var layers = {};
+var naviosLayer = null;
+var naviosMarkers = [];
+
+function initMap() {
+  map = L.map('map').setView([-14.2, -51.9], 4);
+
+  layers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  layers.satelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; Esri, Maxar, Earthstar Geographics'
+  });
+
+  naviosLayer = L.layerGroup().addTo(map);
+}
+
+function toggleLayer(id, layer) {
+  var cb = document.getElementById(id);
+  if (!cb) return;
+  if (cb.checked) {
+    if (!map.hasLayer(layer)) layer.addTo(map);
+  } else {
+    map.removeLayer(layer);
+  }
+}
+
+function esc(s) { return String(s || '—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function carregarNavios() {
+  fetch('/api/mapas/embarcacoes').then(function(r){ return r.json(); }).then(function(d) {
+    naviosLayer.clearLayers();
+    naviosMarkers = [];
+
+    document.getElementById('stat-total').textContent = d.total || 0;
+    document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
+    document.getElementById('stat-fonte').textContent = d.fonte || 'AIS';
+
+    var lista = document.getElementById('lista-navios');
+    var html = '';
+
+    if (d.aviso) {
+      html = '<div style="background:var(--card2);border-radius:8px;padding:8px;margin:6px 0;font-size:13px;color:var(--muted)">' + esc(d.aviso) + '</div>';
+    }
+
+    (d.embarcacoes || []).slice(0, 100).forEach(function(n) {
+      var lat = Number(n.lat), lon = Number(n.lon);
+      if (lat === 0 && lon === 0) return;
+      var marker = L.marker([lat, lon], { title: esc(n.nome) });
+      marker.bindPopup(
+        '<b>🚢 ' + esc(n.nome) + '</b><br>' +
+        '<small>MMSI: ' + esc(n.mmsi) + ' | Tipo: ' + esc(n.tipo) + '</small><br>' +
+        '<small>Velocidade: ' + esc(n.velocidade) + ' nós</small><br>' +
+        '<small>Direção: ' + esc(n.direcao) + '°</small><br>' +
+        '<small>Bandeira: ' + esc(n.bandeira) + '</small>'
+      );
+      naviosMarkers.push(marker);
+      naviosLayer.addLayer(marker);
+
+      html += '<div style="background:var(--card2);border-radius:8px;padding:8px;margin:6px 0;font-size:13px">' +
+        '<b>' + esc(n.nome) + '</b><br>' +
+        '<span class="muted">MMSI: ' + esc(n.mmsi) + ' · Tipo: ' + esc(n.tipo) + ' · Vel: ' + esc(n.velocidade) + ' nós</span>' +
+        '</div>';
+    });
+
+    if (html) {
+      lista.style.display = 'block';
+      lista.innerHTML = html;
+    } else {
+      lista.style.display = 'none';
+    }
+  }).catch(function(e) {
+    toast('Erro ao carregar embarcações: ' + e.message);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initMap();
+
+  document.getElementById('lyr-osm').onchange = function() { toggleLayer('lyr-osm', layers.osm); };
+  document.getElementById('lyr-satelite').onchange = function() { toggleLayer('lyr-satelite', layers.satelite); };
+  document.getElementById('lyr-navios').onchange = function() { toggleLayer('lyr-navios', naviosLayer); };
+
+  document.getElementById('btn-atualizar').onclick = carregarNavios;
+
+  carregarNavios();
+  setInterval(carregarNavios, 300000);
+});
+
+if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; }
+</script>
+</body>
+</html>
