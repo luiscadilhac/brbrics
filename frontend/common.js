@@ -102,6 +102,7 @@ var BRBRICS_NAV=[
   {t:'Comércio exterior',h:'comex.html',ic:'trend'},
   {t:'Guia Fipe',h:'fipe.html',ic:'car'},
   {t:'Agro e safra',h:'agro.html',ic:'leaf'},
+  {t:'Serviços públicos',h:'rss.html',ic:'folder',sub:[{t:'Feeds RSS oficiais',h:'rss.html',ic:'news'},{t:'Calendário e feriados',h:'calendario.html',ic:'calendar'}]},
   {t:'Sobre',h:'sobre.html',ic:'info'}
 ];
 function brbricsCur(){var p=(location.pathname.split('/').pop()||'index.html').split('?')[0];return p;}
