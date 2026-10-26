@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendário Oficial — BrBRICS</title>
+<meta name="description" content="Feriados nacionais, sessões do Congresso e prazos do calendário oficial público brasileiro.">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="style.css?v=41">
+<link rel="stylesheet" href="pro.css?v=41">
+<style>
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--yellow); }
+  .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .cal-card { background: var(--card2); border-radius: 10px; padding: 16px; border: 1px solid var(--line); }
+  .cal-card h4 { margin: 0 0 10px; color: var(--yellow); font-size: 15px; }
+  .cal-item { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; display: flex; justify-content: space-between; }
+  .cal-item:last-child { border-bottom: none; }
+  .cal-item b { color: var(--paper); }
+  .cal-item .muted { color: var(--muted); font-size: 11px; }
+  .tipo-feriado { color: #f87171; font-weight: 800; font-size: 11px; text-transform: uppercase; }
+  .tipo-sessao { color: #3b82f6; font-weight: 800; font-size: 11px; text-transform: uppercase; }
+  .tipo-recesso { color: #a78bfa; font-weight: 800; font-size: 11px; text-transform: uppercase; }
+  .ano-select { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
+  .ano-select select { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg2); color: var(--paper); font-size: 13px; }
+  .btn-ano { background: var(--grad); color: #141414; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  .btn-ano:hover { transform: translateY(-1px); }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">📅 Calendário Oficial</p>
+    <h1>Feriados e Sessões Públicas</h1>
+    <p class="sub">Feriados nacionais, sessões legislativas e recessos — calendário oficial do Brasil.</p>
+  </section>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Eventos no ano</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última atualização</div></div>
+  </div>
+
+  <div class="ano-select">
+    <label style="font-size:13px;color:var(--muted)">Ano:</label>
+    <select id="sel-ano"></select>
+    <button class="btn-ano" id="btn-carregar">Carregar →</button>
+  </div>
+
+  <div class="cal-grid">
+    <div class="cal-card">
+      <h4>🎉 Feriados Nacionais</h4>
+      <div id="lista-feriados">
+        <p class="muted" style="padding:10px;text-align:center">Carregando...</p>
+      </div>
+    </div>
+
+    <div class="cal-card">
+      <h4>🏛️ Sessões e Recessos</h4>
+      <div id="lista-sessoes">
+        <p class="muted" style="padding:10px;text-align:center">Carregando...</p>
+      </div>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — calendário oficial: feriados, sessões e recessos.</div>
+    <div class="flinks"><a href="multimidia.html">Multimídia</a><a href="clima-ar.html">Clima e Ar</a><a href="rss.html">RSS</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=41"></script>
+<script src="app.js?v=41"></script>
+<script>
+var anoAtual = new Date().getFullYear();
+
+function carregarCalendario(ano) {
+  fetch('/api/calendario?ano=' + ano).then(function(r){ return r.json(); }).then(function(d) {
+    document.getElementById('stat-total').textContent = d.total || 0;
+    document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
+
+    var feriados = document.getElementById('lista-feriados');
+    feriados.innerHTML = (d.feriados || []).map(function(f){
+      var classe = 'tipo-feriado';
+      return '<div class="cal-item">' +
+        '<span>' + f.nome + '</span>' +
+        '<span style="display:flex;flex-direction:column;align-items:flex-end;text-align:right">' +
+        '<span class="' + classe + '">' + f.tipo + '</span>' +
+        '<span class="muted">' + f.data.slice(8,10) + '/' + f.data.slice(5,7) + '</span>' +
+        '</span>' +
+        '</div>';
+    }).join('');
+
+    var sessoes = document.getElementById('lista-sessoes');
+    sessoes.innerHTML = (d.sessoes || []).map(function(s){
+      var classe = s.tipo.indexOf('recesso') >= 0 ? 'tipo-recesso' : 'tipo-sessao';
+      return '<div class="cal-item">' +
+        '<span>' + s.nome + '</span>' +
+        '<span style="display:flex;flex-direction:column;align-items:flex-end;text-align:right">' +
+        '<span class="' + classe + '">' + s.tipo + '</span>' +
+        '<span class="muted">' + s.data.slice(8,10) + '/' + s.data.slice(5,7) + '</span>' +
+        '</span>' +
+        '</div>';
+    }).join('');
+  }).catch(function(e){ toast('Erro ao carregar calendário: ' + e.message); });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var sel = document.getElementById('sel-ano');
+  for (var y = 2024; y <= 2030; y++) {
+    var opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    if (y === anoAtual) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  carregarCalendario(anoAtual);
+
+  document.getElementById('btn-carregar').onclick = function(){
+    carregarCalendario(sel.value);
+  };
+});
+
+if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; }
+</script>
+</body>
+</html>

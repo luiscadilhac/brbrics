@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dados Abertos — BrBRICS</title>
+<meta name="description" content="Indicadores econômicos do Banco Central, localidades do IBGE e outros dados abertos do governo federal.">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="style.css?v=41">
+<link rel="stylesheet" href="pro.css?v=41">
+<style>
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--yellow); }
+  .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .dado-card { background: var(--card2); border-radius: 10px; padding: 16px; border: 1px solid var(--line); }
+  .dado-card h4 { margin: 0 0 10px; color: var(--yellow); font-size: 15px; }
+  .dado-row { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .dado-row:last-child { border-bottom: none; }
+  .dado-row b { color: var(--paper); }
+  .dado-row .muted { color: var(--muted); font-size: 11px; }
+  .estados-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+  .estado-chip { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 13px; text-align: center; color: var(--paper); }
+  .fonte-badge { display: inline-block; background: rgba(255,196,0,.15); color: var(--yellow); border: 1px solid rgba(255,196,0,.3); border-radius: 999px; padding: 4px 10px; font-size: 11px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">📊 Dados Abertos do Governo</p>
+    <h1>Indicadores e Localidades Públicas</h1>
+    <p class="sub">Banco Central (SGS), IBGE e outras fontes oficiais — dados em JSON via backend.</p>
+  </section>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="stat-bc">—</div><div class="stat-lab">Indicadores BCB</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-ibge">—</div><div class="stat-lab">Estados IBGE</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última atualização</div></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="dado-card">
+      <span class="fonte-badge">Banco Central — SGS</span>
+      <h4>💰 Indicadores Econômicos</h4>
+      <div class="dado-row"><b>IPCA:</b> <span id="v-ipca">—</span> <span class="muted">último valor</span></div>
+      <div class="dado-row"><b>Selic:</b> <span id="v-selic">—</span> <span class="muted">% a.a.</span></div>
+      <div class="dado-row"><b>IGP-M:</b> <span id="v-igpm">—</span> <span class="muted">último valor</span></div>
+      <div class="dado-row"><b>PTAX:</b> <span id="v-ptax">—</span> <span class="muted">dólar</span></div>
+      <div style="margin-top:10px"><button class="btn-rss" style="width:auto;padding:6px 12px;font-size:12px" onclick="carregarBC()">Atualizar →</button></div>
+    </div>
+
+    <div class="dado-card">
+      <span class="fonte-badge">IBGE — Localidades</span>
+      <h4>🗺️ Estados e Regiões</h4>
+      <div id="lista-estados" class="estados-lista">
+        <p class="muted" style="grid-column:1/-1;text-align:center;padding:10px">Carregando estados...</p>
+      </div>
+      <div style="margin-top:10px"><button class="btn-rss" style="width:auto;padding:6px 12px;font-size:12px" onclick="carregarIBGE()">Atualizar →</button></div>
+    </div>
+  </div>
+
+  <section class="card">
+    <div class="card-h"><h2>🔗 Outras fontes de dados abertos</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--yellow)">PNCP — Licitações</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Pregões eletrônicos e contratos públicos.</p>
+        <a href="licitacoes.html" style="color:var(--yellow);font-size:12px">Ver licitações →</a>
+      </div>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--yellow)">DataJud — CNJ</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Consulta processual dos tribunais.</p>
+        <a href="tribunais.html" style="color:var(--yellow);font-size:12px">Ver tribunais →</a>
+      </div>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--yellow)">ComexStat — MDIC</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Comércio exterior: exportação e importação.</p>
+        <a href="comex.html" style="color:var(--yellow);font-size:12px">Ver Comex →</a>
+      </div>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--yellow)">TSE — Eleições</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Candidatos e prestação de contas eleitorais.</p>
+        <a href="#" style="color:var(--yellow);font-size:12px">Portal TSE →</a>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — dados do Banco Central, IBGE, PNCP, DataJud, ComexStat e TSE.</div>
+    <div class="flinks"><a href="rss.html">RSS</a><a href="mapas.html">Mapas</a><a href="graficos.html">Gráficos</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=41"></script>
+<script src="app.js?v=41"></script>
+<script>
+function carregarBC() {
+  fetch('/api/dados/bc').then(function(r){ return r.json(); }).then(function(d) {
+    document.getElementById('stat-bc').textContent = d.resumo ? Object.keys(d.resumo).length : 0;
+    document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
+    if (d.resumo) {
+      if (d.resumo.ipca != null) document.getElementById('v-ipca').textContent = d.resumo.ipca;
+      if (d.resumo.selic != null) document.getElementById('v-selic').textContent = d.resumo.selic;
+      if (d.resumo.igpm != null) document.getElementById('v-igpm').textContent = d.resumo.igpm;
+      if (d.resumo.ptax != null) document.getElementById('v-ptax').textContent = d.resumo.ptax;
+    }
+  }).catch(function(e){ toast('Erro ao carregar BC: ' + e.message); });
+}
+
+function carregarIBGE() {
+  fetch('/api/dados/ibge').then(function(r){ return r.json(); }).then(function(d) {
+    document.getElementById('stat-ibge').textContent = d.total || 0;
+    document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
+    var lista = document.getElementById('lista-estados');
+    if (d.estados && d.estados.length) {
+      lista.innerHTML = d.estados.map(function(e){
+        return '<div class="estado-chip">' + e.sigla + '<br><span style="font-size:11px;color:var(--muted)">' + e.nome + '</span></div>';
+      }).join('');
+    } else {
+      lista.innerHTML = '<p class="muted" style="grid-column:1/-1;text-align:center;padding:10px">Erro ao carregar estados.</p>';
+    }
+  }).catch(function(e){ toast('Erro ao carregar IBGE: ' + e.message); });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  carregarBC();
+  carregarIBGE();
+});
+
+if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; }
+</script>
+</body>
+</html>

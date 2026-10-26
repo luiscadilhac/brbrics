@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSS — Feeds Oficiais — BrBRICS</title>
+<meta name="description" content="Notícias e publicações oficiais via RSS: Diário Oficial da União, Agência Brasil, IBGE e ANEEL.">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="style.css?v=41">
+<link rel="stylesheet" href="pro.css?v=41">
+<style>
+  .fontes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .fonte-card { background: var(--card); border-radius: 10px; padding: 16px; border: 1px solid var(--line); }
+  .fonte-card h4 { margin: 0 0 8px; color: var(--yellow); font-size: 15px; }
+  .fonte-card p { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
+  .btn-rss { background: var(--grad); color: #141414; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; width: 100%; }
+  .btn-rss:hover { transform: translateY(-1px); }
+  .itens-lista { background: var(--card2); border-radius: 10px; padding: 0; border: 1px solid var(--line); max-height: 600px; overflow-y: auto; }
+  .item-rss { padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .item-rss:last-child { border-bottom: none; }
+  .item-rss b { color: var(--paper); display: block; margin-bottom: 4px; }
+  .item-rss .muted { font-size: 11px; color: var(--muted); }
+  .item-rss a { color: var(--yellow); text-decoration: none; font-size: 12px; }
+  .item-rss a:hover { text-decoration: underline; }
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--yellow); }
+  .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">📰 RSS — Feeds Oficiais</p>
+    <h1>Notícias e Publicações do Governo</h1>
+    <p class="sub">Diário Oficial da União, Agência Brasil, IBGE e ANEEL — atualização automática via RSS.</p>
+  </section>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="stat-fontes">—</div><div class="stat-lab">Fontes cadastradas</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Itens carregados</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última atualização</div></div>
+  </div>
+
+  <div class="fontes-grid" id="grid-fontes">
+    <!-- Cards de fontes gerados por JS -->
+  </div>
+
+  <div style="margin-top: 20px;">
+    <div class="card-h"><h2>📄 Últimos itens selecionados</h2></div>
+    <div class="itens-lista" id="lista-itens">
+      <p class="muted" style="padding:20px">Selecione uma fonte acima para carregar os itens.</p>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — feeds oficiais: DOU, Agência Brasil, IBGE, ANEEL.</div>
+    <div class="flinks"><a href="mapa-brasil.html">Mapas</a><a href="dados.html">Dados Abertos</a><a href="graficos.html">Gráficos</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=41"></script>
+<script src="app.js?v=41"></script>
+<script>
+// Estado
+var fontes = [];
+var fonteAtual = null;
+
+function carregarFontes() {
+  fetch('/api/rss/fontes').then(function(r){ return r.json(); }).then(function(d) {
+    fontes = d.fontes || [];
+    document.getElementById('stat-fontes').textContent = fontes.length;
+    document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
+    var grid = document.getElementById('grid-fontes');
+    grid.innerHTML = fontes.map(function(f){
+      return '<div class="fonte-card">' +
+        '<h4>📰 ' + f.nome + '</h4>' +
+        '<p>' + f.tipo + '</p>' +
+        '<button class="btn-rss" onclick="carregarItens(\'' + f.id + '\', this)">Carregar itens →</button>' +
+        '</div>';
+    }).join('');
+  }).catch(function(e){ toast('Erro ao carregar fontes: ' + e.message); });
+}
+
+function carregarItens(id, btn) {
+  fonteAtual = id;
+  var btns = document.querySelectorAll('.btn-rss');
+  btns.forEach(function(b){ b.style.background = 'var(--grad)'; b.style.color = '#141414'; });
+  btn.style.background = 'var(--yellow)';
+  btn.style.color = '#141414';
+
+  var lista = document.getElementById('lista-itens');
+  lista.innerHTML = '<p class="muted" style="padding:20px">Carregando...</p>';
+
+  fetch('/api/rss/buscar?id=' + encodeURIComponent(id) + '&qtd=15').then(function(r){ return r.json(); }).then(function(d) {
+    document.getElementById('stat-total').textContent = d.total || 0;
+    if (d.erro) {
+      lista.innerHTML = '<p class="muted" style="padding:20px">Erro: ' + d.erro + '</p>';
+      return;
+    }
+    if (!d.itens || d.itens.length === 0) {
+      lista.innerHTML = '<p class="muted" style="padding:20px">Nenhum item encontrado.</p>';
+      return;
+    }
+    var html = d.itens.map(function(item){
+      var data = item.data ? new Date(item.data).toLocaleDateString('pt-BR') : '';
+      return '<div class="item-rss">' +
+        '<b>' + item.titulo + '</b>' +
+        '<span class="muted">' + item.orgao + ' · ' + data + '</span>' +
+        '<div style="margin-top:6px;font-size:12px;color:var(--muted)">' + item.resumo + '</div>' +
+        '<a href="' + item.link + '" target="_blank" rel="noopener">Ler na fonte →</a>' +
+        '</div>';
+    }).join('');
+    lista.innerHTML = html;
+  }).catch(function(e){
+    lista.innerHTML = '<p class="muted" style="padding:20px">Erro: ' + e.message + '</p>';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  carregarFontes();
+});
+
+if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; }
+</script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapas Avançados — BrBRICS</title>
+<meta name="description" content="Mapas temáticos adicionais: desmatamento, queimadas por bioma, estações INMET e mais camadas geoespaciais.">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="style.css?v=41">
+<link rel="stylesheet" href="pro.css?v=41">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  #map { height: 60vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
+  .layer-panel { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+  .layer-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+  .layer-row label { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .layer-row input { accent-color: var(--yellow); }
+  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  .btn-sm:hover { transform: translateY(-1px); }
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--yellow); }
+  .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">🗺️ Mapas Avançados</p>
+    <h1>Camadas Geoespaciais Temáticas</p>
+    <p class="sub">Mapas adicionais de desmatamento, queimadas e estações meteorológicas do INMET.</p>
+  </section>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="stat-camadas">—</div><div class="stat-lab">Camadas ativas</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última atualização</div></div>
+  </div>
+
+  <div class="layer-panel">
+    <div class="layer-row"><strong style="color:var(--paper)">Camadas:</strong></div>
+    <div class="layer-row">
+      <label><input type="checkbox" id="lyr-osm" checked> OpenStreetMap</label>
+      <label><input type="checkbox" id="lyr-satelite"> Satélite (Esri)</label>
+      <label><input type="checkbox" id="lyr-desmatamento"> Desmatamento (INPE)</label>
+      <label><input type="checkbox" id="lyr-inmet"> Estações INMET</label>
+    </div>
+    <div class="layer-row" style="margin-top:8px">
+      <button class="btn-sm" id="btn-carregar">Carregar dados</button>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <section class="card">
+    <div class="card-h"><h2>🔗 Fontes dos mapas avançados</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--yellow)">INPE — PRODES</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Monitoramento do desmatamento na Amazônia Legal.</p>
+        <a href="https://www.inpe.br/" target="_blank" rel="noopener" style="color:var(--yellow);font-size:12px">INPE →</a>
+      </div>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--yellow)">INPE — BDQueimadas</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Focos de calor por bioma (Amazônia, Pantanal, Cerrado).</p>
+        <a href="https://queimadas.dgi.inpe.br/" target="_blank" rel="noopener" style="color:var(--yellow);font-size:12px">BDQueimadas →</a>
+      </div>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--yellow)">INMET — Estações</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Rede de estações meteorológicas automáticas.</p>
+        <a href="https://portal.inmet.gov.br/" target="_blank" rel="noopener" style="color:var(--yellow);font-size:12px">INMET →</a>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — mapas avançados: INPE PRODES, BDQueimadas, INMET e OpenStreetMap.</div>
+    <div class="flinks"><a href="mapa-brasil.html">Mapa Brasil</a><a href="mapa-satelite.html">Satélite</a><a href="rss.html">RSS</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=41"></script>
+<script src="app.js?v=41"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Estado
+var map = null;
+var layers = {};
+var desmatLayer = null;
+var inmetLayer = null;
+
+function initMap() {
+  map = L.map('map').setView([-14.2, -51.9], 4);
+
+  layers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  layers.satelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; Esri, Maxar, Earthstar Geographics'
+  });
+
+  desmatLayer = L.layerGroup().addTo(map);
+  inmetLayer = L.layerGroup().addTo(map);
+}
+
+function toggleLayer(id, layer) {
+  var cb = document.getElementById(id);
+  if (!cb) return;
+  if (cb.checked) {
+    if (!map.hasLayer(layer)) layer.addTo(map);
+  } else {
+    map.removeLayer(layer);
+  }
+}
+
+function carregarEstacoesINMET() {
+  inmetLayer.clearLayers();
+  var estacoes = [
+    { nome: 'INMET - São Paulo (Mirante)', lat: -23.5505, lon: -46.6333 },
+    { nome: 'INMET - Rio de Janeiro', lat: -22.9068, lon: -43.1729 },
+    { nome: 'INMET - Brasília', lat: -15.8267, lon: -47.9218 },
+    { nome: 'INMET - Salvador', lat: -12.9714, lon: -38.5014 },
+    { nome: 'INMET - Belo Horizonte', lat: -19.9167, lon: -43.9345 },
+    { nome: 'INMET - Curitiba', lat: -25.4284, lon: -49.2733 },
+    { nome: 'INMET - Porto Alegre', lat: -30.0346, lon: -51.2177 },
+    { nome: 'INMET - Manaus', lat: -3.1190, lon: -60.0217 }
+  ];
+  estacoes.forEach(function(e){
+    L.marker([e.lat, e.lon]).bindPopup('<b>' + e.nome + '</b>').addTo(inmetLayer);
+  });
+  document.getElementById('stat-camadas').textContent = estacoes.length;
+}
+
+function carregarDesmatamento() {
+  desmatLayer.clearLayers();
+  // Marcadores ilustrativos de áreas de desmatamento monitorado (exemplos)
+  var areas = [
+    { nome: 'Amazônia - Pará', lat: -5.5, lon: -53.0 },
+    { nome: 'Amazônia - Amazonas', lat: -3.5, lon: -61.0 },
+    { nome: 'Cerrado - Mato Grosso', lat: -12.0, lon: -55.0 },
+    { nome: 'Pantanal - Mato Grosso do Sul', lat: -19.0, lon: -57.0 }
+  ];
+  areas.forEach(function(a){
+    L.circleMarker([a.lat, a.lon], { radius: 8, color: '#dc2626', fillColor: '#dc2626', fillOpacity: 0.6 })
+      .bindPopup('<b>⚠️ ' + a.nome + '</b><br><small>Área monitorada INPE/PRODES</small>')
+      .addTo(desmatLayer);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initMap();
+
+  document.getElementById('lyr-osm').onchange = function() { toggleLayer('lyr-osm', layers.osm); };
+  document.getElementById('lyr-satelite').onchange = function() { toggleLayer('lyr-satelite', layers.satelite); };
+  document.getElementById('lyr-desmatamento').onchange = function() { toggleLayer('lyr-desmatamento', desmatLayer); };
+  document.getElementById('lyr-inmet').onchange = function() { toggleLayer('lyr-inmet', inmetLayer); };
+
+  document.getElementById('btn-carregar').onclick = function() {
+    carregarEstacoesINMET();
+    carregarDesmatamento();
+    document.getElementById('stat-atualizacao').textContent = new Date().toLocaleString('pt-BR').slice(0,16);
+  };
+
+  carregarEstacoesINMET();
+  carregarDesmatamento();
+});
+
+if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; }
+</script>
+</body>
+</html>
