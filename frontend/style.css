@@ -2,6 +2,7 @@
   --bg:#0c0c0e; --bg2:#131316; --card:#17171c; --card2:#1e1e24;
   --ink:#e8ecf3; --paper:#e8ecf3; --muted:#a7a7b3; --line:#2a2a32;
   --yellow:#FFC400; --orange:#FF7A00;
+  --ico:#7dd3fc;
   --grad:linear-gradient(135deg,#FFC400,#FF7A00);
   --radius:16px;
   --font:'Inter','Segoe UI',system-ui,-apple-system,Arial,sans-serif;
@@ -29,7 +30,7 @@ body{margin:0;background:radial-gradient(1200px 500px at 80% -10%,rgba(255,122,0
 /* ===== Menu com submenus (dropdown) + hamburguer mobile ===== */
 .navgrp{position:relative}
 .navtop{cursor:pointer}
-.nav-ico{display:inline-flex;color:#FFC400;margin-left:8px;vertical-align:-2px;flex:none}
+.nav-ico{display:inline-flex;color:var(--ico);margin-left:8px;vertical-align:-2px;flex:none}
 .nav-ico svg{width:15px;height:15px;display:block}
 .navgrp .sub .nav-ico svg{width:13px;height:13px}
 .navgrp:hover .navtop .nav-ico,.navgrp:focus-within .navtop .nav-ico,.navtop.active .nav-ico,.nav a.active .nav-ico,.nav a:hover .nav-ico{color:#141414}
@@ -190,7 +191,7 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 /* ===== Compartilhar + favoritos ===== */
 .share-row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center}
 .share-btn{display:inline-flex;align-items:center;gap:6px;background:#101014;border:1px solid var(--line);color:var(--paper);border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:700;cursor:pointer;text-decoration:none}
-.share-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.share-btn svg{width:13px;height:13px;stroke:var(--ico);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .share-btn:hover{border-color:var(--yellow);color:var(--yellow)}
 .fav-btn{background:transparent;border:1px solid var(--line);border-radius:8px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);flex:none;padding:0}
 .fav-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8}
@@ -200,7 +201,7 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 /* ===== Vídeo ===== */
 .vid-link{display:block;position:relative}
 .play-btn{position:absolute;inset:0;margin:auto;width:56px;height:56px;border-radius:50%;background:rgba(10,10,12,.72);border:2px solid var(--paper);display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none}
-.play-btn svg{width:24px;height:24px;fill:var(--paper)}
+.play-btn svg{width:24px;height:24px;fill:var(--ico)}
 .news-card:hover .play-btn{background:var(--grad);border-color:transparent}
 .news-card:hover .play-btn svg{fill:#141414}
 .car-slide .play-btn{width:72px;height:72px}
@@ -240,7 +241,7 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 .tend{font-size:11px;font-weight:800;margin-left:6px;white-space:nowrap}
 /* ===== Estados vazios ===== */
 .empty-state{text-align:center;padding:28px 12px;color:var(--muted)}
-.empty-state svg{width:40px;height:40px;stroke:#3a3a45;margin-bottom:8px}
+.empty-state svg{width:40px;height:40px;stroke:var(--ico);margin-bottom:8px}
 .empty-state p{margin:6px 0;color:var(--paper)}
 /* ===== Miniaturas em rankings ===== */
 .rank-thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;flex:none}
@@ -250,7 +251,7 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 .ticker-track a{color:var(--paper);text-decoration:none;margin:0 14px}
 .ticker-track a:hover{color:var(--yellow);text-decoration:underline}
 .tick-sep{color:#3a3a45;margin:0 4px}
-.ticker-track a .tick-ico{display:inline-flex;vertical-align:-2px;margin-right:6px;color:var(--yellow)}
+.ticker-track a .tick-ico{display:inline-flex;vertical-align:-2px;margin-right:6px;color:var(--ico)}
 .ticker-track a .tick-ico svg{width:12px;height:12px;display:block}
 .mkt-ticker{background:rgba(255,196,0,.05);border-top:none;border-bottom:1px solid var(--line)}
 .tick-market{color:var(--yellow);font-weight:700}
