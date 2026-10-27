@@ -3,7 +3,7 @@ var fetch=null; try{fetch=require('node-fetch');}catch(e){}
 var BASE='https://api-comexstat.mdic.gov.br';
 var DIA=86400000;
 function postComex(path, body){
-  var ctrl=new AbortController(); var timer=setTimeout(function(){ctrl.abort();},60000);
+  var ctrl=new AbortController(); var timer=setTimeout(function(){ctrl.abort();},30000);
   return fetch(BASE+path+'?language=pt',{method:'POST',signal:ctrl.signal,
     headers:{'Content-Type':'application/json','Accept':'application/json','User-Agent':'BrBRICS/1.0'},
     body:JSON.stringify(body)})
@@ -23,16 +23,34 @@ function linhasDe(j){
   return [];
 }
 function esperar(ms){return new Promise(function(r){setTimeout(r,ms);});}
+// ComexStat atende devagar e limita o ritmo. O navegador nunca espera mais que
+// LIMITE: ao estourar, devolve aviso honesto e marca falha em cache curto (NEGATIVO_TTL)
+// para nao martelar a origem a cada clique. Se a origem responder depois, o dado bom
+// entra no cache de 1 dia e a proxima visita ja ve o resultado real.
+var LIMITE=18000; var NEGATIVO_TTL=120000;
+function respostaPrazo(promise, fallback, cacheia, res){
+  var respondido=false;
+  var t=setTimeout(function(){
+    if(respondido) return; respondido=true;
+    var f=fallback(); cacheia(f, true); res.json(f);
+  }, LIMITE);
+  promise.then(function(v){
+    if(!respondido){ respondido=true; clearTimeout(t); cacheia(v, false); res.json(v); }
+    else if(v) cacheia(v, false);
+  }).catch(function(e){
+    if(!respondido){ respondido=true; clearTimeout(t); var f=fallback(); cacheia(f, true); res.json(f); }
+  });
+}
 function fluxoRobusto(body, tent){
   tent=tent||0;
   function tenta(){
     return postComex('/general',body).then(function(r){
       if(linhasDe(r.data).length) return r;
       if(tent>=2) return r;
-      return esperar(15000).then(function(){return fluxoRobusto(body,tent+1);});
+      return esperar(8000).then(function(){return fluxoRobusto(body,tent+1);});
     }).catch(function(e){
       if(tent>=2) return {error:String((e&&e.message)||e)};
-      return esperar(15000).then(function(){return fluxoRobusto(body,tent+1);});
+      return esperar(8000).then(function(){return fluxoRobusto(body,tent+1);});
     });
   }
   return tenta();
@@ -70,46 +88,53 @@ function registrarComex(app, cacheGet, cacheSet, getJSON){
   app.get('/api/comex/resumo', function(req,res){
     var ano=String(req.query.ano||new Date().getFullYear()).replace(/\D/g,'')||String(new Date().getFullYear());
     var ck='cx_res_'+ano; var hit=cacheGet(ck); if(hit) return res.json(hit);
-    function fluxo(f){
-      return postComex('/general',{flow:f, monthDetail:false,
-        period:{from:ano+'-01', to:ano+'-12'}, details:['state'], metrics:['metricFOB']});
-    }
-    // sequencial com intervalo (a API limita o ritmo); só cacheia com dados
-    fluxoRobusto({flow:'export', monthDetail:false,
-      period:{from:ano+'-01', to:ano+'-12'}, details:['state'], metrics:['metricFOB']}).then(function(rE){
-      return esperar(5000).then(function(){
-        return fluxoRobusto({flow:'import', monthDetail:false,
-          period:{from:ano+'-01', to:ano+'-12'}, details:['state'], metrics:['metricFOB']}).then(function(rI){return [rE,rI];});
+    function corpo(f){ return {flow:f, monthDetail:false,
+      period:{from:ano+'-01', to:ano+'-12'}, details:['state'], metrics:['metricFOB']}; }
+    function tot(a){return a.reduce(function(s,x){return s+x.valor;},0);}
+    // sequencial com intervalo (a API limita o ritmo)
+    var tarefa=fluxoRobusto(corpo('export')).then(function(rE){
+      return esperar(3000).then(function(){
+        return fluxoRobusto(corpo('import')).then(function(rI){ return [rE,rI]; });
       });
     }).then(function(rs){
       var ex=linhasDe(rs[0].data), im=linhasDe(rs[1].data);
       var porUFex=agrega(ex,['state','uf','sgUF','noUF'],['metricFOB','fob','FOB','valorFob','value']);
       var porUFim=agrega(im,['state','uf','sgUF','noUF'],['metricFOB','fob','FOB','valorFob','value']);
-      function tot(a){return a.reduce(function(s,x){return s+x.valor;},0);}
       var tE=tot(porUFex), tI=tot(porUFim);
       var mapa={};
       porUFex.forEach(function(x){mapa[x.rotulo]=mapa[x.rotulo]||{uf:x.rotulo,exp:0,imp:0};mapa[x.rotulo].exp=x.valor;});
       porUFim.forEach(function(x){mapa[x.rotulo]=mapa[x.rotulo]||{uf:x.rotulo,exp:0,imp:0};mapa[x.rotulo].imp=x.valor;});
       var ufs=Object.keys(mapa).map(function(k){var o=mapa[k];o.saldo=o.exp-o.imp;o.mov=o.exp+o.imp;return o;})
         .sort(function(a,b){return b.mov-a.mov;});
-      var out={fonte:'MDIC / ComexStat', ano:ano, exportTotal:tE, importTotal:tI, saldo:tE-tI,
+      return {fonte:'MDIC / ComexStat', ano:ano, exportTotal:tE, importTotal:tI, saldo:tE-tI,
         ufs:ufs.slice(0,15),
-        aviso:(!ex.length&&!im.length)?'ComexStat limitou o ritmo (tente de novo em 1 minuto) — doc em api-comexstat.mdic.gov.br/docs':null};
-      if(tE||tI) cacheSet(ck,out,DIA); res.json(out);
-    }).catch(function(e){res.status(502).json({erro:'ComexStat indisponível', detalhe:String((e&&e.message)||e).slice(0,200), doc:'https://api-comexstat.mdic.gov.br/docs'});});
+        aviso:(!ex.length&&!im.length)?'ComexStat limitou o ritmo (tente de novo em 1 minuto) — doc em api-comexstat.mdic.gov.br/docs':null,
+        atualizadoEm:new Date().toISOString()};
+    });
+    function semResposta(){ return {fonte:'MDIC / ComexStat', ano:ano, exportTotal:0, importTotal:0, saldo:0, ufs:[],
+      aviso:'A base ComexStat não respondeu dentro do prazo (ela fila os pedidos). Nova consulta automática em instantes — doc em api-comexstat.mdic.gov.br/docs.',
+      atualizadoEm:new Date().toISOString()}; }
+    function guarda(v, falhou){ cacheSet(ck, v, (!falhou && (v.exportTotal||v.importTotal)) ? DIA : NEGATIVO_TTL); }
+    respostaPrazo(tarefa, semResposta, guarda, res);
   });
   // Top parceiros: /api/comex/parceiros?ano=2025&fluxo=export
   app.get('/api/comex/parceiros', function(req,res){
     var ano=String(req.query.ano||new Date().getFullYear()).replace(/\D/g,'')||String(new Date().getFullYear());
     var fluxo=(String(req.query.fluxo||'export').toLowerCase()==='import')?'import':'export';
     var ck='cx_par_'+ano+'_'+fluxo; var hit=cacheGet(ck); if(hit) return res.json(hit);
-    fluxoRobusto({flow:fluxo, monthDetail:false,
+    var tarefa=fluxoRobusto({flow:fluxo, monthDetail:false,
       period:{from:ano+'-01', to:ano+'-12'}, details:['country'], metrics:['metricFOB']}).then(function(r){
       var rows=linhasDe(r.data||(r&&r.data));
       var pars=agrega(rows,['country','pais','noPais','partner'],['metricFOB','fob','FOB','valorFob','value']);
-      var out={fonte:'MDIC / ComexStat', ano:ano, fluxo:fluxo, parceiros:pars.slice(0,15)};
-      if(pars.length) cacheSet(ck,out,DIA); res.json(out);
-    }).catch(function(e){res.status(502).json({erro:'ComexStat indisponível', detalhe:String((e&&e.message)||e).slice(0,200)});});
+      return {fonte:'MDIC / ComexStat', ano:ano, fluxo:fluxo, parceiros:pars.slice(0,15),
+        aviso:pars.length?null:'ComexStat limitou o ritmo (tente de novo em 1 minuto) — doc em api-comexstat.mdic.gov.br/docs.',
+        atualizadoEm:new Date().toISOString()};
+    });
+    function semResposta(){ return {fonte:'MDIC / ComexStat', ano:ano, fluxo:fluxo, parceiros:[],
+      aviso:'A base ComexStat não respondeu dentro do prazo (ela fila os pedidos). Nova consulta automática em instantes.',
+      atualizadoEm:new Date().toISOString()}; }
+    function guarda(v, falhou){ cacheSet(ck, v, (!falhou && (v.parceiros||[]).length) ? DIA : NEGATIVO_TTL); }
+    respostaPrazo(tarefa, semResposta, guarda, res);
   });
 }
 module.exports={registrarComex:registrarComex};

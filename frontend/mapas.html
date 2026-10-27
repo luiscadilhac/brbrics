@@ -4,214 +4,6 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9633564064128096" crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapas Interativos — BrBRICS</title>
-<meta name="description" content="Mapas geoespaciais interativos com dados governamentais brasileiros: valores de licitações, processos judiciais e indicadores por município.">
-<link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
-<link rel="manifest" href="manifest.json?v=50">
-<link rel="alternate" type="application/rss+xml" title="BrBRICS - Manchetes oficiais" href="/rss.xml">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="BrBRICS">
-<meta property="og:title" content="Mapas Interativos — BrBRICS">
-<meta property="og:description" content="Mapas geoespaciais com dados governamentais oficiais: licitações, valores por município e processos judiciais.">
-<meta property="og:image" content="https://brbrics.com.br/logo-brics.png?v=50">
-<meta name="twitter:card" content="summary">
-<link rel="canonical" href="https://brbrics.com.br/mapas.html">
-<link rel="stylesheet" href="style.css?v=50">
-<link rel="stylesheet" href="pro.css?v=50">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet.heat.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css">
-
-<style>
-/* ========== ESTILOS BÁSICOS ========= */
-.map-container {
-  position: relative;
-  height: 600px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-}
-
-#map {
-  height: 100%;
-  width: 100%;
-}
-
-/* ========== PAINEL DE CONTROLES ========= */
-.controls-panel {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-}
-
-.controls-row {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  align-items: end;
-  margin-bottom: 15px;
-}
-
-.control-group {
-  flex: 1;
-  min-width: 150px;
-}
-
-.control-group label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 5px;
-}
-
-.control-group select,
-.control-group input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.control-group button {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-.control-group button:hover {
-  background: #1d4ed8;
-}
-
-/* ========== ESTATÍSTICAS SUPERIORES ========= */
-.stats-overview {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  text-align: center;
-}
-
-.stat-value {
-  font-size: 32px;
-  font-weight: 800;
-  color: #2563eb;
-  margin-bottom: 5px;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #6b7280;
-  font-weight: 600;
-}
-
-/* ========== PAINEL DE DETALHES ========= */
-.detail-panel {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-  display: none;
-}
-
-.detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: 20px;
-}
-
-.detail-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.detail-meta {
-  text-align: right;
-  font-size: 14px;
-  color: #6b7280;
-}
-
-/* ========== GRÁFICOS ========= */
-.chart-container {
-  position: relative;
-  height: 300px;
-  margin-top: 20px;
-}
-
-/* ========== LEGENDA ========= */
-.legend {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  margin-top: 20px;
-}
-
-.legend-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 14px;
-}
-
-.legend-color {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  margin-right: 10px;
-}
-
-/* ========== RESPONSIVO ========= */
-@media (max-width: 768px) {
-  .controls-row {
-    flex-direction: column;
-  }
-  
-  .map-container {
-    height: 400px;
-  }
-  
-  .stats-overview {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9633564064128096" crossorigin="anonymous"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapas e Satélite — BrBRICS</title>
 <meta name="description" content="Visualizações geoespaciais oficiais sem programar: OpenStreetMap, NASA Worldview, Copernicus Sentinel-2, IBGE, Google Earth Timelapse e mais.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
@@ -226,9 +18,10 @@
 <link rel="canonical" href="https://brbrics.com.br/mapas.html">
 <link rel="stylesheet" href="style.css?v=50">
 <link rel="stylesheet" href="pro.css?v=50">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
-<div style="padding:12px;background:#2563eb;color:#fff;text-align:center;font-weight:700">BrBRICS — Mapas atualizados (bases geográficas, APIs, licenças)</div>
+<div style="padding:12px;background:var(--acc-deep);color:#fff;text-align:center;font-weight:700">BrBRICS — Mapas atualizados (bases geográficas, APIs, licenças)</div>
 <header class="topbar">
   <div class="wrap topbar-in">
     <a class="brand" href="index.html"><img src="logo-brics.png?v=50" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
@@ -261,9 +54,9 @@
     <div class="card-h"><h2>📌 Pontos oficiais — Google Meu Mapas</h2><a href="https://mymaps.google.com" target="_blank" rel="noopener">Criar mapa no Google</a></div>
     <div class="toolbar" style="flex-wrap:wrap;gap:10px">
       <p class="muted" style="margin:0 0 10px 0">Desenhe pontos, linhas e áreas no mapa (órgãos públicos, tribunais, fiscais, etc.) e incorpore no site.</p>
-      <div style="display:flex;align-items:center;justify-content:center;max-width:100%;aspect-ratio:16/9;border:1px solid #ddd;border-radius:8px;overflow:hidden;background:#f7f7f7;color:#666;font-size:13px;line-height:1.5;padding:12px;text-align:center">
+      <div style="display:flex;align-items:center;justify-content:center;max-width:100%;aspect-ratio:16/9;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg2);color:var(--muted);font-size:13px;line-height:1.5;padding:12px;text-align:center">
         📍 <b>Cole aqui o iframe do Google Meu Mapas</b><br>
-        <span style="font-size:12px;color:#999">Passo: mymaps.google.com → Criar mapa → adicionar pontos → Compartilhar → Incorporar no meu site → copiar código.</span>
+        <span style="font-size:12px;color:var(--muted)">Passo: mymaps.google.com → Criar mapa → adicionar pontos → Compartilhar → Incorporar no meu site → copiar código.</span>
       </div>
       <p class="muted" style="margin:8px 0 0 0; font-size:13px"><strong>Passo a passo:</strong> 1) Acesse <a href="https://mymaps.google.com" target="_blank" rel="noopener">mymaps.google.com</a> → 2) Crie um novo mapa → 3) Adicione pontos/linhas/áreas → 4) Clique em <em>Compartilhar → Incorporar no meu site</em> → 5) Cole o código aqui.</p>
     </div>
@@ -346,17 +139,17 @@
     <h2>Dados Governamentais — incorporados diretamente (sem sair do site)</h2>
     <p>Buscas diretas via fetch para APIs públicas: BrasilAPI, PNCP, IBGE, Querido Diário (feed). Nenhum link externo obrigatório.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px;margin-bottom:20px">
-      <div style="background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.08)">
+      <div style="background:var(--card2);border:1px solid var(--line);padding:15px;border-radius:8px">
         <h3 style="margin-top:0">BrasilAPI — CEP exemplo</h3>
         <div id="brasilapi-box">Carregando...</div>
       </div>
-      <div style="background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.08)">
+      <div style="background:var(--card2);border:1px solid var(--line);padding:15px;border-radius:8px">
         <h3 style="margin-top:0">PNCP — licitações recentes</h3>
         <div id="pncp-box">Carregando...</div>
       </div>
-      <div style="background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.08)">
+      <div style="background:var(--card2);border:1px solid var(--line);padding:15px;border-radius:8px">
         <h3 style="margin-top:0">Querido Diário — feed</h3>
-        <p style="font-size:12px;color:#6b7280">Diários oficiais pesquisáveis de 5.000+ cidades. Para incorporação direta, use feed de uma cidade específica.</p>
+        <p style="font-size:12px;color:var(--muted)">Diários oficiais pesquisáveis de 5.000+ cidades. Para incorporação direta, use feed de uma cidade específica.</p>
         <a href="https://queridodiario.ok.org.br/" target="_blank" rel="noopener" style="font-size:12px">Acessar feed (opcional)</a>
       </div>
     </div>
@@ -366,6 +159,7 @@
     <h2>Mapa Interativo — Base IBGE + Leaflet</h2>
     <p>Malha oficial de estados (IBGE) + exemplo de choropleth por valor de licitação. Para municípios, use versão simplificada (<strong>tilacog/br-atlas</strong>, <strong>cristoferluch/GeoDadosBrasil</strong>).</p>
     <div style="position:relative;height:600px;border-radius:8px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:20px"><div id="map-implantao" style="height:100%;width:100%"></div></div>
+    <p id="status-mapa-dados" class="muted" style="font-size:13px;margin:0 0 14px">Preparando o mapa com a malha do IBGE e as licitações do PNCP...</p>
 
     <div style="padding:12px;background:rgba(59,130,246,.07);border-left:4px solid var(--acc-deep);border-radius:6px;font-size:12px;color:var(--muted)">
       <strong>Sugestões implementadas / fontes</strong><br>
@@ -380,11 +174,11 @@
   <section style="max-width:1200px;margin:30px auto;padding:0 20px">
     <h2>1. Bases Geográficas — todos os repositórios</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
-      <div style="background:#fff;padding:18px;border-radius:10px;border:1px solid #e2e8f0"><h3>tilacog/br-atlas</h3><p class="small">TopoJSON/GeoJSON do IBGE. BSD 3-Clause. Gera Brasil, estados e municípios.</p></div>
-      <div style="background:#fff;padding:18px;border-radius:10px;border:1px solid #e2e8f0"><h3>cristoferluch/GeoDadosBrasil</h3><p class="small">GeoJSON 3 níveis: mínimo (leve), intermediário, máximo. Escolha o leve para mapa rápido.</p></div>
-      <div style="background:#fff;padding:18px;border-radius:10px;border:1px solid #e2e8f0"><h3>ggondim/ibge-cidades-com-poligonos</h3><p class="small">Municípios já cruzados com polígonos. Liga código do município a licitação/despesa.</p></div>
-      <div style="background:#fff;padding:18px;border-radius:10px;border:1px solid #e2e8f0"><h3>0e1/localidades</h3><p class="small">Coordenadas, bandeiras, gentílicos das UFs. <strong>ODbL — exige citar fonte.</strong></p></div>
-      <div style="background:#fff;padding:18px;border-radius:10px;border:1px solid #e2e8f0"><h3>igorjba/malha</h3><p class="small">5.570 municípios com indicadores IBGE. Referência de 5 métodos de classificação de cores.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--line);padding:18px;border-radius:10px"><h3>tilacog/br-atlas</h3><p class="small">TopoJSON/GeoJSON do IBGE. BSD 3-Clause. Gera Brasil, estados e municípios.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--line);padding:18px;border-radius:10px"><h3>cristoferluch/GeoDadosBrasil</h3><p class="small">GeoJSON 3 níveis: mínimo (leve), intermediário, máximo. Escolha o leve para mapa rápido.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--line);padding:18px;border-radius:10px"><h3>ggondim/ibge-cidades-com-poligonos</h3><p class="small">Municípios já cruzados com polígonos. Liga código do município a licitação/despesa.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--line);padding:18px;border-radius:10px"><h3>0e1/localidades</h3><p class="small">Coordenadas, bandeiras, gentílicos das UFs. <strong>ODbL — exige citar fonte.</strong></p></div>
+      <div style="background:var(--card2);border:1px solid var(--line);padding:18px;border-radius:10px"><h3>igorjba/malha</h3><p class="small">5.570 municípios com indicadores IBGE. Referência de 5 métodos de classificação de cores.</p></div>
     </div>
   </section>
 
@@ -402,9 +196,9 @@
   <section style="max-width:1200px;margin:30px auto;padding:0 20px">
     <h2>3. Fontes de Dados — incorporadas diretamente</h2>
     <div class="grid-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
-      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>jxnxts/mcp-brasil</h3><p class="small"><strong>Catálogo de APIs.</strong> Câmara, Senado, Portal Transparência, TCU, PNCP/ComprasNet, DataJud/CNJ, STF/STJ/TST, TSE, IBGE, TCEs, INPE. Não exige chave na maioria.</p></div>
-      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>BrasilAPI</h3><p class="small">CEP, CNPJ, bancos, câmbio. Útil para enriquecer registros de fornecedores.</p></div>
-      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>Querido Diário (OK Brasil)</h3><p class="small">5.000+ diários oficiais, pesquisáveis. Entra como feed de atos municipais.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>jxnxts/mcp-brasil</h3><p class="small"><strong>Catálogo de APIs.</strong> Câmara, Senado, Portal Transparência, TCU, PNCP/ComprasNet, DataJud/CNJ, STF/STJ/TST, TSE, IBGE, TCEs, INPE. Não exige chave na maioria.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>BrasilAPI</h3><p class="small">CEP, CNPJ, bancos, câmbio. Útil para enriquecer registros de fornecedores.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>Querido Diário (OK Brasil)</h3><p class="small">5.000+ diários oficiais, pesquisáveis. Entra como feed de atos municipais.</p></div>
     </div>
   </section>
 
@@ -421,9 +215,9 @@
   <section style="max-width:1200px;margin:30px auto;padding:0 20px">
     <h2>6. Painéis incorporados — funcionando no site</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
-      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>Mapa interativo IBGE</h3><p>Malha oficial de estados + cor por licitação.</p><a href="mapa-brasil.html">Ver →</a></div>
-      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>Dados de APIs</h3><p>BrasilAPI, PNCP, IBGE, Querido Diário — fetch direto.</p><a href="dados-apis.html">Ver →</a></div>
-      <div style="background:#fff;padding:16px;border-radius:10px;border:1px solid #e2e8f0"><h3>Fontes e Licenças</h3><p>Tabela completa + como encaixar no Google Sites.</p><a href="fontes-licencas.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>Mapa interativo IBGE</h3><p>Malha oficial de estados + cor por licitação.</p><a href="mapa-brasil.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>Focos de calor (INPE)</h3><p>Malha do IBGE + focos das últimas 48h direto do BDQueimadas.</p><a href="mapa-satelite.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>Aviões, embarcações e câmeras</h3><p>ADS-B da OpenSky, rede portuária e câmeras públicas.</p><a href="mapa-avioes.html">Aviões</a> · <a href="mapa-embarcacoes.html">Embarcações</a> · <a href="mapa-cameras.html">Câmeras</a></div>
     </div>
   </section>
 
@@ -441,22 +235,63 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
-  const m = L.map('map-implantao').setView([-14.2,-51.9],4);
+  var m = L.map('map-implantao').setView([-14.2,-51.9],4);
+  setTimeout(function(){ m.invalidateSize(); }, 200);
+  window.addEventListener('load', function(){ m.invalidateSize(); });
+  window.addEventListener('resize', function(){ m.invalidateSize(); });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap',maxZoom:18}).addTo(m);
-  const sim = {'11':'R$ 3,2bi','12':'R$ 1,8bi','13':'R$ 4,5bi','21':'R$ 6,0bi','26':'R$ 9,2bi','35':'R$ 8,9bi','41':'R$ 4,0bi'};
-  fetch('https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json').then(r=>r.json()).then(geo=>{
-    L.geoJSON(geo,{style:f=>{const id=f.properties.id||f.properties.CO_UF||'';return{color:'#fff',weight:1,fillColor:sim[id]?'#2563eb':'#e5e7eb',fillOpacity:0.7};},onEachFeature:(f,l)=>{const id=f.properties.id||f.properties.CO_UF||'';l.bindPopup('<b>'+(f.properties.nome||'Estado')+'</b><br>'+ (sim[id]||'—'));}}).addTo(m);
-  });
+  var st = document.getElementById('status-mapa-dados');
+  if (st) st.textContent = 'Carregando malha do IBGE e licitações do PNCP...';
+  Promise.all([
+    fetch('https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json&intrarregiao=UF&qualidade=minima').then(function(r){ return r.json(); }),
+    fetch('/api/licitacoes?tamanhoPagina=100&pagina=1').then(function(r){ return r.json(); }).catch(function(){ return {}; }),
+    fetch('/api/ibge/estados').then(function(r){ return r.json(); }).catch(function(){ return {}; })
+  ]).then(function(lote){
+    var geo = lote[0] || {}, lic = lote[1] || {}, ufs = lote[2] || {};
+    var siglaPorCodigo = {};
+    (ufs.estados || []).forEach(function(e){ siglaPorCodigo[String(e.id)] = e.sigla; });
+    var cont = {};
+    (lic.dados || []).forEach(function(x){
+      var s = (x.unidadeOrgao && x.unidadeOrgao.ufSigla) || x.ufSigla || '';
+      if (s) cont[s] = (cont[s] || 0) + 1;
+    });
+    var max = 1;
+    Object.keys(cont).forEach(function(k){ if (cont[k] > max) max = cont[k]; });
+    L.geoJSON(geo, {
+      style: function(f){
+        var cod = String((f.properties || {}).codarea || '');
+        var n = cont[siglaPorCodigo[cod]] || 0;
+        return { color: '#7DD3FC', weight: 1, fillColor: n ? '#3B82F6' : '#1e1e24', fillOpacity: n ? (0.3 + 0.5 * (n / max)) : 0.18 };
+      },
+      onEachFeature: function(f, l){
+        var cod = String((f.properties || {}).codarea || '');
+        var s = siglaPorCodigo[cod] || 'BR';
+        var n = cont[s] || 0;
+        l.bindPopup('<b>' + s + '</b><br>' + (n ? n + ' licitações publicadas no período (PNCP)' : 'Nenhuma licitação na amostra dos últimos 7 dias'));
+      }
+    }).addTo(m);
+    if (st) st.textContent = (geo.features || []).length + ' estados na malha oficial do IBGE; ' + Object.keys(cont).length +
+      ' deles com licitações na amostra de ' + (lic.dados || []).length + ' contratações (' + Number(lic.total || 0).toLocaleString('pt-BR') + ' no período completo).';
+  }).catch(function(e){ if (st) st.textContent = 'Falha ao montar o mapa: ' + e.message; });
 })();
 </script>
 <script>
-fetch('https://brasilapi.com.br/api/cep/v1/01310100').then(r=>r.json()).then(d=>{
-  document.getElementById('brasilapi-box').innerHTML='<b>'+ (d.cep||d.cep_code||'—') +'</b> — '+ (d.logradouro||d.street||'') + ', '+ (d.bairro||d.neighborhood||'') + '<br><small>Cidade: '+ (d.cidade||d.city||'') + ' / UF: '+ (d.uf||d.state||'') + '</small>';
-}).catch(e=>{document.getElementById('brasilapi-box').innerHTML='<small>BrasilAPI: erro/CORS — recarregue.</small>';});
-fetch('https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial=01/01/2026').then(r=>r.json()).then(d=>{
-  const items = (d.contratacoes||d||[]).slice(0,3);
-  document.getElementById('pncp-box').innerHTML = items.map(x=>'<div><b>'+ (x.numero||x.id||'?') + '</b> — '+ (x.uasg||x.orgao||'') + '<br><small>'+ (x.objeto||x.descricao||'') + '</small></div>').join('') || '<small>Nenhum resultado direto via CORS; use backend.</small>';
-}).catch(e=>{document.getElementById('pncp-box').innerHTML='<small>PNCP: falha CORS — dados via backend/serve.</small>';});
-</script>
+function pinta(id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; }
+function fmtDia(s) { s = String(s || ''); return s.length === 8 ? s.slice(6,8) + '/' + s.slice(4,6) + '/' + s.slice(0,4) : s; }
+fetch('https://brasilapi.com.br/api/cep/v1/01310100').then(function(r){ return r.json(); }).then(function(d){
+  // A BrasilAPI responde em ingles (street/neighborhood/city/state), nao no formato da ViaCEP.
+  if (!d.street && !d.city) { pinta('brasilapi-box', '<small>A BrasilAPI não devolveu o endereço deste CEP agora.</small>'); return; }
+  pinta('brasilapi-box', '<b>' + esc(d.cep) + '</b> - ' + esc(d.street) + ', ' + esc(d.neighborhood) + '<br><small>Cidade: ' + esc(d.city) + ' / UF: ' + esc(d.state) + '</small>');
+}).catch(function(){ pinta('brasilapi-box', '<small>BrasilAPI indisponível agora.</small>'); });
+fetch('/api/licitacoes?tamanhoPagina=3&pagina=1').then(function(r){ return r.json(); }).then(function(d){
+  var itens = d.dados || [];
+  if (!itens.length) { pinta('pncp-box', '<small>Sem contratações publicadas no período.</small>'); return; }
+  pinta('pncp-box', itens.map(function(x){
+    var org = (x.orgaoEntidade && x.orgaoEntidade.razaoSocial) || x.orgao || '';
+    var uf = (x.unidadeOrgao && x.unidadeOrgao.ufSigla) || '';
+    return '<div style="margin-bottom:8px"><b>' + esc(x.numeroCompra || x.sequencialCompra || '?') + '</b> - ' + esc(org) + (uf ? ' (' + esc(uf) + ')' : '') +
+      '<br><small>' + esc(String(x.objetoCompra || '').slice(0, 110)) + '</small></div>';
+  }).join('') + '<small class="muted">PNCP via backend: ' + Number(d.total || 0).toLocaleString('pt-BR') + ' contratações entre ' + fmtDia((d.periodo || {}).ini) + ' e ' + fmtDia((d.periodo || {}).fim) + '</small>');
+}).catch(function(){ pinta('pncp-box', '<small>O PNCP não respondeu agora. Recarregue a página em instantes.</small>'); });</script>
 </body>
 </html>

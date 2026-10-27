@@ -115,11 +115,11 @@
 
   <section class="grid2">
     <div class="card">
-      <div class="card-h"><h2>Atos normativos & nomeações</h2><span class="tag">DOU Seção 1</span></div>
+      <div class="card-h"><h2>Atos normativos & nomeações</h2><span class="tag" id="cont-sec1">DOU Seção 1</span></div>
       <div id="dou-sec1" class="list"><div class="skel"></div><div class="skel"></div></div>
     </div>
     <div class="card">
-      <div class="card-h"><h2>Editais, licitações & contratos</h2><span class="tag">DOU Seção 3</span></div>
+      <div class="card-h"><h2>Editais, licitações & contratos</h2><span class="tag" id="cont-sec3">DOU Seção 3</span></div>
       <div id="dou-sec3" class="list"><div class="skel"></div><div class="skel"></div></div>
     </div>
   </section>
@@ -149,18 +149,33 @@ jget('/api/edicao/destaques').then(function(r){
   var sec1 = r.secao1 || []; var sec3 = r.secao3 || [];
   var period = r.periodo || '';
   document.getElementById('edicao-periodo').textContent = period || 'últimos 7 dias';
+  function rotulo(elId, arr, total, nome){
+    var el = document.getElementById(elId); if(!el) return;
+    el.textContent = nome + ' · ' + Number(total || (arr||[]).length).toLocaleString('pt-BR') + ' atos';
+  }
+  rotulo('cont-sec1', sec1, r.totalSecao1, 'DOU Seção 1');
+  rotulo('cont-sec3', sec3, r.totalSecao3, 'DOU Seção 3');
+  if(r.linkEdicao){
+    var cta = document.querySelector('.hero-edicao .cta a');
+    if(cta) cta.href = r.linkEdicao;
+  }
   function render(arr, elId, emptyMsg){
     var html = '';
     (arr||[]).forEach(function(a){
-      html += '<article><div class="tag-row"><span class="tag">'+esc(a.secao||'DOU')+'</span>'+favBtnHTML(a.link,a.titulo)+'</div><h4><a href="'+esc(a.link)+'" target="_blank" rel="noopener">'+esc(a.titulo)+'</a></h4>';
-      if(a.orgao) html += '<small class="muted">'+esc(a.orgao)+' · '+esc(a.data)+'</small>';
-      else html += '<small class="muted">'+esc(a.data)+'</small>';
+      html += '<article><div class="tag-row"><span class="tag">'+esc(a.artType||a.secao||'DOU')+'</span>'+favBtnHTML(a.link,a.titulo)+'</div><h4><a href="'+esc(a.link)+'" target="_blank" rel="noopener">'+esc(a.titulo)+'</a></h4>';
+      if(a.resumo) html += '<p class="muted" style="font-size:13px;margin:4px 0">'+esc(String(a.resumo).slice(0,180))+(String(a.resumo).length>180?'…':'')+'</p>';
+      var rod = [];
+      if(a.orgao) rod.push(a.orgao);
+      rod.push(a.secao||'DOU');
+      if(a.data) rod.push(a.data);
+      if(a.pagina) rod.push('p. '+a.pagina);
+      html += '<small class="muted">'+esc(rod.join(' · '))+'</small>';
       html += shareHTML(a.link,a.titulo)+'</article>';
     });
-    document.getElementById(elId).innerHTML = html || '<p class="muted">'+esc(emptyMsg)+'</p>';
+    document.getElementById(elId).innerHTML = html || emptyHTML(emptyMsg, r.aviso || 'A Imprensa Nacional publica de segunda a sexta.');
   }
-  render(sec1, 'dou-sec1', 'Sem atos normativos recentes');
-  render(sec3, 'dou-sec3', 'Sem editais recentes');
+  render(sec1, 'dou-sec1', 'Sem atos normativos nesta edição');
+  render(sec3, 'dou-sec3', 'Sem editais nesta edição');
 }).catch(function(){ 
   document.getElementById('dou-sec1').innerHTML = '<p class="muted">Erro ao carregar destaques. <button class="btn ghost" onclick="location.reload()">Tentar de novo</button></p>';
   document.getElementById('dou-sec3').innerHTML = '<p class="muted">Erro ao carregar destaques.</p>';

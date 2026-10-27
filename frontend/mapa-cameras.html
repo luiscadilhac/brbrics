@@ -115,6 +115,11 @@ var filtroAtual = 'todos';
 
 function initMap() {
   map = L.map('map').setView([-14.2, -51.9], 4);
+  // O container mede a altura em vh: sem recalcular depois do layout o Leaflet
+  // projeta tudo em 0,0 e o mapa parece em branco.
+  setTimeout(function(){ map.invalidateSize(); }, 200);
+  window.addEventListener('load', function(){ map.invalidateSize(); });
+  window.addEventListener('resize', function(){ map.invalidateSize(); });
 
   layers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -148,7 +153,7 @@ function carregarCameras() {
     document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
 
     var lista = document.getElementById('lista-cameras');
-    var html = '';
+    var html = d.aviso ? '<div style="background:var(--card2);border-radius:8px;padding:8px;margin:6px 0;font-size:13px;color:var(--muted)">' + esc(d.aviso) + '</div>' : '';
 
     (d.cameras || []).forEach(function(c) {
       if (filtroAtual !== 'todos' && c.tipo !== filtroAtual) return;

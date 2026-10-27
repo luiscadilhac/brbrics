@@ -8,6 +8,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 var fetch = require('node-fetch');
+var dou = require('./dou.js');
 
 // Global error handlers to catch silent crashes
 process.on('uncaughtException', function(err) {
@@ -56,47 +57,68 @@ function fmtDOU(d){function p(n){return String(n).padStart(2,'0');}return p(d.ge
 
 
 // ---- PNCP ----
+// A consulta do PNCP devolve lista VAZIA quando tamanhoPagina passa de 50, entao
+// pedidos maiores sao montados varrendo varias paginas de 50 itens na fonte.
+var PNCP_UP = 50;
+var PNCP_LIMITE_UP = 12;
 app.get('/api/licitacoes', function(req, res){
   var hoje = new Date();
   var ini = req.query.dataInicial || fmtPNCP(addDays(hoje, -7));
   var fim = req.query.dataFinal || fmtPNCP(hoje);
   var pagina = parseInt(req.query.pagina||'1',10)||1;
   var tamanho = parseInt(req.query.tamanhoPagina||'20',10)||20;
+  tamanho = Math.min(Math.max(tamanho,1),200);
   var modalidade = req.query.modalidade || 6;
   var q = String(req.query.q||'').toLowerCase().trim();
   var ck = 'lic_'+ini+'_'+fim+'_'+pagina+'_'+tamanho+'_'+modalidade+'_'+q;
   var hit = cacheGet(ck); if(hit) return res.json(hit);
-  var url = 'https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial='+ini+'&dataFinal='+fim+'&codigoModalidadeContratacao='+modalidade+'&pagina='+pagina+'&tamanhoPagina='+Math.max(tamanho,50);
-  getJSON(url).then(function(r){
-    var dados=(r.data&&r.data.data)?r.data.data:(Array.isArray(r.data)?r.data:[]);
-    var totalPNCP=(r.data&&r.data.totalRegistros!=null)?r.data.totalRegistros:((r.data&&r.data.totalElementos!=null)?r.data.totalElementos:dados.length);
+  var base = 'https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial='+ini+'&dataFinal='+fim+'&codigoModalidadeContratacao='+modalidade+'&tamanhoPagina='+PNCP_UP+'&pagina=';
+  function pegaUp(n){
+    return getJSON(base+n).then(function(r){
+      // JSON de erro/429 vem como texto: nao pode virar "nenhuma licitacao".
+      if(r.status !== 200 || !r.data || typeof r.data !== 'object'){
+        var e = new Error('PNCP respondeu HTTP ' + r.status); e.falha = true; throw e;
+      }
+      var dados=(r.data.data)?r.data.data:(Array.isArray(r.data)?r.data:[]);
+      var tot=(r.data.totalRegistros!=null)?r.data.totalRegistros:((r.data.totalElementos!=null)?r.data.totalElementos:dados.length);
+      return { dados: dados, total: tot };
+    });
+  }
+  var filtrar = function(o){
+    var texto = (o.objetoCompra||'')+' '+(o.orgaoEntidade&&o.orgaoEntidade.razaoSocial||'')+' '+(o.unidadeOrgao&&o.unidadeOrgao.nomeUnidade||'')+' '+(o.numeroControlePNCP||'');
+    return texto.toLowerCase().indexOf(q) !== -1;
+  };
+  // Sao preciso os (pagina*tamanho) primeiros itens; com busca, ate juntar essa
+  // quantidade de coincidencias, porque o PNCP nao filtra por palavra-chave.
+  var alvo = pagina*tamanho;
+  var acumulado = [], total = null, varridas = 0, amostraLimitada = false;
+  function caminha(n){
+    if(n > PNCP_LIMITE_UP){ amostraLimitada = true; return Promise.resolve(); }
+    return pegaUp(n).then(function(r){
+      if(total === null) total = r.total;
+      varridas++;
+      acumulado = acumulado.concat(r.dados);
+      var util = q ? acumulado.filter(filtrar) : acumulado;
+      if(util.length >= alvo || r.dados.length < PNCP_UP) return Promise.resolve();
+      return caminha(n+1);
+    }).catch(function(e){
+      if(n === 1) throw e;          // sem a primeira pagina nao ha nada a dizer
+      return Promise.resolve();     // pagina extra falhou: fica com a amostra atual
+    });
+  }
+  caminha(1).then(function(){
+    var lista = q ? acumulado.filter(filtrar) : acumulado;
+    var t = (total !== null) ? total : lista.length;
+    var out = { fonte: 'PNCP', periodo: { ini: ini, fim: fim }, modalidade: modalidade, pagina: pagina, tamanhoPagina: tamanho, total: t, totalPaginas: t?Math.ceil(t/tamanho):1, dados: lista.slice((pagina-1)*tamanho, pagina*tamanho) };
     if(q){
-      // Filtro local nos 50 itens da página atual; se zerar, tenta páginas 2..6 (PNCP não busca por palavra-chave)
-      var filtrar = function(lista){
-        return lista.filter(function(o){
-          var texto = (o.objetoCompra||'')+' '+(o.orgaoEntidade&&o.orgaoEntidade.razaoSocial||'')+' '+(o.unidadeOrgao&&o.unidadeOrgao.nomeUnidade||'')+' '+(o.numeroControlePNCP||'');
-          return texto.toLowerCase().indexOf(q) !== -1;
-        });
-      };
-      var achados = filtrar(dados);
-      var baseUrl = 'https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial='+ini+'&dataFinal='+fim+'&codigoModalidadeContratacao='+modalidade+'&tamanhoPagina='+Math.max(tamanho,50)+'&pagina=';
-      var pags = [2,3,4,5,6];
-      (function prox(k){
-        if(achados.length>=tamanho || k>=pags.length){
-          var out = { fonte: 'PNCP', periodo: { ini: ini, fim: fim }, modalidade: modalidade, pagina: pagina, tamanhoPagina: tamanho, total: totalPNCP, totalPaginas: totalPNCP?Math.ceil(totalPNCP/tamanho):1, dados: achados.slice(0,tamanho), busca: q, paginasVarridas: 1+k };
-          cacheSet(ck, out); return res.json(out);
-        }
-        getJSON(baseUrl+pags[k]).then(function(r2){
-          var d2=(r2.data&&r2.data.data)?r2.data.data:(Array.isArray(r2.data)?r2.data:[]);
-          achados = achados.concat(filtrar(d2));
-          prox(k+1);
-        }).catch(function(){ prox(k+1); });
-      })(0);
-      return;
+      // Com busca, o que se pode prometer de paginaao e o numero de coincidencias encontradas.
+      out.busca = q; out.paginasVarridas = varridas; out.coincidencias = lista.length;
+      out.totalPaginas = Math.max(1, Math.ceil(lista.length/tamanho));
+      if(amostraLimitada) out.amostraLimitada = true;
     }
-    var total=totalPNCP;
-    var out = { fonte: 'PNCP', periodo: { ini: ini, fim: fim }, modalidade: modalidade, pagina: pagina, tamanhoPagina: tamanho, total: total, totalPaginas: total?Math.ceil(total/tamanho):1, dados: dados.slice(0,tamanho) };
-    cacheSet(ck, out); res.json(out);
+    // Resultado vazio e guardado pouco: costuma ser instabilidade da fonte, nao ausencia de licitacoes.
+    if(out.dados.length || out.total) cacheSet(ck, out); else cacheSet(ck, out, 20000);
+    res.json(out);
   }).catch(function(e){ res.status(502).json({ erro: 'PNCP indisponivel', detalhe: String((e&&e.message)||e) }); });
 });
 
@@ -151,9 +173,33 @@ app.get('/api/indicadores', function(req, res){
 
 // ---- DOU ----
 app.get('/api/dou', function(req, res){
-  var data = req.query.data || fmtDOU(new Date());
-  var url = 'https://www.in.gov.br/consulta/-/buscar/dou?q=*&s=do1&exactDate='+data+'&sortType=0';
-  res.json({ fonte: 'Imprensa Nacional (DOU)', data: data, linkBusca: url });
+  var secaoQ = String(req.query.secao || 'do1').toLowerCase();
+  var secao = ['do1','do2','do3'].indexOf(secaoQ) >= 0 ? secaoQ : 'do1';
+  var rotulo = 'Seção ' + secao.slice(2);
+  var diaExato = /^\d{2}-\d{2}-\d{4}$/.test(String(req.query.data || '')) ? String(req.query.data) : null;
+  var data = diaExato || dou.fmtData(new Date());
+  var ck = 'dou_' + secao + '_' + data;
+  var hit = cacheGet(ck); if(hit) return res.json(hit);
+  var promessa = diaExato ? dou.baixarSecao(secao, diaExato) : dou.ultimosDias(secao, 7);
+  promessa.then(function(r){
+    var pesos = secao === 'do3' ? dou.EDITAIS : dou.NORMATIVOS;
+    var atos = dou.destaques(r.atos, rotulo, 'dou', pesos, 20);
+    var out = {
+      fonte: 'Imprensa Nacional (DOU)', data: r.data, dataBR: String(r.data || '').split('-').join('/'), secao: secao, rotulo: rotulo,
+      total: (r.atos || []).length, atos: atos,
+      linkBusca: 'https://www.in.gov.br/consulta/-/buscar/dou?q=*&s=' + secao + '&exactDate=' + r.data + '&sortType=0',
+      linkEdicao: 'https://www.in.gov.br/leiturajornal?data=' + r.data + '&secao=' + secao,
+      aviso: atos.length ? null : ('Nenhum ato publicado na ' + rotulo + ' em ' + r.data + '. Fins de semana e feriados não têm edição.' + (r.erro ? ' (' + String(r.erro).slice(0,80) + ')' : '')),
+      atualizadoEm: new Date().toISOString()
+    };
+    cacheSet(ck, out, atos.length ? 3600000 : 120000);
+    res.json(out);
+  }).catch(function(e){
+    res.status(502).json({ fonte:'Imprensa Nacional (DOU)', data:data, secao:secao, total:0, atos:[],
+      erro:'DOU indisponível', aviso:'A Imprensa Nacional não respondeu agora. Tente novamente em alguns minutos.',
+      detalhe:String((e && e.message) || e).slice(0,160),
+      linkBusca:'https://www.in.gov.br/consulta/-/buscar/dou?q=*&s=' + secao + '&exactDate=' + data + '&sortType=0' });
+  });
 });
 
 // ---- Detail pages (canonical URLs para SEO e compartilhamento) ----
@@ -211,50 +257,28 @@ app.get('/api/proposicao/:id', function(req, res){
 // (Removido stub de /api/deputado/:id — a rota real vive em backend/deputados.js.
  // O stub antigo reescrevia req.url sem responder e pendurava a requisição.)
 
-// ---- Edição Semanal - Destaques do DOU (via RSS feeds oficiais) ----
+// ---- Edição Semanal - Destaques do DOU (fonte oficial: página de leitura da Imprensa Nacional) ----
 app.get('/api/edicao/destaques', function(req, res){
   var hit = cacheGet('edicao_destaques');
   if(hit) return res.json(hit);
-  var hoje = new Date();
-  var ini = new Date(hoje.getTime() - 7*86400000);
-  var periodo = fmtDOU(ini)+' a '+fmtDOU(hoje);
-  // Feeds RSS do DOU por seção (oficiais in.gov.br)
-  var feeds = [
-    { secao: 'Seção 1', url: 'https://www.in.gov.br/leiturajornal?secao=dou1&format=xml', tipo: 'normativo' },
-    { secao: 'Seção 3', url: 'https://www.in.gov.br/leiturajornal?secao=dou3&format=xml', tipo: 'edital' }
-  ];
-  var Parser = null;
-  try { Parser = require('rss-parser'); } catch(e){}
-  if(!Parser) return res.json({ fonte: 'IN/DOU (RSS)', periodo: periodo, secao1: [], secao3: [], erro: 'rss-parser não instalado' });
-  var parser = new Parser();
-  var fetch = require('node-fetch');
-  Promise.all(feeds.map(function(f){
-    var ctrl = new AbortController();
-    var timer = setTimeout(function(){ ctrl.abort(); }, 15000);
-    return fetch(f.url, { signal: ctrl.signal, headers: { 'User-Agent': 'BrBRICS/1.0', 'Accept': 'application/rss+xml, application/xml, text/xml' } })
-      .then(function(r){ return r.text().then(function(t){ clearTimeout(timer); return { status: r.status, text: t, secao: f.secao, tipo: f.tipo }; }); })
-      .then(function(x){
-        if(x.status!==200) throw new Error('HTTP '+x.status);
-        return parser.parseString(x.text).then(function(feed){
-          var items = (feed.items||[]).slice(0,15).map(function(item){
-            var title = (item.title||'').trim();
-            var link = item.link||'';
-            var pub = item.pubDate || item.isoDate || '';
-            var orgao = '';
-            var m = title.match(/^([A-ZÇÃÕ\s\.\-]+?)\s*[-–—]\s*(.+)$/);
-            if(m){ orgao = m[1].trim(); title = m[2].trim(); }
-            return { secao: x.secao, tipo: x.tipo, titulo: title, link: link, data: pub ? new Date(pub).toLocaleDateString('pt-BR') : '', orgao: orgao };
-          });
-          return { secao: f.secao, items: items };
-        });
-      })
-      .catch(function(e){ return { secao: f.secao, items: [], erro: String((e&&e.message)||e) }; });
-  })).then(function(results){
-    var sec1 = results.find(function(r){ return r.secao==='Seção 1'; }) || { items: [] };
-    var sec3 = results.find(function(r){ return r.secao==='Seção 3'; }) || { items: [] };
-    // SEM FALLBACK FAKE - retorna vazio se RSS falhar
-    var out = { fonte: 'Imprensa Nacional — DOU (RSS oficial)', periodo: periodo, secao1: sec1.items, secao3: sec3.items, atualizadoEm: new Date().toISOString() };
-    cacheSet('edicao_destaques', out, 3600000); // 1h cache
+  Promise.all([dou.ultimosDias('do1', 7), dou.ultimosDias('do3', 7)]).then(function(rs){
+    var d1 = rs[0], d3 = rs[1];
+    var sec1 = dou.destaques(d1.atos, 'Seção 1', 'normativo', dou.NORMATIVOS, 10);
+    var sec3 = dou.destaques(d3.atos, 'Seção 3', 'edital', dou.EDITAIS, 10);
+    var dias = [];
+    if(d1.data) dias.push(d1.data);
+    if(d3.data && d3.data !== d1.data) dias.push(d3.data);
+    var out = {
+      fonte: 'Imprensa Nacional — DOU (edições oficiais)',
+      periodo: dias.length ? dias.map(function(d){ return d.split('-').join('/'); }).join(' e ') : 'últimos 7 dias',
+      secao1: sec1, secao3: sec3,
+      totalSecao1: (d1.atos || []).length, totalSecao3: (d3.atos || []).length,
+      linkEdicao: 'https://www.in.gov.br/leiturajornal?data=' + (d1.data || dou.fmtData(new Date())) + '&secao=do1',
+      aviso: (sec1.length || sec3.length) ? null
+        : 'A Imprensa Nacional não publicou (ou não respondeu) nas últimas 7 dias. Consulte diretamente em in.gov.br.',
+      atualizadoEm: new Date().toISOString()
+    };
+    cacheSet('edicao_destaques', out, (sec1.length || sec3.length) ? 3600000 : 120000);
     res.json(out);
   });
 });

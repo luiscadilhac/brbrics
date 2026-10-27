@@ -51,9 +51,10 @@
     <div class="layer-row">
       <label><input type="checkbox" id="lyr-osm" checked> OpenStreetMap (base)</label>
       <label><input type="checkbox" id="lyr-satelite"> Satélite (Esri World Imagery)</label>
-      <label><input type="checkbox" id="lyr-focos"> Focos de calor INPE</label>
+      <label><input type="checkbox" id="lyr-focos" checked> Focos de calor INPE</label>
       <label><input type="checkbox" id="lyr-ibge"> Limites IBGE (estados)</label>
     </div>
+    <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Consultando o BDQueimadas (INPE)…</p>
     <div class="layer-row" style="margin-top:8px">
       <label style="font-size:12px">Estado: </label>
       <select id="sel-uf" style="padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg2);color:var(--paper)">
@@ -77,8 +78,8 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
         <h4 style="margin:0 0 8px;color:var(--marca)">INPE — BDQueimadas</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Focos de calor detectados pelos satélites CBERS e GOES-16. Últimas 48h.</p>
-        <a href="https://queimadas.dgi.inpe.br/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">Portal INPE →</a>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Focos de calor detectados pelos satélites GOES e Sentinel, atualizados a cada 3 horas. Últimas 48h.</p>
+        <a href="https://data.inpe.br/queimadas/bdqueimadas/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">Portal INPE →</a>
       </div>
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
         <h4 style="margin:0 0 8px;color:var(--marca)">NASA Worldview</h4>
@@ -113,6 +114,11 @@ var ibgeLayer = null;
 
 function initMap() {
   map = L.map('map', { zoomControl: true }).setView([-14.2, -51.9], 4);
+  // O container mede a altura em vh: sem recalcular depois do layout o Leaflet
+  // projeta tudo em 0,0 e o mapa parece em branco.
+  setTimeout(function(){ map.invalidateSize(); }, 200);
+  window.addEventListener('load', function(){ map.invalidateSize(); });
+  window.addEventListener('resize', function(){ map.invalidateSize(); });
 
   layers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -122,8 +128,13 @@ function initMap() {
     attribution: '&copy; Esri, Maxar, Earthstar Geographics'
   });
 
-  focosLayer = L.layerGroup().addTo(map);
-  ibgeLayer = L.layerGroup().addTo(map);
+  focosLayer = L.layerGroup();
+  ibgeLayer = L.layerGroup();
+}
+
+function sincronizarCamadas() {
+  [['lyr-osm', layers.osm], ['lyr-satelite', layers.satelite], ['lyr-focos', focosLayer], ['lyr-ibge', ibgeLayer]]
+    .forEach(function(par) { toggleLayer(par[0], par[1]); });
 }
 
 function toggleLayer(id, layer) {
@@ -137,38 +148,56 @@ function toggleLayer(id, layer) {
 }
 
 function carregarFocos(uf) {
+  var status = document.getElementById('status-dados');
+  if (status) status.textContent = 'Consultando o BDQueimadas (INPE)…';
   var url = '/api/mapas/satelite' + (uf ? '?estado=' + encodeURIComponent(uf) : '');
   fetch(url).then(function(r){ return r.json(); }).then(function(d) {
     focosLayer.clearLayers();
-    document.getElementById('stat-focos').textContent = d.total || 0;
+    var todos = d.focos || [];
+    document.getElementById('stat-focos').textContent = Number(d.totalNas48h || d.total || 0).toLocaleString('pt-BR');
     document.getElementById('stat-estado').textContent = uf || 'Brasil';
     document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
-    (d.focos || []).slice(0, 500).forEach(function(f) {
+    var amostra = todos.slice(0, 800);
+    amostra.forEach(function(f) {
       if (f.lat == null || f.lon == null) return;
-      var cor = f.intensidade && String(f.intensidade).toLowerCase().indexOf('alto') >= 0 ? '#dc2626' : '#86EFAC';
+      var forte = String(f.intensidade || '').toUpperCase().indexOf('ALTO') >= 0 || (f.frp != null && f.frp >= 30);
+      var cor = forte ? '#f87171' : '#86EFAC';
       var circ = L.circleMarker([f.lat, f.lon], {
-        radius: 5, color: cor, fillColor: cor, fillOpacity: 0.8, weight: 1
+        radius: forte ? 6 : 4, color: cor, fillColor: cor, fillOpacity: 0.75, weight: 1
       });
       circ.bindPopup(
-        '<b>' + (f.municipio || 'Local') + ' — ' + (f.uf || '') + '</b><br>' +
-        '<small>Satélite: ' + (f.satelite || '—') + '</small><br>' +
-        '<small>Data: ' + (f.datahora || '—') + '</small><br>' +
-        '<small>Intensidade: ' + (f.intensidade || '—') + '</small><br>' +
-        '<small>Bioma: ' + (f.bioma || '—') + '</small>'
+        '<b>' + esc(f.municipio || 'Local') + ' — ' + esc(f.uf || '') + '</b><br>' +
+        '<small>Satélite: ' + esc(f.satelite || '—') + '</small><br>' +
+        '<small>Data (GMT): ' + esc(f.datahora || '—') + '</small><br>' +
+        '<small>Intensidade: ' + esc(f.intensidade || '—') + (f.frp != null ? ' (FRP ' + esc(f.frp) + ')' : '') + '</small><br>' +
+        '<small>Bioma: ' + esc(f.bioma || '—') + '</small>'
       );
       focosLayer.addLayer(circ);
     });
+    if (uf && amostra.length) map.fitBounds(L.latLngBounds(amostra.map(function(f){ return [f.lat, f.lon]; })).pad(0.25));
+    else if (!uf) map.setView([-14.2, -51.9], 4);
+    var msg;
+    if (d.erro) msg = 'Sem dados agora: ' + d.erro;
+    else if (!todos.length) msg = 'Nenhum foco de calor registrado nas últimas 48h' + (uf ? ' em ' + uf : '') + '.';
+    else {
+      msg = Number(d.total).toLocaleString('pt-BR') + ' focos' + (todos.length > amostra.length ? ' (o mapa desenha ' + amostra.length + ')' : '') +
+            ' nas últimas 48h' + (uf ? ' em ' + uf : ' no Brasil inteiro') + '.';
+      if (d.aviso) msg = d.aviso + ' ' + msg;
+    }
+    if (status) status.textContent = msg;
+    if (d.aviso && typeof toast === 'function') toast(d.aviso);
   }).catch(function(e) {
+    if (status) status.textContent = 'Falha ao consultar o INPE: ' + e.message;
     toast('Erro ao carregar focos: ' + e.message);
   });
 }
 
 function carregarLimitesIBGE() {
   ibgeLayer.clearLayers();
-  fetch('https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json')
+  fetch('https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json&intrarregiao=UF&qualidade=minima')
     .then(function(r){ return r.json(); }).then(function(geo) {
       L.geoJSON(geo, {
-        style: { color: '#fff', weight: 1, fillColor: '#6366f1', fillOpacity: 0.15 },
+        style: { color: '#7DD3FC', weight: 1, fillColor: '#3B82F6', fillOpacity: 0.08 },
         onEachFeature: function(f, l) {
           var nome = f.properties.nome || f.properties.NOME || 'Estado';
           var id = f.properties.id || f.properties.CO_UF || '';
@@ -180,6 +209,7 @@ function carregarLimitesIBGE() {
 
 document.addEventListener('DOMContentLoaded', function() {
   initMap();
+  sincronizarCamadas();
 
   document.getElementById('lyr-osm').onchange = function() { toggleLayer('lyr-osm', layers.osm); };
   document.getElementById('lyr-satelite').onchange = function() { toggleLayer('lyr-satelite', layers.satelite); };
@@ -187,6 +217,10 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('lyr-ibge').onchange = function() { toggleLayer('lyr-ibge', ibgeLayer); };
 
   carregarLimitesIBGE();
+
+  document.getElementById('sel-uf').onchange = function() {
+    carregarFocos(this.value);
+  };
 
   document.getElementById('btn-carregar').onclick = function() {
     var uf = document.getElementById('sel-uf').value;

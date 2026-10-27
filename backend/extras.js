@@ -1,4 +1,49 @@
 // BrBRICS - Rotas extras de conteúdo agregado (RSS, dados abertos, clima/ar, calendário)
+var dou = require('./dou.js');
+
+function limpaTag(s) {
+  return String(s || '')
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ')
+    .replace(/&#(\d+);/g, function(_, n){ return String.fromCharCode(Number(n)); })
+    .replace(/&#x([0-9a-f]+);/gi, function(_, n){ return String.fromCharCode(parseInt(n, 16)); })
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ').trim();
+}
+
+// Feed malformado (XML com < solto) faz o rss-parser jogar fora tudo: lê item a item.
+function itensDeXmlLeniente(txt) {
+  var blocos = String(txt || '').match(/<item[\s\S]*?<\/item>/gi) || [];
+  function pega(bloco, tags) {
+    for (var i = 0; i < tags.length; i++) {
+      var m = bloco.match(new RegExp('<' + tags[i] + '[^>]*>([\\s\\S]*?)</' + tags[i] + '>', 'i'));
+      if (m) return limpaTag(m[1]);
+    }
+    return '';
+  }
+  return blocos.map(function(b){
+    var link = pega(b, ['link']);
+    if (!link) { var ma = b.match(/href="([^"]+)"/); link = ma ? ma[1] : ''; }
+    return { title: pega(b, ['title']), link: link, pubDate: pega(b, ['pubDate', 'updated', 'published', 'date']),
+      content: pega(b, ['description', 'summary', 'content:encoded', 'content']) };
+  }).filter(function(x){ return x.title; });
+}
+
+function remataItem(item) {
+  var title = (item.title || '').trim();
+  var orgao = '';
+  var m = title.match(/^([A-ZÇÃÕ\s\.\-]+?)\s*[-–—]\s*(.+)$/);
+  if (m) { orgao = m[1].trim(); title = m[2].trim(); }
+  return {
+    titulo: title,
+    link: item.link || '',
+    data: item.pubDate || item.isoDate || '',
+    orgao: orgao,
+    resumo: String(item.content || item['content:encoded'] || item.summary || '').slice(0, 200)
+  };
+}
+
 module.exports.registrarExtras = function(app, cacheGet, cacheSet, getJSON) {
 
   // ---- RSS: agregador de feeds oficiais ----
@@ -8,8 +53,9 @@ module.exports.registrarExtras = function(app, cacheGet, cacheSet, getJSON) {
     if (hit) return res.json(hit);
 
     var fontes = [
-      { id: 'dou1', nome: 'Diário Oficial - Seção 1', url: 'https://www.in.gov.br/leiturajornal?secao=dou1&format=xml', tipo: 'normativo' },
-      { id: 'dou3', nome: 'Diário Oficial - Seção 3', url: 'https://www.in.gov.br/leiturajornal?secao=dou3&format=xml', tipo: 'edital' },
+      { id: 'dou1', nome: 'Diário Oficial - Seção 1', url: 'https://www.in.gov.br/leiturajornal?secao=do1', tipo: 'normativo' },
+      { id: 'dou2', nome: 'Diário Oficial - Seção 2', url: 'https://www.in.gov.br/leiturajornal?secao=do2', tipo: 'administrativo' },
+      { id: 'dou3', nome: 'Diário Oficial - Seção 3', url: 'https://www.in.gov.br/leiturajornal?secao=do3', tipo: 'edital' },
       { id: 'agenciabrasil', nome: 'Agência Brasil', url: 'https://agenciabrasil.ebc.com.br/rss', tipo: 'noticia' },
       { id: 'ibge', nome: 'IBGE - Agência de Notícias', url: 'https://agenciadenoticias.ibge.gov.br/noticias?format=rss', tipo: 'noticia' },
       { id: 'aneel', nome: 'ANEEL - Notícias', url: 'https://www.aneel.gov.br/agencia/rss', tipo: 'noticia' }
@@ -27,14 +73,32 @@ module.exports.registrarExtras = function(app, cacheGet, cacheSet, getJSON) {
     if (hit) return res.json(hit);
 
     var fontes = {
-      dou1: 'https://www.in.gov.br/leiturajornal?secao=dou1&format=xml',
-      dou3: 'https://www.in.gov.br/leiturajornal?secao=dou3&format=xml',
+      dou1: 'https://www.in.gov.br/leiturajornal?secao=do1',
+      dou2: 'https://www.in.gov.br/leiturajornal?secao=do2',
+      dou3: 'https://www.in.gov.br/leiturajornal?secao=do3',
       agenciabrasil: 'https://agenciabrasil.ebc.com.br/rss',
       ibge: 'https://agenciadenoticias.ibge.gov.br/noticias?format=rss',
       aneel: 'https://www.aneel.gov.br/agencia/rss'
     };
     var url = fontes[id];
     if (!url) return res.status(400).json({ erro: 'Fonte não encontrada' });
+
+    // DOU nao tem RSS: a pagina de leitura embute o JSON da edicao (backend/dou.js)
+    if (/^dou[123]$/.test(id)) {
+      var secao = 'do' + id.slice(3);
+      dou.ultimosDias(secao, 7).then(function(r){
+        var pesos = secao === 'do3' ? dou.EDITAIS : dou.NORMATIVOS;
+        var itens = dou.destaques(r.atos, 'Seção ' + secao.slice(2), 'dou', pesos, qtd);
+        var out = {
+          fonte: id, total: itens.length, itens: itens, data: r.data,
+          aviso: itens.length ? null : 'Nenhum ato disponivel na ' + 'Seção ' + secao.slice(2) + ' em ' + r.data + '.',
+          atualizadoEm: new Date().toISOString()
+        };
+        cacheSet(ck, out, itens.length ? 3600000 : 120000);
+        res.json(out);
+      });
+      return;
+    }
 
     var Parser = null;
     try { Parser = require('rss-parser'); } catch(e){}
@@ -44,28 +108,22 @@ module.exports.registrarExtras = function(app, cacheGet, cacheSet, getJSON) {
     var ctrl = new AbortController();
     var timer = setTimeout(function(){ ctrl.abort(); }, 20000);
     fetch(url, { signal: ctrl.signal, headers: { 'User-Agent': 'BrBRICS/1.0', 'Accept': 'application/rss+xml, application/xml, text/xml' } })
-      .then(function(r){ return r.text(); })
-      .then(function(t){ clearTimeout(timer); return parser.parseString(t); })
+      .then(function(r){ clearTimeout(timer); if (r.status !== 200) throw new Error('Feed HTTP ' + r.status); return r.text(); })
+      .then(function(t){
+        return parser.parseString(t).catch(function(){ return { items: itensDeXmlLeniente(t) }; });
+      })
       .then(function(feed){
-        var itens = (feed.items || []).slice(0, qtd).map(function(item){
-          var title = (item.title || '').trim();
-          var orgao = '';
-          var m = title.match(/^([A-ZÇÃÕ\s\.\-]+?)\s*[-–—]\s*(.+)$/);
-          if(m){ orgao = m[1].trim(); title = m[2].trim(); }
-          return {
-            titulo: title,
-            link: item.link || '',
-            data: item.pubDate || item.isoDate || '',
-            orgao: orgao,
-            resumo: (item.content || item['content:encoded'] || item.summary || '').slice(0, 200)
-          };
-        });
-        var out = { fonte: id, total: itens.length, itens: itens, atualizadoEm: new Date().toISOString() };
-        cacheSet(ck, out, 600000);
+        var itens = (feed.items || []).slice(0, qtd).map(remataItem);
+        var out = { fonte: id, total: itens.length, itens: itens,
+          aviso: itens.length ? null : 'Esta fonte não devolveu itens agora.',
+          atualizadoEm: new Date().toISOString() };
+        cacheSet(ck, out, itens.length ? 600000 : 120000);
         res.json(out);
       })
       .catch(function(e){
-        res.json({ fonte: id, total: 0, itens: [], erro: String((e && e.message) || e).slice(0, 160), atualizadoEm: new Date().toISOString() });
+        res.json({ fonte: id, total: 0, itens: [], erro: 'Feed indisponível',
+          aviso: 'A fonte não respondeu ou está com o XML inválido agora. Tente novamente em alguns minutos.',
+          detalhe: String((e && e.message) || e).slice(0, 120), atualizadoEm: new Date().toISOString() });
       });
   });
 

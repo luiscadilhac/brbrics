@@ -66,7 +66,10 @@ jget('/api/contas/status').then(function(r){
   document.getElementById('cgu-msg').innerHTML=r.cguToken
     ?'Token configurado. Consulte abaixo.'
     :'Para usar este bloco, cadastre um e-mail em <a href="https://portaldatransparencia.gov.br/api-de-dados" target="_blank" rel="noopener">portaldatransparencia.gov.br/api-de-dados</a> e defina TRANSPARENCIA_TOKEN no servidor.';
-}).catch(function(){});
+}).catch(function(){
+  var s=document.getElementById('cgu-status'); if(s) s.textContent='fora do ar';
+  var m=document.getElementById('cgu-msg'); if(m) m.innerHTML='Não foi possível verificar o acesso à API da CGU agora. Tente novamente mais tarde.';
+});
 document.getElementById('btn-ct').onclick=function(){
   var ente=document.getElementById('ct-ente').value.replace(/\D/g,'');
   var ano=document.getElementById('ct-ano').value.replace(/\D/g,'')||new Date().getFullYear();
@@ -77,6 +80,7 @@ document.getElementById('btn-ct').onclick=function(){
   document.getElementById('res-ct').innerHTML='<div class="skel"></div><div class="skel"></div>';
   jget('/api/contas/'+tipo+'?ente='+ente+'&ano='+ano+'&periodo='+per+'&anexo='+encodeURIComponent(anexo)).then(function(r){
     var rows=r.dados||[];
+    if(!rows.length){document.getElementById('res-ct').innerHTML='<p class="muted">Nenhum '+esc(tipo.toUpperCase())+' publicado para o ente '+esc(ente)+' em '+esc(ano)+', período '+esc(per)+'. Confira o código IBGE, o ano e o nome do anexo (ex.: RREO-Anexo 01).</p>';return;}
     var cols=rows.length?Object.keys(rows[0]).slice(0,6):[];
     var html='<p class="muted">Fonte: '+esc(r.fonte||'')+' · '+esc(r.total||rows.length)+' registros'+(r.continua?' (primeira página)':'')+'</p>';
     html+='<div style="overflow-x:auto"><table><thead><tr>'+cols.map(function(c){return '<th>'+esc(c)+'</th>';}).join('')+'</tr></thead><tbody>';
@@ -91,6 +95,7 @@ document.getElementById('btn-bf').onclick=function(){
   document.getElementById('res-bf').innerHTML='<div class="skel"></div>';
   jget('/api/contas/bolsa?ibge='+ibge+'&mesAno='+mes).then(function(r){
     var rows=Array.isArray(r.dados)?r.dados:((r.dados&&r.dados.data)||[]);
+    if(!rows.length){document.getElementById('res-bf').innerHTML='<p class="muted">Nenhum registro de Bolsa Família para o município '+esc(ibge)+' em '+esc(mes)+'. Use mês/ano no formato AAAAMM e um código IBGE de 7 dígitos.</p>';return;}
     document.getElementById('res-bf').innerHTML='<p class="muted">Fonte: '+esc(r.fonte||'')+' · '+rows.length+' registros</p>'
     +'<div style="overflow-x:auto"><table><thead><tr><th>Beneficiário/Mês</th><th>Valor</th></tr></thead><tbody>'
     +rows.slice(0,25).map(function(o){

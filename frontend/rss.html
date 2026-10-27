@@ -85,8 +85,8 @@ function carregarFontes() {
     var grid = document.getElementById('grid-fontes');
     grid.innerHTML = fontes.map(function(f){
       return '<div class="fonte-card">' +
-        '<h4>📰 ' + f.nome + '</h4>' +
-        '<p>' + f.tipo + '</p>' +
+        '<h4>📰 ' + esc(f.nome) + '</h4>' +
+        '<p>' + esc(f.tipo) + '</p>' +
         '<button class="btn-rss" onclick="carregarItens(\'' + f.id + '\', this)">Carregar itens →</button>' +
         '</div>';
     }).join('');
@@ -105,26 +105,23 @@ function carregarItens(id, btn) {
 
   fetch('/api/rss/buscar?id=' + encodeURIComponent(id) + '&qtd=15').then(function(r){ return r.json(); }).then(function(d) {
     document.getElementById('stat-total').textContent = d.total || 0;
-    if (d.erro) {
-      lista.innerHTML = '<p class="muted" style="padding:20px">Erro: ' + d.erro + '</p>';
-      return;
-    }
     if (!d.itens || d.itens.length === 0) {
-      lista.innerHTML = '<p class="muted" style="padding:20px">Nenhum item encontrado.</p>';
+      lista.innerHTML = '<p class="muted" style="padding:20px">' + esc(d.aviso || d.erro || 'Nenhum item encontrado.') + '</p>';
       return;
     }
-    var html = d.itens.map(function(item){
-      var data = item.data ? new Date(item.data).toLocaleDateString('pt-BR') : '';
+    var html = (d.aviso ? '<p class="muted" style="padding:12px 20px">' + esc(d.aviso) + '</p>' : '');
+    html += d.itens.map(function(item){
+      var data = /^\d{2}\/\d{2}\/\d{4}$/.test(item.data || '') ? item.data : (item.data ? new Date(item.data).toLocaleDateString('pt-BR') : '');
       return '<div class="item-rss">' +
-        '<b>' + item.titulo + '</b>' +
-        '<span class="muted">' + item.orgao + ' · ' + data + '</span>' +
-        '<div style="margin-top:6px;font-size:12px;color:var(--muted)">' + item.resumo + '</div>' +
-        '<a href="' + item.link + '" target="_blank" rel="noopener">Ler na fonte →</a>' +
+        '<b>' + esc(item.titulo) + '</b>' +
+        '<span class="muted">' + esc(item.artType ? item.artType + ' · ' : '') + esc(item.orgao || 'Fonte oficial') + (data ? ' · ' + esc(data) : '') + '</span>' +
+        '<div style="margin-top:6px;font-size:12px;color:var(--muted)">' + esc(item.resumo || '') + '</div>' +
+        '<a href="' + esc(item.link || '#') + '" target="_blank" rel="noopener">Ler na fonte →</a>' +
         '</div>';
     }).join('');
     lista.innerHTML = html;
   }).catch(function(e){
-    lista.innerHTML = '<p class="muted" style="padding:20px">Erro: ' + e.message + '</p>';
+    lista.innerHTML = '<p class="muted" style="padding:20px">' + esc(e.message) + ' — tente novamente em alguns minutos.</p>';
   });
 }
 

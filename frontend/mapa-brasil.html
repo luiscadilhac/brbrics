@@ -56,8 +56,9 @@
       <label><input type="checkbox" id="lyr-osm" checked> OpenStreetMap</label>
       <label><input type="checkbox" id="lyr-satelite"> Satélite (Esri)</label>
       <label><input type="checkbox" id="lyr-estados" checked> Limites IBGE (estados)</label>
-      <label><input type="checkbox" id="lyr-focos"> Focos de calor INPE</label>
+      <label><input type="checkbox" id="lyr-focos" checked> Focos de calor INPE</label>
     </div>
+    <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Carregando malha do IBGE e focos do INPE…</p>
     <div class="layer-row" style="margin-top:8px">
       <button class="btn-sm" id="btn-carregar">Recarregar dados</button>
     </div>
@@ -95,6 +96,11 @@ var focosLayer = null;
 
 function initMap() {
   map = L.map('map').setView([-14.2, -51.9], 4);
+  // O container mede a altura em vh: sem recalcular depois do layout o Leaflet
+  // projeta tudo em 0,0 e o mapa parece em branco.
+  setTimeout(function(){ map.invalidateSize(); }, 200);
+  window.addEventListener('load', function(){ map.invalidateSize(); });
+  window.addEventListener('resize', function(){ map.invalidateSize(); });
 
   layers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -104,8 +110,13 @@ function initMap() {
     attribution: '&copy; Esri, Maxar, Earthstar Geographics'
   });
 
-  estadosLayer = L.layerGroup().addTo(map);
-  focosLayer = L.layerGroup().addTo(map);
+  estadosLayer = L.layerGroup();
+  focosLayer = L.layerGroup();
+}
+
+function sincronizarCamadas() {
+  [['lyr-osm', layers.osm], ['lyr-satelite', layers.satelite], ['lyr-estados', estadosLayer], ['lyr-focos', focosLayer]]
+    .forEach(function (par) { toggleLayer(par[0], par[1]); });
 }
 
 function toggleLayer(id, layer) {
@@ -120,37 +131,67 @@ function toggleLayer(id, layer) {
 
 function carregarEstadosIBGE() {
   estadosLayer.clearLayers();
-  fetch('https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json')
+  fetch('https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json&intrarregiao=UF&qualidade=minima')
     .then(function(r){ return r.json(); }).then(function(geo) {
-      L.geoJSON(geo, {
-        style: { color: '#fff', weight: 1.5, fillColor: '#6366f1', fillOpacity: 0.2 },
-        onEachFeature: function(f, l) {
-          var nome = f.properties.nome || f.properties.NOME || 'Estado';
-          var id = f.properties.id || f.properties.CO_UF || '';
-          l.bindPopup('<b>' + nome + '</b><br><small>Código IBGE: ' + id + '</small>');
-        }
-      }).addTo(estadosLayer);
-      document.getElementById('stat-estados').textContent = (geo.features || []).length;
-      document.getElementById('stat-atualizacao').textContent = new Date().toLocaleString('pt-BR').slice(0,16);
-    }).catch(function(){});
+      var recortes = (geo && geo.features) || [];
+      fetch('/api/ibge/estados').then(function(r){ return r.json(); }).catch(function(){ return {}; }).then(function(lista) {
+        var nomes = {};
+        (lista.estados || []).forEach(function(e) { nomes[String(e.id)] = e; });
+        L.geoJSON(geo, {
+          style: { color: '#7DD3FC', weight: 1.5, fillColor: '#3B82F6', fillOpacity: 0.12 },
+          onEachFeature: function(f, l) {
+            var cod = String(f.properties.codarea || '');
+            var e = nomes[cod] || {};
+            var nome = e.nome || f.properties.nome || 'Brasil';
+            l.bindPopup('<b>' + esc(nome) + (e.sigla ? ' (' + esc(e.sigla) + ')' : '') + '</b><br>' +
+                        '<small>Região: ' + esc(e.regiao || '—') + ' · Código IBGE ' + esc(cod) + '</small><br>' +
+                        (e.sigla ? '<small><a href="#" onclick="verFocosUf(\'' + esc(e.sigla) + '\');return false;">Ver focos de calor deste estado</a></small>' : ''));
+          }
+        }).addTo(estadosLayer);
+        document.getElementById('stat-estados').textContent = recortes.length;
+        document.getElementById('stat-atualizacao').textContent = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR').slice(0,5);
+      });
+    }).catch(function(e) {
+      var st = document.getElementById('status-dados');
+      if (st) st.textContent = 'Malha do IBGE indisponível: ' + e.message;
+    });
 }
 
 function carregarFocos(uf) {
+  var st = document.getElementById('status-dados');
+  if (st) st.textContent = 'Consultando o BDQueimadas (INPE)…';
   var url = '/api/mapas/satelite' + (uf ? '?estado=' + encodeURIComponent(uf) : '');
   fetch(url).then(function(r){ return r.json(); }).then(function(d) {
     focosLayer.clearLayers();
-    (d.focos || []).slice(0, 500).forEach(function(f) {
+    var todos = d.focos || [];
+    var amostra = todos.slice(0, 800);
+    amostra.forEach(function(f) {
       if (f.lat == null || f.lon == null) return;
-      var cor = f.intensidade && String(f.intensidade).toLowerCase().indexOf('alto') >= 0 ? '#dc2626' : '#86EFAC';
-      L.circleMarker([f.lat, f.lon], { radius: 5, color: cor, fillColor: cor, fillOpacity: 0.8, weight: 1 })
-        .bindPopup('<b>' + (f.municipio || 'Local') + ' — ' + (f.uf || '') + '</b><br><small>Satélite: ' + (f.satelite || '—') + '</small><br><small>Data: ' + (f.datahora || '—') + '</small>')
+      var forte = String(f.intensidade || '').toUpperCase().indexOf('ALTO') >= 0 || (f.frp != null && f.frp >= 30);
+      var cor = forte ? '#f87171' : '#86EFAC';
+      L.circleMarker([f.lat, f.lon], { radius: forte ? 6 : 4, color: cor, fillColor: cor, fillOpacity: 0.75, weight: 1 })
+        .bindPopup('<b>' + esc(f.municipio || 'Local') + ' — ' + esc(f.uf || '') + '</b><br><small>Satélite: ' + esc(f.satelite || '—') + '</small><br><small>Data (GMT): ' + esc(f.datahora || '—') + '</small>')
         .addTo(focosLayer);
     });
-  }).catch(function(){});
+    if (!map.hasLayer(focosLayer)) focosLayer.addTo(map);
+    if (uf && amostra.length) map.fitBounds(L.latLngBounds(amostra.map(function(f){ return [f.lat, f.lon]; })).pad(0.25));
+    if (st) {
+      if (d.erro) st.textContent = 'Focos do INPE indisponíveis agora: ' + d.erro;
+      else if (!todos.length) st.textContent = 'Nenhum foco de calor registrado nas últimas 48h.';
+      else st.textContent = Number(d.total).toLocaleString('pt-BR') + ' focos de calor ' + (uf ? 'em ' + uf : 'no Brasil') + ' nas últimas 48h (INPE/BDQueimadas)' +
+        (todos.length > amostra.length ? '; o mapa desenha ' + amostra.length : '') + '. Atualizado ' + (d.atualizadoEm || '').slice(0,16).replace('T',' ') + '.' +
+        (d.aviso ? ' ' + d.aviso : '');
+    }
+  }).catch(function(e) {
+    if (st) st.textContent = 'Falha ao consultar o INPE: ' + e.message;
+  });
 }
+
+window.verFocosUf = function(uf) { carregarFocos(uf); };
 
 document.addEventListener('DOMContentLoaded', function() {
   initMap();
+  sincronizarCamadas();
 
   document.getElementById('lyr-osm').onchange = function() { toggleLayer('lyr-osm', layers.osm); };
   document.getElementById('lyr-satelite').onchange = function() { toggleLayer('lyr-satelite', layers.satelite); };

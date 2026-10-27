@@ -108,6 +108,11 @@ var naviosMarkers = [];
 
 function initMap() {
   map = L.map('map').setView([-14.2, -51.9], 4);
+  // O container mede a altura em vh: sem recalcular depois do layout o Leaflet
+  // projeta tudo em 0,0 e o mapa parece em branco.
+  setTimeout(function(){ map.invalidateSize(); }, 200);
+  window.addEventListener('load', function(){ map.invalidateSize(); });
+  window.addEventListener('resize', function(){ map.invalidateSize(); });
 
   layers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -151,20 +156,29 @@ function carregarNavios() {
     (d.embarcacoes || []).slice(0, 100).forEach(function(n) {
       var lat = Number(n.lat), lon = Number(n.lon);
       if (lat === 0 && lon === 0) return;
-      var marker = L.marker([lat, lon], { title: esc(n.nome) });
+      var aoVivo = n.aoVivo !== false;
+      var cor = aoVivo ? '#86EFAC' : '#7DD3FC';
+      var marker = L.circleMarker([lat, lon], {
+        radius: aoVivo ? 5 : 7, color: cor, fillColor: aoVivo ? '#22C55E' : '#3B82F6', fillOpacity: 0.85, weight: 1.5
+      });
       marker.bindPopup(
-        '<b>🚢 ' + esc(n.nome) + '</b><br>' +
-        '<small>MMSI: ' + esc(n.mmsi) + ' | Tipo: ' + esc(n.tipo) + '</small><br>' +
-        '<small>Velocidade: ' + esc(n.velocidade) + ' nós</small><br>' +
-        '<small>Direção: ' + esc(n.direcao) + '°</small><br>' +
-        '<small>Bandeira: ' + esc(n.bandeira) + '</small>'
+        '<b>' + (aoVivo ? '🚢 ' : '⚓ ') + esc(n.nome) + '</b><br>' +
+        (aoVivo
+          ? '<small>MMSI: ' + esc(n.mmsi) + ' | Tipo: ' + esc(n.tipo) + '</small><br>' +
+            '<small>Velocidade: ' + esc(n.velocidade) + ' nós</small><br>' +
+            '<small>Direção: ' + esc(n.direcao) + '°</small><br>' +
+            '<small>Bandeira: ' + esc(n.bandeira) + '</small>'
+          : '<small>' + esc(n.tipo) + ' · ' + esc(n.uf) + '</small><br>' +
+            '<small>Hidrovia/zona: ' + esc(n.hidrovia || '—') + '</small>')
       );
       naviosMarkers.push(marker);
       naviosLayer.addLayer(marker);
 
       html += '<div style="background:var(--card2);border-radius:8px;padding:8px;margin:6px 0;font-size:13px">' +
         '<b>' + esc(n.nome) + '</b><br>' +
-        '<span class="muted">MMSI: ' + esc(n.mmsi) + ' · Tipo: ' + esc(n.tipo) + ' · Vel: ' + esc(n.velocidade) + ' nós</span>' +
+        '<span class="muted">' + (aoVivo
+          ? 'MMSI: ' + esc(n.mmsi) + ' · Tipo: ' + esc(n.tipo) + ' · Vel: ' + esc(n.velocidade) + ' nós'
+          : esc(n.tipo) + ' · ' + esc(n.uf) + ' · ' + esc(n.hidrovia || '—')) + '</span>' +
         '</div>';
     });
 

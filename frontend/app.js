@@ -118,9 +118,20 @@ jget('/api/proposicoes').then(function(p){
 }).catch(function(e){fail('congresso','Câmara indisponivel no momento.');});
 
 // ===== DOU =====
-jget('/api/dou').then(function(dou){
+jget('/api/dou').then(function(d){
   var el=document.getElementById('manchetes');if(!el)return;
-  el.innerHTML='<article><span class="tag">DOU</span><h4>Edição de hoje no Diário Oficial</h4><p><a href="'+dou.linkBusca+'" target="_blank" rel="noopener">Abrir busca do dia '+esc(dou.data)+' na Imprensa Nacional</a></p></article>';
+  var atos=(d.atos||[]).slice(0,3);var html='';
+  atos.forEach(function(a){
+    html+='<article><div class="tag-row"><span class="tag">'+esc(a.artType||'DOU')+'</span>'+favBtnHTML(a.link,a.titulo)+'</div>'
+      +'<h4><a href="'+esc(a.link)+'" target="_blank" rel="noopener">'+esc(String(a.titulo||'').slice(0,130))+'</a></h4>'
+      +'<small class="muted">'+esc(a.orgao||'Imprensa Nacional')+' · '+esc(d.rotulo||'Seção 1')+' · '+esc(a.data||d.data||'')+'</small>'
+      +shareHTML(a.link,a.titulo)+'</article>';
+  });
+  if(!html){
+    html='<article><span class="tag">DOU</span><h4>Diário Oficial da União</h4><p><a href="'+esc(d.linkEdicao||d.linkBusca||'https://www.in.gov.br')+'" target="_blank" rel="noopener">Abrir a edição na Imprensa Nacional</a></p></article>';
+  }
+  html+='<p class="muted">'+Number(d.total||0).toLocaleString('pt-BR')+' atos na '+esc(d.rotulo||'Seção 1')+' de '+esc(d.dataBR||d.data||'')+' · <a href="edicao.html">destaques da semana</a>'+(d.aviso?'<br>'+esc(d.aviso):'')+'</p>';
+  el.innerHTML=html;
 }).catch(function(e){fail('manchetes','DOU indisponivel no momento.');});
 
 // ===== Justiça (Tribunais) =====

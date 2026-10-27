@@ -57,6 +57,7 @@
       <button class="btn-sm" id="btn-atualizar">Atualizar agora</button>
       <span class="muted" style="font-size:12px;margin-left:10px">Atualização automática: 60s</span>
     </div>
+    <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Consultando a OpenSky Network (ADS-B)…</p>
   </div>
 
   <div id="map"></div>
@@ -91,6 +92,11 @@ var avioesMarkers = [];
 
 function initMap() {
   map = L.map('map').setView([-14.2, -51.9], 4);
+  // O container mede a altura em vh: sem recalcular depois do layout o Leaflet
+  // projeta tudo em 0,0 e o mapa parece em branco.
+  setTimeout(function(){ map.invalidateSize(); }, 200);
+  window.addEventListener('load', function(){ map.invalidateSize(); });
+  window.addEventListener('resize', function(){ map.invalidateSize(); });
 
   layers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -101,7 +107,13 @@ function initMap() {
   });
 
   markerCluster = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
-  avioesLayer = L.layerGroup().addTo(map);
+  avioesLayer = L.layerGroup();
+}
+
+function sincronizarCamadas() {
+  [['lyr-osm', layers.osm], ['lyr-satelite', layers.satelite], ['lyr-avioes', null]].forEach(function(par) {
+    toggleLayer(par[0], par[1]);
+  });
 }
 
 function toggleLayer(id, layer) {
@@ -120,22 +132,24 @@ function toggleLayer(id, layer) {
 }
 
 function carregarAvioes() {
+  var st = document.getElementById('status-dados');
+  if (st) st.textContent = 'Consultando a OpenSky Network (ADS-B)…';
   fetch('/api/mapas/avioes').then(function(r){ return r.json(); }).then(function(d) {
     avioesLayer.clearLayers();
     markerCluster.clearLayers();
     avioesMarkers = [];
 
-    document.getElementById('stat-total').textContent = d.total || 0;
+    document.getElementById('stat-total').textContent = Number(d.total || 0).toLocaleString('pt-BR');
     document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
     document.getElementById('stat-fonte').textContent = d.fonte || 'OpenSky';
 
     var lista = document.getElementById('lista-avioes');
     var html = '';
 
-    (d.avioes || []).slice(0, 200).forEach(function(a) {
+    (d.avioes || []).slice(0, 300).forEach(function(a) {
       if (a.lat == null || a.lon == null) return;
-      var marker = L.marker([a.lat, a.lon], {
-        title: a.callsign + ' (' + a.icao24 + ')'
+      var marker = L.circleMarker([a.lat, a.lon], {
+        radius: 5, color: '#7DD3FC', fillColor: '#3B82F6', fillOpacity: 0.85, weight: 1.5
       });
       marker.bindPopup(
         '<b>✈️ ' + esc(a.callsign) + '</b><br>' +
@@ -153,14 +167,22 @@ function carregarAvioes() {
         '</div>';
     });
 
-    avioesLayer.addLayers(avioesMarkers);
+    if (!map.hasLayer(markerCluster) && document.getElementById('lyr-avioes').checked) markerCluster.addTo(map);
     if (html) {
       lista.style.display = 'block';
       lista.innerHTML = html;
     } else {
       lista.style.display = 'none';
     }
+    if (st) {
+      if (d.erro) st.textContent = 'A OpenSky não respondeu agora: ' + d.erro;
+      else if (!avioesMarkers.length) st.textContent = 'Nenhuma aeronave com transponder ADS-B na área no momento.';
+      else st.textContent = Number(d.total).toLocaleString('pt-BR') + ' aeronaves com transponder sobre o Brasil' +
+        ((d.avioes || []).length > avioesMarkers.length ? ' (mapa mostra ' + avioesMarkers.length + ')' : '') +
+        (d.stale ? ' — última leitura válida' : '') + '. ' + (d.aviso || 'Atualiza sozinho a cada 60 segundos.');
+    }
   }).catch(function(e) {
+    if (st) st.textContent = 'Falha ao consultar a OpenSky: ' + e.message;
     toast('Erro ao carregar aviões: ' + e.message);
   });
 }
@@ -169,6 +191,7 @@ function esc(s) { return String(s || '—').replace(/&/g,'&amp;').replace(/</g,'
 
 document.addEventListener('DOMContentLoaded', function() {
   initMap();
+  sincronizarCamadas();
 
   document.getElementById('lyr-osm').onchange = function() { toggleLayer('lyr-osm', layers.osm); };
   document.getElementById('lyr-satelite').onchange = function() { toggleLayer('lyr-satelite', layers.satelite); };

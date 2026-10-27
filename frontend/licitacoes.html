@@ -175,9 +175,13 @@ function carregar(){
     _totalPg=(d1.totalPaginas&&d1.totalPaginas>0)?d1.totalPaginas:1;
     var all=Array.isArray(d1.dados)?d1.dados.slice():[];
     if(uf)all=all.filter(function(o){return o.unidadeOrgao&&o.unidadeOrgao.ufSigla===uf;});
-    if(q)all=all.filter(function(o){return (o.objetoCompra||'').toLowerCase().indexOf(q.toLowerCase())>=0;});
+    // A busca por texto ja vem filtrada do backend (objeto, orgao, unidade e numero de controle):
+    // refiltrar aqui só pelo objeto fazia sumirem os acertos por nome de orgao.
     window._lic=all;renderLic(all);
-    st.textContent='Página '+_pg+' de '+_totalPg+' — '+all.length+' exibidos'+(uf?' · UF '+uf:'')+(q?' · filtro "'+q+'"':'')+' (total PNCP: '+(d1.total||'-')+')';
+    var texto = q
+      ? all.length+' contratações com "'+q+'" ('+(d1.paginasVarridas||1)+' páginas do PNCP varridas'+(d1.amostraLimitada?', amostra limitada':'')+')'
+      : 'Página '+_pg+' de '+_totalPg+' — '+all.length+' exibidos';
+    st.textContent = texto + (uf?' · UF '+uf:'') + ' · total PNCP no período: '+(d1.total||'-');
     renderPager();
   }).catch(function(e){st.textContent='PNCP indisponível: '+e.message;document.getElementById('tb').innerHTML='<tr><td colspan="6">Erro ao carregar. <button class="btn ghost" onclick="carregar()">Tentar de novo</button></td></tr>';});
 }
