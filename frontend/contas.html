@@ -6,14 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contas Públicas — BrBRICS</title>
 <meta name="description" content="RREO e RGF de estados e municípios (Tesouro SICONFI) + Bolsa Família e convênios (CGU).">
-<link rel="icon" href="favicon.ico?v=49" type="image/x-icon"><link rel="icon" href="favicon.png?v=49" type="image/png" sizes="64x64">
-<link rel="stylesheet" href="style.css?v=49">
-<link rel="stylesheet" href="pro.css?v=49">
+<link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
+<link rel="stylesheet" href="style.css?v=50">
+<link rel="stylesheet" href="pro.css?v=50">
 </head>
 <body>
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="brand" href="index.html"><img src="logo-brics.png?v=49" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=50" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
     <nav class="nav"></nav>
     <div class="actions">
       <input id="busca" type="search" placeholder="Buscar no portal...">
@@ -59,7 +59,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=49"></script>
+<script src="common.js?v=50"></script>
 <script>
 jget('/api/contas/status').then(function(r){
   document.getElementById('cgu-status').textContent=r.cguToken?'token ativo':'sem token';
@@ -101,6 +101,6 @@ document.getElementById('btn-bf').onclick=function(){
   }).catch(function(e){document.getElementById('res-bf').innerHTML='<p class="muted">'+esc(e.message)+' — veja <a href="https://portaldatransparencia.gov.br/api-de-dados" target="_blank" rel="noopener">como obter o token</a>.</p>';});
 };
 </script>
-<script src="app.js?v=49"></script>
+<script src="app.js?v=50"></script>
 </body>
 </html>

@@ -314,7 +314,7 @@ function buildFooter(){
   var fts=document.querySelectorAll('footer');
   for(var i=0;i<fts.length;i++){
     fts[i].innerHTML='<div class="wrap foot-grid">'
-    +'<div class="f-brand"><img src="logo-brics.png?v=49" alt="BrBRICS"><div><b>BrBRICS</b><p class="muted">Transparência de dados do setor público — direto das fontes oficiais, sem intermediários.</p></div></div>'
+    +'<div class="f-brand"><img src="logo-brics.png?v=50" alt="BrBRICS"><div><b>BrBRICS</b><p class="muted">Transparência de dados do setor público — direto das fontes oficiais, sem intermediários.</p></div></div>'
     +'<div class="f-col"><h4>Seções</h4><a href="index.html">Início</a><a href="edicao.html">Diário Oficial</a><a href="licitacoes.html">Licitações</a><a href="proposicoes.html">Congresso</a><a href="indicadores.html">Indicadores</a><a href="tribunais.html">Tribunais</a></div>'
     +'<div class="f-col"><h4>Território (IBGE)</h4><a href="territorio.html">Território</a></div>'
     +'<div class="f-col"><h4>Clima nas capitais</h4><a href="clima.html">Clima</a></div>'

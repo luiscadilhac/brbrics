@@ -11,17 +11,17 @@
 <meta property="og:site_name" content="BrBRICS">
 <meta property="og:title" content="Congresso — BrBRICS">
 <meta property="og:description" content="Proposições recentes, tramitação completa e votações. Dados abertos oficiais.">
-<meta property="og:image" content="https://brbrics.onrender.com/logo-brics.png?v=49">
+<meta property="og:image" content="https://brbrics.onrender.com/logo-brics.png?v=50">
 <meta property="og:url" content="https://brbrics.onrender.com/proposicoes.html">
 <meta name="twitter:card" content="summary">
-<link rel="icon" href="favicon.ico?v=49" type="image/x-icon"><link rel="icon" href="favicon.png?v=49" type="image/png" sizes="64x64">
-<link rel="stylesheet" href="style.css?v=49">
-<link rel="stylesheet" href="pro.css?v=49">
+<link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
+<link rel="stylesheet" href="style.css?v=50">
+<link rel="stylesheet" href="pro.css?v=50">
 </head>
 <body>
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="brand" href="index.html"><img src="logo-brics.png?v=49" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=50" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
     <nav class="nav">
   <a href="index.html">Início</a>
   <div class="navgrp">
@@ -140,7 +140,7 @@
 <div class="lightbox" id="lightbox"><button class="lb-close" id="lb-close" aria-label="Fechar">&#10005;</button><img id="lb-img" src="" alt=""><div class="lb-cap" id="lb-cap"></div></div>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=49"></script>
+<script src="common.js?v=50"></script>
 <script>
 function propLink(id){return 'https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao='+encodeURIComponent(id);}
 function verTramitacao(id){
@@ -179,6 +179,6 @@ function renderSen(data){
 jget('/api/proposicoes').then(renderCam).catch(function(){document.getElementById('l-cam').innerHTML='<p class="muted">Erro ao carregar Câmara.</p>';});
 jget('/api/legislacao/senado').then(renderSen).catch(function(){document.getElementById('l-sen').innerHTML='<p class="muted">Erro ao carregar Senado.</p>';});
 </script>
-<script src="app.js?v=49"></script>
+<script src="app.js?v=50"></script>
 </body>
 </html>
