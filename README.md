@@ -5,7 +5,7 @@ DataJud, BCB, IBGE, INPE, ANA, Fipe), servidos por um backend próprio em Expres
 estáticas em `frontend/`.
 
 - Deploy: Render, serviço `brbrics-portal` (ver `render.yaml`), reimplanta no push da `main`
-- Ar no ar: https://brbrics.onrender.com
+- Ar no ar: https://brbrics.com.br
 - O domínio `brbrics.com.br` ainda **não** serve esta aplicação (apontamento por resolver)
 
 ## Rodar localmente

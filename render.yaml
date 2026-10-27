@@ -11,6 +11,6 @@ services:
       - key: BRAPI_TOKEN
         sync: false
       - key: SITE_URL
-        value: https://brbrics.onrender.com
+        value: https://brbrics.com.br
       - key: PAINEL_TOKEN
         generateValue: true

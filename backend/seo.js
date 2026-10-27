@@ -11,7 +11,14 @@ var PAGINAS=[
   ['/rss.html','daily'],['/calendario.html','monthly']
 ];
 function escX(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function base(req){return req.protocol+'://'+req.get('host');}
+// Host canonico do portal. Sitemap, robots e RSS nao podem sair no host da
+// requisicao: o site vai servir em www e na raiz ao mesmo tempo, e cada um
+// gerar seu proprio sitemap duplica o conteudo aos olhos do Google.
+function base(req){
+  var host = req.get('host') || '';
+  if (/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host)) return req.protocol + '://' + host;
+  return (process.env.SITE_URL || 'https://brbrics.com.br').replace(/\/+$/, '');
+}
 function interno(path){
   return new Promise(function(resolve){
     var http=require('http');var PORT=process.env.PORT||3000;
@@ -44,8 +51,21 @@ function hstsMiddleware(req, res, next) {
   res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   next();
 }
-function registrarSEO(app, cacheGet, cacheSet){
+// www e raiz sao o mesmo portal: o www entrega a raiz em vez de manter uma
+// copia paralela do site inteiro indexada em dois enderecos.
+function hostOficial(req, res, next) {
+  if (req.get('host') === 'www.brbrics.com.br') {
+    return res.redirect(301, 'https://brbrics.com.br' + (req.originalUrl || '/'));
+  }
+  next();
+}
+// Estes dois precisam rodar ANTES do express.static, sena o arquivo servido na
+// linha de cima encerra a resposta e nenhum header/redirect chega na pagina.
+function aplicarCabecalhos(app) {
   app.use(hstsMiddleware);
+  app.use(hostOficial);
+}
+function registrarSEO(app, cacheGet, cacheSet){
   app.get('/robots.txt', function(req,res){
     res.set('Content-Type','text/plain');
     res.send('User-agent: *\nAllow: /\nSitemap: '+base(req)+'/sitemap.xml\n');
@@ -92,4 +112,4 @@ function registrarSEO(app, cacheGet, cacheSet){
     res.send('google.com, pub-9633564064128096, DIRECT, f08c47fec0942fa0\n');
   });
 }
-module.exports={registrarSEO:registrarSEO};
+module.exports={registrarSEO:registrarSEO, aplicarCabecalhos:aplicarCabecalhos};

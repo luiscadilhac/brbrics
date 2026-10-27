@@ -4,8 +4,10 @@ var cors = require('cors');
 var path = require('path');
 var app = express();
 var PORT = process.env.PORT || 3000;
+var seoCabecalhos = require('./seo');
 app.use(cors());
 app.use(express.json());
+seoCabecalhos.aplicarCabecalhos(app);
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 var fetch = require('node-fetch');
 var dou = require('./dou.js');
@@ -50,7 +52,7 @@ function getJSONFast(url, timeout){
   ]);
 }
 // Base pública do site (Render + domínio próprio). Defina SITE_URL no Render.
-function siteBase(){ return (process.env.SITE_URL||'https://brbrics.onrender.com').replace(/\/+$/,''); }
+function siteBase(){ return (process.env.SITE_URL||'https://brbrics.com.br').replace(/\/+$/,''); }
 function addDays(d, n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
 function fmtPNCP(d){function p(n){return String(n).padStart(2,'0');}return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());}
 function fmtDOU(d){function p(n){return String(n).padStart(2,'0');}return p(d.getDate())+'-'+p(d.getMonth()+1)+'-'+d.getFullYear();}
