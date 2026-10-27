@@ -150,7 +150,7 @@ function carregarCameras() {
     camerasMarkers = [];
 
     document.getElementById('stat-total').textContent = d.total || 0;
-    document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
+    document.getElementById('stat-atualizacao').textContent = horaBR(d.atualizadoEm);
 
     var lista = document.getElementById('lista-cameras');
     var html = d.aviso ? '<div style="background:var(--card2);border-radius:8px;padding:8px;margin:6px 0;font-size:13px;color:var(--muted)">' + esc(d.aviso) + '</div>' : '';

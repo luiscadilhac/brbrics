@@ -179,7 +179,7 @@ function carregarFocos(uf) {
       if (d.erro) st.textContent = 'Focos do INPE indisponíveis agora: ' + d.erro;
       else if (!todos.length) st.textContent = 'Nenhum foco de calor registrado nas últimas 48h.';
       else st.textContent = Number(d.total).toLocaleString('pt-BR') + ' focos de calor ' + (uf ? 'em ' + uf : 'no Brasil') + ' nas últimas 48h (INPE/BDQueimadas)' +
-        (todos.length > amostra.length ? '; o mapa desenha ' + amostra.length : '') + '. Atualizado ' + (d.atualizadoEm || '').slice(0,16).replace('T',' ') + '.' +
+        (todos.length > amostra.length ? '; o mapa desenha ' + amostra.length : '') + '. Atualizado ' + horaBR(d.atualizadoEm) + '.' +
         (d.aviso ? ' ' + d.aviso : '');
     }
   }).catch(function(e) {

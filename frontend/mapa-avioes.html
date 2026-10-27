@@ -140,7 +140,7 @@ function carregarAvioes() {
     avioesMarkers = [];
 
     document.getElementById('stat-total').textContent = Number(d.total || 0).toLocaleString('pt-BR');
-    document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
+    document.getElementById('stat-atualizacao').textContent = horaBR(d.atualizadoEm);
     document.getElementById('stat-fonte').textContent = d.fonte || 'OpenSky';
 
     var lista = document.getElementById('lista-avioes');

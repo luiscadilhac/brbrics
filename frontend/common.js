@@ -215,6 +215,8 @@ function initHamburger(){
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){var abertos=document.querySelectorAll('.navgrp.open');for(var i=0;i<abertos.length;i++){abertos[i].classList.remove('open');}}});
 // ===== Utilitários visuais (tempo relativo, leitura, vídeo, share, favoritos, fonte, progresso) =====
 function escA(s){return esc(s).replace(/"/g,'&quot;');}
+// Carimbo da API vem em UTC; quem le o site esta em horario de Brasilia.
+function horaBR(iso){try{var d=new Date(iso);if(isNaN(d.getTime()))return '—';return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR').slice(0,5);}catch(e){return '—';}}
 function tempoRel(d){try{var t=new Date(d).getTime();if(isNaN(t))return '';var s=(Date.now()-t)/1000;if(s<0)s=0;if(s<90)return 'agora mesmo';if(s<3600){var m=Math.floor(s/60);return 'há '+m+' min';}if(s<86400){var h=Math.floor(s/3600);return 'há '+h+'h';}var dd=Math.floor(s/86400);if(dd<7)return 'há '+dd+' dias';if(dd<30){var w=Math.floor(dd/7);return w>1?('há '+w+' semanas'):'há 1 semana';}var mo=Math.floor(dd/30);if(mo<12)return mo>1?('há '+mo+' meses'):'há 1 mês';var an=Math.floor(mo/12);return an>1?('há '+an+' anos'):'há 1 ano';}catch(e){return '';}}
 function tempoLeitura(txt){var w=String(txt||'').trim().split(/\s+/);var n=(w.length===1&&w[0]==='')?0:w.length;return Math.max(1,Math.round(n/180))+' min de leitura';}
 function ytId(u){try{var m=String(u||'').match(/(?:youtube\.com\/(?:watch\?[^#]*v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/i);return m?m[1]:'';}catch(e){return '';}}

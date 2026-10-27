@@ -156,7 +156,7 @@ function carregarFocos(uf) {
     var todos = d.focos || [];
     document.getElementById('stat-focos').textContent = Number(d.totalNas48h || d.total || 0).toLocaleString('pt-BR');
     document.getElementById('stat-estado').textContent = uf || 'Brasil';
-    document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
+    document.getElementById('stat-atualizacao').textContent = horaBR(d.atualizadoEm);
     var amostra = todos.slice(0, 800);
     amostra.forEach(function(f) {
       if (f.lat == null || f.lon == null) return;

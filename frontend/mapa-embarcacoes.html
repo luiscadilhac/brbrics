@@ -143,7 +143,7 @@ function carregarNavios() {
     naviosMarkers = [];
 
     document.getElementById('stat-total').textContent = d.total || 0;
-    document.getElementById('stat-atualizacao').textContent = (d.atualizadoEm || '').slice(0,16).replace('T',' ');
+    document.getElementById('stat-atualizacao').textContent = horaBR(d.atualizadoEm);
     document.getElementById('stat-fonte').textContent = d.fonte || 'AIS';
 
     var lista = document.getElementById('lista-navios');
