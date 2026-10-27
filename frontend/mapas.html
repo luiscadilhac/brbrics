@@ -242,14 +242,16 @@
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap',maxZoom:18}).addTo(m);
   var st = document.getElementById('status-mapa-dados');
   if (st) st.textContent = 'Carregando malha do IBGE e licitações do PNCP...';
+  // Codigo IBGE da UF -> sigla. A tabela e publica e nao muda nunca, entao o
+  // coroplote nao precisa depender de mais uma chamada que pode falhar e deixar
+  // todos os estados cinza enquanto o texto diz o contrario.
+  var UFS = {'11':'RO','12':'AC','13':'AM','14':'RR','15':'PA','16':'AP','17':'TO','21':'MA','22':'PI','23':'CE','24':'RN','25':'PB','26':'PE','27':'AL','28':'SE','29':'BA','31':'MG','32':'ES','33':'RJ','35':'SP','41':'PR','42':'SC','43':'RS','50':'MS','51':'MT','52':'GO','53':'DF'};
+  var siglaPorCodigo = function(cod){ return UFS[String(cod)] || ''; };
   Promise.all([
     fetch('https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json&intrarregiao=UF&qualidade=minima').then(function(r){ return r.json(); }),
-    fetch('/api/licitacoes?tamanhoPagina=100&pagina=1').then(function(r){ return r.json(); }).catch(function(){ return {}; }),
-    fetch('/api/ibge/estados').then(function(r){ return r.json(); }).catch(function(){ return {}; })
+    fetch('/api/licitacoes?tamanhoPagina=100&pagina=1').then(function(r){ return r.json(); }).catch(function(){ return {}; })
   ]).then(function(lote){
-    var geo = lote[0] || {}, lic = lote[1] || {}, ufs = lote[2] || {};
-    var siglaPorCodigo = {};
-    (ufs.estados || []).forEach(function(e){ siglaPorCodigo[String(e.id)] = e.sigla; });
+    var geo = lote[0] || {}, lic = lote[1] || {};
     var cont = {};
     (lic.dados || []).forEach(function(x){
       var s = (x.unidadeOrgao && x.unidadeOrgao.ufSigla) || x.ufSigla || '';
@@ -257,21 +259,27 @@
     });
     var max = 1;
     Object.keys(cont).forEach(function(k){ if (cont[k] > max) max = cont[k]; });
+    var coloridos = 0;
     L.geoJSON(geo, {
       style: function(f){
-        var cod = String((f.properties || {}).codarea || '');
-        var n = cont[siglaPorCodigo[cod]] || 0;
+        var n = cont[siglaPorCodigo((f.properties || {}).codarea)] || 0;
+        if (n) coloridos++;
         return { color: '#7DD3FC', weight: 1, fillColor: n ? '#3B82F6' : '#1e1e24', fillOpacity: n ? (0.3 + 0.5 * (n / max)) : 0.18 };
       },
       onEachFeature: function(f, l){
-        var cod = String((f.properties || {}).codarea || '');
-        var s = siglaPorCodigo[cod] || 'BR';
+        var s = siglaPorCodigo((f.properties || {}).codarea) || 'BR';
         var n = cont[s] || 0;
         l.bindPopup('<b>' + s + '</b><br>' + (n ? n + ' licitações publicadas no período (PNCP)' : 'Nenhuma licitação na amostra dos últimos 7 dias'));
       }
     }).addTo(m);
-    if (st) st.textContent = (geo.features || []).length + ' estados na malha oficial do IBGE; ' + Object.keys(cont).length +
-      ' deles com licitações na amostra de ' + (lic.dados || []).length + ' contratações (' + Number(lic.total || 0).toLocaleString('pt-BR') + ' no período completo).';
+    var naMalha = (geo.features || []).length;
+    if (!lic.dados) {
+      if (st) st.textContent = naMalha + ' estados na malha oficial do IBGE, mas o PNCP não respondeu agora — o mapa está sem a camada de licitações. Recarregue daqui a pouco.';
+    } else if (!lic.dados.length) {
+      if (st) st.textContent = naMalha + ' estados na malha oficial do IBGE. Nenhuma contratação do tipo publicado no período consultado.';
+    } else {
+      if (st) st.textContent = naMalha + ' estados na malha oficial do IBGE; ' + coloridos + ' deles com licitações na amostra de ' + lic.dados.length + ' contratações (' + Number(lic.total || 0).toLocaleString('pt-BR') + ' no período completo).';
+    }
   }).catch(function(e){ if (st) st.textContent = 'Falha ao montar o mapa: ' + e.message; });
 })();
 </script>

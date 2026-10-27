@@ -10,7 +10,18 @@ function registrarIBGE(app, cacheGet, cacheSet, getJSON){
   // UFs
   app.get('/api/ibge/estados', function(req,res){
     var hit=cacheGet('ibge_ufs'); if(hit) return res.json(hit);
-    getJSON(IBGE1+'/localidades/estados?orderBy=nome').then(function(r){
+    // Lista quase estatica, mas uma instabilidade dela derruba o coroplote do
+    // portal inteiro: prazo longo, segunda tentativa e nada de cachear vazio.
+    function tenta(restam){
+      return getJSON(IBGE1+'/localidades/estados?orderBy=nome', {}, 30000).then(function(r){
+        if(!Array.isArray(r.data) || !r.data.length) throw new Error('IBGE devolveu a lista de estados vazia');
+        return r;
+      }).catch(function(e){
+        if(restam<=1) throw e;
+        return new Promise(function(ok){ setTimeout(ok, 1500); }).then(function(){ return tenta(restam-1); });
+      });
+    }
+    tenta(2).then(function(r){
       var out={fonte:'IBGE - Localidades', total:(r.data||[]).length,
         estados:(r.data||[]).map(function(e){return {id:e.id, sigla:e.sigla, nome:e.nome, regiao:(e.regiao||{}).nome||''};})};
       cacheSet('ibge_ufs',out,7*DIA); res.json(out);
