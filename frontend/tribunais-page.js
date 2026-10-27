@@ -131,7 +131,7 @@ document.getElementById('feed').innerHTML=html||'<p class="muted">Sem dados.</p>
 function carregarRSS(){
   jget('/api/tribunais/noticias').then(function(r){
     var html='';(r.tribunais||[]).forEach(function(t){
-      html+='<h3 style="color:#FF7A00;margin:14px 0 4px">'+esc(t.sigla)+' - '+esc(t.nome||'')+'</h3>';
+      html+='<h3 style="color:var(--ico);margin:14px 0 4px">'+esc(t.sigla)+' - '+esc(t.nome||'')+'</h3>';
       if(t.erro){html+='<p class="muted">RSS indisponivel.</p>';}
       else{(t.noticias||[]).forEach(function(n){
         var vd=n.video||'';var src=n.imagem||(vd?ytThumb(ytId(vd)):'');

@@ -167,7 +167,7 @@ function renderTable(d){
     var arr = (d[k]||[]).slice(-4);
     arr.forEach(function(p){
       rows += '<tr class="clickable" onclick="window.open(\''+sgsLink(SGS[k])+'\',\'_blank\')" title="Abrir série '+k.toUpperCase()+' no BCB">';
-      rows += '<td><b>'+k.toUpperCase()+'</b></td><td>'+esc(p.data)+'</td><td>'+esc(p.valor)+' <span style="color:#FF7A00">↗</span></td></tr>';
+      rows += '<td><b>'+k.toUpperCase()+'</b></td><td>'+esc(p.data)+'</td><td>'+esc(p.valor)+' <span style="color:var(--ico)">↗</span></td></tr>';
     });
   });
   document.getElementById('tb').innerHTML = rows || '<tr><td colspan="3">Sem dados.</td></tr>';
@@ -209,7 +209,7 @@ function carregar(){
     renderTable(r.dados||{});
     tendencia(r.dados.ipca,'t-ipca');tendencia(r.dados.selic,'t-selic');tendencia(r.dados.cambio,'t-cambio');tendencia(r.dados.igpm,'t-igpm');
     mkChart('c-ipca', r.dados.ipca, '#FFC400', 433);
-    mkChart('c-selic', r.dados.selic, '#FF7A00', 432);
+    mkChart('c-selic', r.dados.selic, '#3B82F6', 432);
     mkChart('c-cambio', r.dados.cambio, '#8B5CF6', 3698);
     mkChart('c-igpm', r.dados.igpm, '#06B6D4', 189);
     document.getElementById('s').textContent = 'Fonte: '+(r.fonte||'BCB')+(r.offline?' (offline)':'');
