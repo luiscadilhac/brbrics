@@ -5,35 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapa de Câmeras — BrBRICS</title>
 <meta name="description" content="Câmeras online públicas do Brasil: trânsito (CET-SP), rodovias (DNIT), clima (INMET) e cidades.">
-<link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=40">
-<link rel="stylesheet" href="pro.css?v=40">
+<link rel="icon" href="favicon.ico?v=49" type="image/x-icon">
+<link rel="stylesheet" href="style.css?v=49">
+<link rel="stylesheet" href="pro.css?v=49">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   #map { height: 60vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
   .layer-panel { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
   .layer-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
   .layer-row label { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
-  .layer-row input { accent-color: var(--yellow); }
+  .layer-row input { accent-color: var(--marca); }
   .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
   .btn-sm:hover { transform: translateY(-1px); }
   .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
   .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
-  .stat-val { font-size: 26px; font-weight: 800; color: var(--yellow); }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .cam-card { background: var(--card2); border-radius: 10px; padding: 12px; margin: 8px 0; border: 1px solid var(--line); font-size: 13px; }
   .cam-card b { color: var(--paper); display: block; margin-bottom: 4px; }
   .cam-card .muted { color: var(--muted); font-size: 11px; }
   .cam-img { width: 100%; max-width: 320px; height: 180px; object-fit: cover; border-radius: 8px; margin: 8px 0; border: 1px solid var(--line); background: #000; }
   .filtro { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
-  .filtro button { background: transparent; color: var(--yellow); border: 1px solid #4a4a55; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; }
-  .filtro button.ativo { background: var(--yellow); color: #141414; font-weight: 800; }
+  .filtro button { background: transparent; color: var(--marca); border: 1px solid #4a4a55; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  .filtro button.ativo { background: var(--marca); color: #141414; font-weight: 800; }
 </style>
 </head>
 <body>
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=49" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
     <nav class="nav"></nav>
     <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
   </div>
@@ -77,19 +77,19 @@
     <div class="card-h"><h2>🔗 Mais fontes de câmeras online</h2></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
-        <h4 style="margin:0 0 8px;color:var(--yellow)">CET-SP (São Paulo)</h4>
+        <h4 style="margin:0 0 8px;color:var(--marca)">CET-SP (São Paulo)</h4>
         <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Câmeras de trânsito da capital e região metropolitana.</p>
-        <a href="https://www.cetsp.com.br/" target="_blank" rel="noopener" style="color:var(--yellow);font-size:12px">CET-SP →</a>
+        <a href="https://www.cetsp.com.br/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">CET-SP →</a>
       </div>
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
-        <h4 style="margin:0 0 8px;color:var(--yellow)">DNIT</h4>
+        <h4 style="margin:0 0 8px;color:var(--marca)">DNIT</h4>
         <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Câmeras de rodovias federais em todo o Brasil.</p>
-        <a href="https://www.dnit.gov.br/" target="_blank" rel="noopener" style="color:var(--yellow);font-size:12px">DNIT →</a>
+        <a href="https://www.dnit.gov.br/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">DNIT →</a>
       </div>
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
-        <h4 style="margin:0 0 8px;color:var(--yellow)">INMET</h4>
+        <h4 style="margin:0 0 8px;color:var(--marca)">INMET</h4>
         <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Estações meteorológicas com imagens de câmeras.</p>
-        <a href="https://portal.inmet.gov.br/" target="_blank" rel="noopener" style="color:var(--yellow);font-size:12px">INMET →</a>
+        <a href="https://portal.inmet.gov.br/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">INMET →</a>
       </div>
     </div>
   </section>
@@ -102,8 +102,8 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=40"></script>
-<script src="app.js?v=40"></script>
+<script src="common.js?v=49"></script>
+<script src="app.js?v=49"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // Estado
@@ -164,7 +164,7 @@ function carregarCameras() {
       html += '<div class="cam-card">' +
         '<b>📹 ' + esc(c.nome) + '</b>' +
         '<span class="muted">Tipo: ' + esc(c.tipo) + ' · ' + esc(c.cidade) + ' — ' + esc(c.uf) + '</span>' +
-        '<br><a href="' + esc(c.url) + '" target="_blank" rel="noopener" style="color:var(--yellow);font-size:12px">Abrir imagem oficial →</a>' +
+        '<br><a href="' + esc(c.url) + '" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">Abrir imagem oficial →</a>' +
         '</div>';
     });
 

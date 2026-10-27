@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RSS — Feeds Oficiais — BrBRICS</title>
 <meta name="description" content="Notícias e publicações oficiais via RSS: Diário Oficial da União, Agência Brasil, IBGE e ANEEL.">
-<link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=41">
-<link rel="stylesheet" href="pro.css?v=41">
+<link rel="icon" href="favicon.ico?v=49" type="image/x-icon">
+<link rel="stylesheet" href="style.css?v=49">
+<link rel="stylesheet" href="pro.css?v=49">
 <style>
   .fontes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 24px; }
   .fonte-card { background: var(--card); border-radius: 10px; padding: 16px; border: 1px solid var(--line); }
-  .fonte-card h4 { margin: 0 0 8px; color: var(--yellow); font-size: 15px; }
+  .fonte-card h4 { margin: 0 0 8px; color: var(--marca); font-size: 15px; }
   .fonte-card p { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
   .btn-rss { background: var(--grad); color: #141414; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; width: 100%; }
   .btn-rss:hover { transform: translateY(-1px); }
@@ -20,18 +20,18 @@
   .item-rss:last-child { border-bottom: none; }
   .item-rss b { color: var(--paper); display: block; margin-bottom: 4px; }
   .item-rss .muted { font-size: 11px; color: var(--muted); }
-  .item-rss a { color: var(--yellow); text-decoration: none; font-size: 12px; }
+  .item-rss a { color: var(--marca); text-decoration: none; font-size: 12px; }
   .item-rss a:hover { text-decoration: underline; }
   .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
   .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
-  .stat-val { font-size: 26px; font-weight: 800; color: var(--yellow); }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
 </style>
 </head>
 <body>
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=49" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
     <nav class="nav"></nav>
     <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
   </div>
@@ -70,8 +70,8 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=41"></script>
-<script src="app.js?v=41"></script>
+<script src="common.js?v=49"></script>
+<script src="app.js?v=49"></script>
 <script>
 // Estado
 var fontes = [];
@@ -97,7 +97,7 @@ function carregarItens(id, btn) {
   fonteAtual = id;
   var btns = document.querySelectorAll('.btn-rss');
   btns.forEach(function(b){ b.style.background = 'var(--grad)'; b.style.color = '#141414'; });
-  btn.style.background = 'var(--yellow)';
+  btn.style.background = 'var(--marca)';
   btn.style.color = '#141414';
 
   var lista = document.getElementById('lista-itens');

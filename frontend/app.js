@@ -81,7 +81,7 @@ var d=ind.dados||{};var html='';
 var nums=a.map(function(p){return parseFloat(String(p.valor).replace(',','.'));}).filter(function(x){return !isNaN(x);});
 var dif=nums.length>1?(nums[nums.length-1]-nums[nums.length-2]):null;
 var tHtml=dif==null?'':(' <span class="tend '+(dif>0?'var-up':(dif<0?'var-down':'var-flat'))+'">'+(dif>0?'▲':(dif<0?'▼':'＝'))+' '+Math.abs(dif).toFixed(2)+'</span>');
-html+='<div class="kpi">'+kpiIco(k)+'<b>'+k.toUpperCase()+'</b> - '+(v?esc(v.valor)+tHtml+' <span class="muted">('+esc(v.data)+')</span>':'indisponivel')+sparkSVG(nums.slice(-12),90,26,'#FFC400')+'</div>';});
+html+='<div class="kpi">'+kpiIco(k)+'<b>'+k.toUpperCase()+'</b> - '+(v?esc(v.valor)+tHtml+' <span class="muted">('+esc(v.data)+')</span>':'indisponivel')+sparkSVG(nums.slice(-12),90,26,'#86EFAC')+'</div>';});
   html+='<small class="muted">Fonte: '+(esc(ind.fonte||'BCB'))+(ind.offline?' (offline)':'')+'</small>';
   document.getElementById('indicadores').innerHTML=html;
   var ipca=last(d.ipca),selic=last(d.selic),cam=last(d.cambio);

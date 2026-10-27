@@ -1,7 +1,7 @@
 :root{
   --bg:#0c0c0e; --bg2:#131316; --card:#17171c; --card2:#1e1e24;
   --ink:#e8ecf3; --paper:#e8ecf3; --muted:#a7a7b3; --line:#2a2a32;
-  --yellow:#FFC400;
+  --marca:#86EFAC;
   --acc:#7DD3FC; --acc-deep:#3B82F6; --ico:#7DD3FC;
   --pos:#86EFAC; --pos-deep:#22C55E; --neg:#f87171;
   --grad:var(--acc);
@@ -15,7 +15,7 @@ body{margin:0;background:radial-gradient(1200px 500px at 80% -10%,rgba(59,130,24
 .topbar-in{display:flex;align-items:center;gap:22px;padding:12px 22px}
 .brand{display:flex;align-items:center;gap:10px;color:var(--paper);text-decoration:none;font-size:22px;font-weight:800}
 .brand img{width:34px;height:34px;border-radius:10px}
-.brand b{color:var(--yellow)}
+.brand b{color:var(--marca)}
 .brand-tx{display:inline-block;white-space:nowrap}
 .nav{display:flex;gap:6px;flex:1;flex-wrap:wrap}
 .nav a{color:var(--paper);text-decoration:none;font-size:14.5px;font-weight:600;padding:8px 13px;border-radius:999px}
@@ -64,37 +64,37 @@ h1{font-size:36px;line-height:1.05;margin:.2em 0;font-weight:800;letter-spacing:
 h1 .hl{color:var(--acc)}
 h2,h3{color:var(--paper)}
 .sub{font-size:14px;color:var(--muted)}
-.sub b{color:var(--yellow)}
+.sub b{color:var(--marca)}
 .cta{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;justify-content:center}
 .stats{display:flex;gap:14px;margin-top:20px;flex-wrap:wrap;justify-content:center}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;min-width:140px}
-.stat b{font-size:20px;color:var(--yellow);display:block}
+.stat b{font-size:20px;color:var(--marca);display:block}
 .stat span{font-size:12px;color:var(--muted)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
 .card-h{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px;gap:10px}
 .card-h h2{margin:0;font-size:21px}
 .card-h a{font-size:13.5px;color:var(--acc);font-weight:700;text-decoration:none;white-space:nowrap}
 .newsletter input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;margin:8px 0;background:#0f0f12;color:var(--paper)}
-.newsletter h3{color:var(--yellow);margin:0 0 4px}
+.newsletter h3{color:var(--marca);margin:0 0 4px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:6px 0 4px}
 .grid3 a{text-decoration:none}
 .list article{padding:12px 0;border-bottom:1px dashed var(--line)}
 .list article:hover{background:rgba(125,211,252,.05);border-radius:8px;padding-left:8px}
 .list h4{margin:0 0 4px;font-size:16.5px;color:var(--paper)}
-.list a{color:var(--yellow)}
-.tag{font-size:11px;font-weight:800;background:#26262e;color:var(--yellow);border:1px solid #3a3a45;border-radius:7px;padding:2px 9px;margin-right:6px;text-transform:uppercase}
+.list a{color:var(--marca)}
+.tag{font-size:11px;font-weight:800;background:#26262e;color:var(--marca);border:1px solid #3a3a45;border-radius:7px;padding:2px 9px;margin-right:6px;text-transform:uppercase}
 .muted{color:var(--muted)}
 .kpis{display:grid;gap:10px}
 .kpi{border:1px solid var(--line);border-radius:12px;padding:11px 14px;background:#101014}
-.var-up{color:var(--pos);font-weight:700}
+.var-up{color:var(--pos-deep);font-weight:700}
 .var-down{color:var(--neg);font-weight:700}
 .var-flat{color:#a7a7b3;font-weight:700}
 footer{background:#08080a;border-top:1px solid var(--line);color:#9a9aa5;margin-top:34px;padding:26px 0;font-size:14px}
 .foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
 .foot b{color:var(--paper)}
 .flinks{display:flex;gap:16px;flex-wrap:wrap}
-.flinks a{color:var(--yellow);text-decoration:none}
+.flinks a{color:var(--marca);text-decoration:none}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th{color:var(--ico);text-transform:uppercase;font-size:12px;letter-spacing:.06em}
 th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}
@@ -195,8 +195,8 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 .share-btn:hover{border-color:var(--acc);color:var(--acc)}
 .fav-btn{background:transparent;border:1px solid var(--line);border-radius:8px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);flex:none;padding:0}
 .fav-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8}
-.fav-btn.on{color:var(--yellow);border-color:var(--yellow)}
-.fav-btn:hover{border-color:var(--yellow)}
+.fav-btn.on{color:var(--marca);border-color:var(--marca)}
+.fav-btn:hover{border-color:var(--marca)}
 .tag-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
 /* ===== Vídeo ===== */
 .vid-link{display:block;position:relative}
@@ -221,7 +221,7 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 /* ===== Prazo e modalidade (licitações) ===== */
 .prazo{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 10px;margin-left:6px;white-space:nowrap}
 .prazo.ok{background:rgba(134,239,172,.14);color:var(--pos);border:1px solid rgba(134,239,172,.4)}
-.prazo.warn{background:rgba(255,196,0,.14);color:var(--yellow);border:1px solid rgba(255,196,0,.4)}
+.prazo.warn{background:rgba(125,211,252,.14);color:var(--acc);border:1px solid rgba(125,211,252,.4)}
 .prazo.urg{background:rgba(239,68,68,.15);color:var(--neg);border:1px solid rgba(239,68,68,.4)}
 .prazo.off{background:#26262e;color:var(--muted);border:1px solid #3a3a45}
 .mod{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;flex:none}
@@ -263,7 +263,7 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 .mkt-table tr:last-child td{border-bottom:none}
 .mkt-sym{font-weight:800;color:var(--paper)}
 .mkt-logo{width:22px;height:22px;border-radius:50%;vertical-align:-6px;margin-right:7px;background:#101014}
-.mkt-up{color:var(--pos);font-weight:800;white-space:nowrap}
+.mkt-up{color:var(--pos-deep);font-weight:800;white-space:nowrap}
 .mkt-down{color:var(--neg);font-weight:800;white-space:nowrap}
 .mkt-flat{color:var(--muted);font-weight:800;white-space:nowrap}
 /* ===== Rodapé com menus ===== */

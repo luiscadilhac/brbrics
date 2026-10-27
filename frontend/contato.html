@@ -6,15 +6,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contato — BrBRICS</title>
 <meta name="description" content="Fale com a equipe do BrBRICS: dúvidas, correções de dados, sugestões de fontes e parcerias.">
-<link rel="icon" href="favicon.ico" type="image/x-icon"><link rel="icon" href="favicon.png" type="image/png" sizes="64x64">
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css?v=14">
-<link rel="stylesheet" href="pro.css?v=14">
+<link rel="icon" href="favicon.ico?v=49" type="image/x-icon"><link rel="icon" href="favicon.png?v=49" type="image/png" sizes="64x64">
+<link rel="manifest" href="manifest.json?v=49">
+<link rel="stylesheet" href="style.css?v=49">
+<link rel="stylesheet" href="pro.css?v=49">
 </head>
 <body>
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=49" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
     <nav class="nav">
       <a href="index.html">Início</a>
       <a href="sobre.html">Sobre</a>
@@ -35,7 +35,7 @@
 
   <section class="card">
     <div class="card-h"><h2>Email</h2></div>
-    <p><b>E-mail oficial:</b> <a href="mailto:contato@brbrics.com.br" style="color:#FFC400">contato@brbrics.com.br</a></p>
+    <p><b>E-mail oficial:</b> <a href="mailto:contato@brbrics.com.br" style="color:var(--marca)">contato@brbrics.com.br</a></p>
     <p class="muted">Prefere escrever direto? Use o botão abaixo — abre seu aplicativo de email com o assunto pronto.</p>
     <div class="toolbar">
       <input id="ct-assunto" type="text" placeholder="Assunto (ex: correção de dado)" style="min-width:240px;flex:1">
@@ -60,8 +60,8 @@
     </div>
     <div class="card">
       <div class="card-h"><h2>Outros canais</h2></div>
-      <p><b>Sobre o projeto:</b> <a href="sobre.html" style="color:#FFC400">Como produzimos</a></p>
-      <p><b>Privacidade:</b> <a href="privacidade.html" style="color:#FFC400">Política de privacidade (LGPD)</a></p>
+      <p><b>Sobre o projeto:</b> <a href="sobre.html" style="color:var(--marca)">Como produzimos</a></p>
+      <p><b>Privacidade:</b> <a href="privacidade.html" style="color:var(--marca)">Política de privacidade (LGPD)</a></p>
       <p class="muted">O BrBRICS é um portal independente de transparência de dados públicos, sem vínculo com governos ou partidos.</p>
     </div>
   </section>
@@ -74,7 +74,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=34"></script>
+<script src="common.js?v=49"></script>
 <script>
 document.getElementById('ct-enviar').onclick=function(){
   var a=(document.getElementById('ct-assunto')||{}).value||'';

@@ -247,7 +247,7 @@ document.addEventListener('click',function(e){
   if(a&&a.href&&!(a.classList&&a.classList.contains('share-btn'))){var art=a.closest('article');var tag=art?art.querySelector('.tag,.badge'):null;trackLeitura(a.href,(a.textContent||'').trim().slice(0,120),tag?tag.textContent.trim():'');}
 },true);
 function sparkSVG(vals,w,h,color){
-  w=w||90;h=h||28;color=color||'#FFC400';
+  w=w||90;h=h||28;color=color||'#86EFAC';
   var nums=(vals||[]).map(function(v){return parseFloat(String(v).replace(',','.'));}).filter(function(v){return !isNaN(v);});
   if(nums.length<2)return '';
   var min=Math.min.apply(null,nums),max=Math.max.apply(null,nums),rg=(max-min)||1;
@@ -314,7 +314,7 @@ function buildFooter(){
   var fts=document.querySelectorAll('footer');
   for(var i=0;i<fts.length;i++){
     fts[i].innerHTML='<div class="wrap foot-grid">'
-    +'<div class="f-brand"><img src="logo-brics.png" alt="BrBRICS"><div><b>BrBRICS</b><p class="muted">Transparência de dados do setor público — direto das fontes oficiais, sem intermediários.</p></div></div>'
+    +'<div class="f-brand"><img src="logo-brics.png?v=49" alt="BrBRICS"><div><b>BrBRICS</b><p class="muted">Transparência de dados do setor público — direto das fontes oficiais, sem intermediários.</p></div></div>'
     +'<div class="f-col"><h4>Seções</h4><a href="index.html">Início</a><a href="edicao.html">Diário Oficial</a><a href="licitacoes.html">Licitações</a><a href="proposicoes.html">Congresso</a><a href="indicadores.html">Indicadores</a><a href="tribunais.html">Tribunais</a></div>'
     +'<div class="f-col"><h4>Território (IBGE)</h4><a href="territorio.html">Território</a></div>'
     +'<div class="f-col"><h4>Clima nas capitais</h4><a href="clima.html">Clima</a></div>'

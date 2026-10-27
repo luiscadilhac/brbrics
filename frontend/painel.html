@@ -7,14 +7,14 @@
 <title>Painel de visitas — BrBRICS</title>
 <meta name="description" content="Estatísticas de visitação do BrBRICS: páginas vistas, conteúdo popular e origens. Medição própria, sem cookies.">
 <meta name="robots" content="noindex, nofollow">
-<link rel="icon" href="favicon.ico" type="image/x-icon"><link rel="icon" href="favicon.png" type="image/png" sizes="64x64">
-<link rel="stylesheet" href="style.css?v=14">
-<link rel="stylesheet" href="pro.css?v=14">
+<link rel="icon" href="favicon.ico?v=49" type="image/x-icon"><link rel="icon" href="favicon.png?v=49" type="image/png" sizes="64x64">
+<link rel="stylesheet" href="style.css?v=49">
+<link rel="stylesheet" href="pro.css?v=49">
 </head>
 <body>
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=49" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
     <nav class="nav"></nav>
     <div class="actions">
       <input id="busca" type="search" placeholder="Buscar no portal...">
@@ -36,12 +36,12 @@
   </section>
 
   <section class="grid3" id="cards-resumo" style="display:none">
-    <div class="card" style="text-align:center"><h3>Hoje</h3><p style="font-size:28px;margin:4px 0"><b id="n-hoje" style="color:var(--yellow)">-</b></p></div>
-    <div class="card" style="text-align:center"><h3>Últimos 7 dias</h3><p style="font-size:28px;margin:4px 0"><b id="n-7" style="color:var(--yellow)">-</b></p></div>
-    <div class="card" style="text-align:center"><h3>Últimos 30 dias</h3><p style="font-size:28px;margin:4px 0"><b id="n-30" style="color:var(--yellow)">-</b></p></div>
+    <div class="card" style="text-align:center"><h3>Hoje</h3><p style="font-size:28px;margin:4px 0"><b id="n-hoje" style="color:var(--marca)">-</b></p></div>
+    <div class="card" style="text-align:center"><h3>Últimos 7 dias</h3><p style="font-size:28px;margin:4px 0"><b id="n-7" style="color:var(--marca)">-</b></p></div>
+    <div class="card" style="text-align:center"><h3>Últimos 30 dias</h3><p style="font-size:28px;margin:4px 0"><b id="n-30" style="color:var(--marca)">-</b></p></div>
   </section>
   <section class="grid3" id="cards-resumo2" style="display:none">
-    <div class="card" style="text-align:center"><h3>Total (mês)</h3><p style="font-size:28px;margin:4px 0"><b id="n-total" style="color:var(--yellow)">-</b></p></div>
+    <div class="card" style="text-align:center"><h3>Total (mês)</h3><p style="font-size:28px;margin:4px 0"><b id="n-total" style="color:var(--marca)">-</b></p></div>
     <div class="card" style="text-align:center"><h3>Online agora (5 min)</h3><p style="font-size:28px;margin:4px 0"><b id="n-online" style="color:#4ade80">-</b></p></div>
     <div class="card" style="text-align:center"><h3>Modo</h3><p style="font-size:14px" id="n-modo" class="muted">-</p></div>
   </section>
@@ -70,7 +70,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=34"></script>
+<script src="common.js?v=49"></script>
 <script>
 try{var qk=new URLSearchParams(location.search).get('chave');if(qk){document.getElementById('chave').value=qk;try{sessionStorage.setItem('brbrics_painel',qk);}catch(e){}}}catch(e){}
 try{var sk=sessionStorage.getItem('brbrics_painel');if(sk)document.getElementById('chave').value=sk;}catch(e){}
@@ -125,6 +125,6 @@ document.getElementById('btn-csv').onclick=function(){
 document.getElementById('chave').addEventListener('keydown',function(e){if(e.key==='Enter')carregarPainel();});
 if(document.getElementById('chave').value)carregarPainel();
 </script>
-<script src="app.js?v=34"></script>
+<script src="app.js?v=49"></script>
 </body>
 </html>

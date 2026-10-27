@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Calendário Oficial — BrBRICS</title>
 <meta name="description" content="Feriados nacionais, sessões do Congresso e prazos do calendário oficial público brasileiro.">
-<link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=41">
-<link rel="stylesheet" href="pro.css?v=41">
+<link rel="icon" href="favicon.ico?v=49" type="image/x-icon">
+<link rel="stylesheet" href="style.css?v=49">
+<link rel="stylesheet" href="pro.css?v=49">
 <style>
   .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
   .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
-  .stat-val { font-size: 26px; font-weight: 800; color: var(--yellow); }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .cal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
   .cal-card { background: var(--card2); border-radius: 10px; padding: 16px; border: 1px solid var(--line); }
-  .cal-card h4 { margin: 0 0 10px; color: var(--yellow); font-size: 15px; }
+  .cal-card h4 { margin: 0 0 10px; color: var(--marca); font-size: 15px; }
   .cal-item { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; display: flex; justify-content: space-between; }
   .cal-item:last-child { border-bottom: none; }
   .cal-item b { color: var(--paper); }
@@ -32,7 +32,7 @@
 <body>
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="brand" href="index.html"><img src="logo-brics.png" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=49" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
     <nav class="nav"></nav>
     <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
   </div>
@@ -81,8 +81,8 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=41"></script>
-<script src="app.js?v=41"></script>
+<script src="common.js?v=49"></script>
+<script src="app.js?v=49"></script>
 <script>
 var anoAtual = new Date().getFullYear();
 

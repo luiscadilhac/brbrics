@@ -121,7 +121,7 @@ return '<tr class="clickable" data-sg="'+esc(p.siglaTrib||sigla)+'" data-num="'+
 function carregarFeed(){
 jget('/api/tribunais/feed?tribunais=STF,STJ,TST,TJSP,TJRJ,TJMG&qtd=2').then(function(r){
 var html='';(r.tribunais||[]).forEach(function(t){
-html+='<h3 style="color:#FFC400;margin:14px 0 4px">'+esc(t.sigla)+' - '+esc(t.nome||'')+'</h3>';
+html+='<h3 style="color:var(--marca);margin:14px 0 4px">'+esc(t.sigla)+' - '+esc(t.nome||'')+'</h3>';
 if(t.erro){html+='<p class="muted">Indisponivel no momento.</p>';}
 else{(t.processos||[]).forEach(function(p){html+=cardProc(p);});}
 });
