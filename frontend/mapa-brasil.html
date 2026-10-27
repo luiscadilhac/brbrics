@@ -134,9 +134,9 @@ function carregarEstadosIBGE() {
   fetch('https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json&intrarregiao=UF&qualidade=minima')
     .then(function(r){ return r.json(); }).then(function(geo) {
       var recortes = (geo && geo.features) || [];
-      fetch('/api/ibge/estados').then(function(r){ return r.json(); }).catch(function(){ return {}; }).then(function(lista) {
-        var nomes = {};
-        (lista.estados || []).forEach(function(e) { nomes[String(e.id)] = e; });
+      var nomes = {};
+      function desenha() {
+        estadosLayer.clearLayers();
         L.geoJSON(geo, {
           style: { color: '#7DD3FC', weight: 1.5, fillColor: '#3B82F6', fillOpacity: 0.12 },
           onEachFeature: function(f, l) {
@@ -150,6 +150,15 @@ function carregarEstadosIBGE() {
         }).addTo(estadosLayer);
         document.getElementById('stat-estados').textContent = recortes.length;
         document.getElementById('stat-atualizacao').textContent = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR').slice(0,5);
+      }
+      // A malha ja traz o nome do estado, entao ela pinta na hora. A ponte de
+      // UFs so acrescenta regiao, sigla e o atalho de focos: quando chegar,
+      // redesenha, em vez de segurar o mapa inteiro esperando uma chamada lenta.
+      desenha();
+      fetch('/api/ibge/estados').then(function(r){ return r.json(); }).catch(function(){ return {}; }).then(function(lista) {
+        if (!(lista && lista.estados && lista.estados.length)) return;
+        lista.estados.forEach(function(e) { nomes[String(e.id)] = e; });
+        desenha();
       });
     }).catch(function(e) {
       var st = document.getElementById('status-dados');
