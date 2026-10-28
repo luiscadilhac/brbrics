@@ -69,6 +69,15 @@ SEO: `backend/seo.js` gera `robots.txt` e `sitemap.xml`; as páginas listadas em
 ficheiro entram no sitemap — nova página precisa de entrada lá e, se quiser offline, também na
 lista `CORE` de `frontend/sw.js` (com `CACHE_NAME` incremented).
 
+O mesmo módulo publica o feed **do próprio portal** em `/rss.xml` (alias `/feed`, `application/rss+xml`,
+cache de 15 min). É o mecanismo de "aviso" do BrBRICS: não guarda nada em servidor nem pede cadastro —
+quem quer ser avisado assina o endereço, e a página `rss.html` explica e dá o link para copiar.
+
+A ficha de Eleições ([frontend/eleicoes.html](frontend/eleicoes.html)) exporta o resultado filtrado em
+CSV (ponto e vírgula + BOM, formato que o Excel pt-BR espera) e guarda filtros no `localStorage` do
+navegador. Nenhum dos dois toca em dado pessoal: os únicos campos que saem do servidor são os 12
+públicos listados em `CAMPOS`/`abreviar()` em [backend/eleicoes.js](backend/eleicoes.js).
+
 ## Convenções e cuidados
 
 - **Encoding**: os ficheiros são UTF-8 e alguns `.html` têm BOM. Não corras scripts avulsos de

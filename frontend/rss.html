@@ -61,6 +61,22 @@
       <p class="muted" style="padding:20px">Selecione uma fonte acima para carregar os itens.</p>
     </div>
   </div>
+
+  <div class="card" style="margin-top:22px">
+    <div class="card-h"><h2>Feed do próprio BrBRICS</h2><span class="tag">sem cadastro</span></div>
+    <p>Além de mostrar os feeds do governo, este portal publica o seu. Assinando, o seu leitor de
+      notícias avisa quando a <b>edição do dia</b> sair — sem e-mail, sem cadastro, sem nos entregar
+      nenhum dado seu.</p>
+    <div class="toolbar" style="margin:14px 0">
+      <input id="feed-url" type="text" readonly style="min-width:260px;flex:1;max-width:420px">
+      <button class="btn" id="btn-copia-feed" type="button">Copiar endereço</button>
+      <a class="btn" id="btn-google-feed" href="#" target="_blank" rel="noopener">Abrir no Google News</a>
+    </div>
+    <div class="list" id="feed-lista"></div>
+    <p class="muted">O feed é regerado a cada 15 minutos. Qualquer app de RSS (Feedly, Inoreader,
+      Thunderbird, ReadKit) aceita o endereço acima; no celular, o Chrome para Android e o Safari não
+      leem RSS sozinhos — precisam de um app de leitor.</p>
+  </div>
 </main>
 <footer>
   <div class="wrap foot">
@@ -125,8 +141,32 @@ function carregarItens(id, btn) {
   });
 }
 
+function preencheFeedBrbrics(){
+  var base = location.protocol + '//' + location.host;
+  var endereco = base + '/rss.xml';
+  var campo = document.getElementById('feed-url');
+  var lista = document.getElementById('feed-lista');
+  var gnews = document.getElementById('btn-google-feed');
+  if (campo) campo.value = endereco;
+  if (gnews) gnews.href = 'https://news.google.com/addfeed?feed=' + encodeURIComponent(endereco);
+  if (lista) lista.innerHTML =
+      '<article><h3 style="margin:0 0 4px;font-size:17px">O que sai no feed do portal</h3>'
+    + '<p style="margin:6px 0 0">Manchetes e publicações reunidas pelo BrBRICS: Diário Oficial da União, '
+    + 'licitações do PNCP, proposições do Congresso e atualizações de agências reguladoras.</p>'
+    + '<p style="margin:8px 0 0" class="muted">Endereço único: <b>' + esc(endereco) + '</b> '
+    + '(também funciona <b>' + esc(base) + '/feed</b>).</p></article>';
+  var btn = document.getElementById('btn-copia-feed');
+  if (btn) btn.addEventListener('click', function(){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(endereco).then(function(){ toast('Endereço do feed copiado'); })
+        .catch(function(){ toast(endereco); });
+    } else { toast(endereco); }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   carregarFontes();
+  preencheFeedBrbrics();
 });
 
 if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; }

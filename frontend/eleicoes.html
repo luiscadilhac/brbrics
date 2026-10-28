@@ -49,6 +49,7 @@
       <input id="f-situacao" type="search" placeholder="Situação (ex.: indefer)" style="max-width:170px">
       <button class="btn" id="btn-buscar">Procurar</button>
       <button class="btn" id="btn-limpar" type="button">Limpar</button>
+      <button class="btn" id="btn-csv" type="button" title="Baixa o resultado filtrado em planilha">Baixar planilha</button>
       <button class="btn" id="btn-salvar" type="button" title="Guarda este filtro neste navegador, sem cadastro">★ Salvar filtro</button>
     </div>
     <div id="el-favoritos" class="toolbar" style="display:none"></div>
@@ -182,7 +183,39 @@ document.addEventListener('click',function(ev){
   if(partes.length>=4){ el('f-cargo').value=partes[1]||''; el('f-uf').value=partes[2]||''; el('f-nome').value=partes[0]||''; el('f-partido').value=''; carregarLista(1); mostrarFavoritos(); }
 });
 
+// Baixa o resultado filtrado em planilha. Ponto e vírgula + BOM: é o formato que o
+// Excel em português espera (vírgula seria lida como separador decimal).
+var COLUNAS_CSV=[['nome','Nome'],['nomeUrna','Nome de urna'],['numero','Número'],['cargo','Cargo'],
+  ['partido','Partido'],['uf','UF'],['municipio','Município/UF'],['situacao','Situação do registro'],
+  ['coligacao','Coligação'],['ocupacao','Ocupação']];
+function celulaCsv(v){
+  var s=String(v==null?'':v);
+  if(s.indexOf(';')>=0||s.indexOf('"')>=0||/[\r\n]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+function baixarCSV(){
+  el('btn-csv').disabled=true;
+  jget(urlAPI(1).replace('tamanho=30','tamanho=200')).then(function(r){
+    var total=r.totalfiltrado||0;
+    if(total>200) toast('A planilha traz as 200 primeiras de '+numBR(total)+'. Afine o filtro para reduzir.');
+    var cab=COLUNAS_CSV.map(function(c){return celulaCsv(c[1]);}).join(';');
+    var linhas=(r.candidatos||[]).map(function(c){
+      return COLUNAS_CSV.map(function(cc){return celulaCsv(c[cc[0]]);}).join(';');
+    });
+    var texto='sep=;\r\n'+cab+'\r\n'+linhas.join('\r\n')+'\r\n';
+    var blob=new Blob([String.fromCharCode(0xFEFF)+texto],{type:'text/csv;charset=utf-8'});
+    var nome='brbrics-eleicoes-2026-'+(el('f-uf').value||'brasil')+'-'+(el('f-cargo').value||'todos')
+      .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'.csv';
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download=nome;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href); document.body.removeChild(a);},400);
+  }).catch(function(e){ toast('Não foi possível baixar: '+(e.message||'erro')); })
+    .then(function(){ el('btn-csv').disabled=false; });
+}
+
 el('btn-buscar').addEventListener('click',function(){carregarLista(1);mostrarFavoritos();});
+el('btn-csv').addEventListener('click',baixarCSV);
 el('btn-limpar').addEventListener('click',function(){
   ['f-nome','f-situacao'].forEach(function(i){el(i).value='';});
   ['f-uf','f-cargo','f-partido'].forEach(function(i){el(i).value='';});
