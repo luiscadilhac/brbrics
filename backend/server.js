@@ -384,6 +384,8 @@ try {
   emendas.registrarEmendas(app, cacheGet, cacheSet, getJSON);
   repasses.registrarRepasses(app, cacheGet, cacheSet, getJSON);
   deputados.registrarDeputados(app, cacheGet, cacheSet, getJSON, getJSONFast);
+  var eleicoes = require('./eleicoes');
+  eleicoes.registrarEleicoes(app, cacheGet, cacheSet, getJSON);
 } catch(e){ console.log('Modulo tribunais indisponivel:', e.message); }
 
 // ---- Canonical HTML pages (SEO + social cards) ----
@@ -406,50 +408,6 @@ app.get('/deputado/:id', function(req, res){
   var id = String(req.params.id||'').replace(/\D/g,'');
   if(!id) return res.redirect(301, '/proposicoes.html');
   res.sendFile(path.join(__dirname, '..', 'frontend', 'deputado-detalhe.html'));
-});
-
-// Newsletter subscription (+ alerta de busca). Arquivos em dados/ (efêmero no plano free).
-var DADOS_DIR = path.join(__dirname, '..', 'dados');
-var NEWSLETTER_FILE = path.join(DADOS_DIR, 'newsletter.json');
-var ALERTAS_FILE = path.join(DADOS_DIR, 'alertas.json');
-function lerListaJSON(f){
-  var fs = require('fs');
-  try{
-    if(!fs.existsSync(f)) return [];
-    var v = JSON.parse(fs.readFileSync(f,'utf8'));
-    return Array.isArray(v)?v:[];
-  }catch(e){ return []; }
-}
-function salvarListaJSON(f, list){
-  var fs = require('fs');
-  try{
-    if(!fs.existsSync(DADOS_DIR)) fs.mkdirSync(DADOS_DIR, {recursive:true});
-    fs.writeFileSync(f, JSON.stringify(list, null, 2));
-    return true;
-  }catch(e){ return false; }
-}
-app.post('/api/newsletter', function(req, res){
-  var email = String((req.body&&req.body.email)||'').trim().toLowerCase();
-  if(!email || email.indexOf('@')<0 || email.length>120) return res.status(400).json({erro:'Email inválido'});
-  var list = lerListaJSON(NEWSLETTER_FILE);
-  if(list.indexOf(email)<0){ list.push(email); }
-  if(!salvarListaJSON(NEWSLETTER_FILE, list)) return res.status(500).json({erro:'Falha ao salvar (disco indisponível)'});
-  res.json({ok:true, message:'Inscrito com sucesso', total:list.length});
-});
-app.get('/api/newsletter/total', function(req, res){
-  res.json({total: lerListaJSON(NEWSLETTER_FILE).length});
-});
-
-// Search alerts (salva busca para alerta futuro)
-app.post('/api/alertas', function(req, res){
-  var termo = String((req.body&&req.body.termo)||'').trim().toLowerCase().slice(0,80);
-  var email = String((req.body&&req.body.email)||'').trim().toLowerCase();
-  if(!termo || !email || email.indexOf('@')<0) return res.status(400).json({erro:'Informe termo + email válido'});
-  var list = lerListaJSON(ALERTAS_FILE);
-  var key = email+'|'+termo;
-  if(list.indexOf(key)<0){ list.push(key); }
-  if(!salvarListaJSON(ALERTAS_FILE, list)) return res.status(500).json({erro:'Falha ao salvar alerta'});
-  res.json({ok:true, message:'Alerta criado para "'+termo+'"'});
 });
 
 app.listen(PORT, function(){ console.log('BrBRICS em http://localhost:'+PORT); });

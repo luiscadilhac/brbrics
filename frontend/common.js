@@ -90,6 +90,7 @@ var BRBRICS_NAV=[
   {t:'Início',h:'index.html',ic:'home'},
   {t:'Diário Oficial',h:'edicao.html',ic:'file',sub:[{t:'Edição da Semana',h:'edicao.html',ic:'calendar'},{t:'Manchetes do Dia',h:'manchetes.html',ic:'news'},{t:'Buscar no DOU',h:'busca.html?q=dou',ic:'search'}]},
   {t:'Licitações',h:'licitacoes.html',ic:'clipcheck',sub:[{t:'Todas (PNCP)',h:'licitacoes.html',ic:'file'}]},
+  {t:'Eleições 2026',h:'eleicoes.html',ic:'clipcheck'},
   {t:'Congresso',h:'proposicoes.html',ic:'landmark',sub:[{t:'Proposições Recentes',h:'proposicoes.html',ic:'clock'},{t:'Busca Avançada',h:'legislacao.html',ic:'sliders'},{t:'Buscar no Congresso',h:'busca.html?q=proposicao',ic:'search'}]},
   {t:'Mapas',h:'mapa-brasil.html',ic:'globe',sub:[{t:'Mapa do Brasil (IBGE)',h:'mapa-brasil.html',ic:'pin'},{t:'Satélite e Focos (INPE)',h:'mapa-satelite.html',ic:'globe'},{t:'Aviões (ADS-B)',h:'mapa-avioes.html',ic:'landmark'},{t:'Embarcações (AIS)',h:'mapa-embarcacoes.html',ic:'trend'},{t:'Câmeras Online',h:'mapa-cameras.html',ic:'zap'}]},
   {t:'Indicadores',h:'indicadores.html',ic:'chart',sub:[{t:'Séries BCB (IPCA, Selic, Câmbio)',h:'indicadores.html',ic:'chart'},{t:'Boletim Focus 2026',h:'indicadores.html#focus',ic:'trend'},{t:'Bolsa e cripto',h:'index.html#mercado'},{t:'IPCA 12m & Desemprego',h:'indicadores.html#extras',ic:'users'}]},

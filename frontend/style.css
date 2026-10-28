@@ -77,8 +77,6 @@ h2,h3{color:var(--paper)}
 .card-h{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px;gap:10px}
 .card-h h2{margin:0;font-size:21px}
 .card-h a{font-size:13.5px;color:var(--acc);font-weight:700;text-decoration:none;white-space:nowrap}
-.newsletter input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;margin:8px 0;background:#0f0f12;color:var(--paper)}
-.newsletter h3{color:var(--marca);margin:0 0 4px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:6px 0 4px}
 .grid3 a{text-decoration:none}

@@ -56,13 +56,14 @@ O backend expõe ~65 rotas sob `/api/*`, todas com cache em memória. As princip
 |---|---|
 | Diário Oficial | `/api/dou`, `/api/edicao/destaques`, `/api/resumo` |
 | Licitações | `/api/licitacoes`, `/api/licitacao/*` |
+| Eleições | `/api/eleicoes` (filtros `uf,cargo,partido,nome,situacao,pagina,tamanho`), `/api/eleicoes/resumo` |
 | Congresso | `/api/proposicoes`, `/api/proposicao/:id`, `/api/deputados`, `/api/deputado/:id`, `/api/legislacao/*` |
 | Tribunais | `/api/tribunais`, `/api/tribunais/{buscar,detalhe,feed,noticias,recentes,tema}` |
 | Economia | `/api/indicadores`, `/api/focus`, `/api/economia`, `/api/mercado/{resumo,bolsa,cripto,ptax}` |
 | Territórios e ambiente | `/api/ibge/*`, `/api/clima`, `/api/clima/capitais`, `/api/mapas/{satelite,avioes,embarcacoes,cameras}` |
 | Contas e energia | `/api/contas/*`, `/api/energia/*`, `/api/repasses`, `/api/repasses/ranking`, `/api/emendas`, `/api/comex/*`, `/api/fipe/*` |
 | Conteúdo agregado | `/api/manchetes`, `/api/reguladores`, `/api/rss/{fontes,buscar}`, `/api/calendario` |
-| Infraestrutura | `/api/health`, `/api/status`, `/api/visita`, `/api/visitas/resumo`, `/api/newsletter` |
+| Infraestrutura | `/api/health`, `/api/status`, `/api/visita`, `/api/visitas/resumo` |
 
 SEO: `backend/seo.js` gera `robots.txt` e `sitemap.xml`; as páginas listadas em `PAGINAS` nesse
 ficheiro entram no sitemap — nova página precisa de entrada lá e, se quiser offline, também na
@@ -74,13 +75,19 @@ lista `CORE` de `frontend/sw.js` (com `CACHE_NAME` incremented).
   "correção de encoding" sobre o `frontend/` — foi isso que, uma vez, corrompeu o `common.js`
   (perdeu o prefixo `var BRBRICS_NAV=`, as funções do topo e a linha de boot, e trocou acentos por
   lixo tipo `Licitae7fces`).
+- **Dados pessoais**: o portal não cadastra ninguém e não envia e-mail — as rotas de newsletter e
+  alerta de busca foram removidas por isso (guardavam e-mail em `dados/`, que o plano free do Render
+  apaga a cada deploy). Na ficha de Eleições, `backend/eleicoes.js` descarta `NR_CPF_CANDIDATO`,
+  `DT_NASCIMENTO`, `DS_EMAIL` e o título de eleitor **na leitura da planilha do TSE**, para que nenhum
+  dado pessoal entre no cache nem chegue ao navegador. Manter assim: é o que sustenta a promessa do
+  `privacidade.html`.
 - **Validar antes de commitar**: `node --check` em cada `.js` tocado, e confirmar em
   `http://localhost:3000` que o menu e os dados aparecem.
 - Não há testes automatizados nem linter; a verificação é feita a correr o servidor.
 
 ## Páginas
 
-34 páginas estáticas em `frontend/`. As de entrada do menu: `index`, `edicao`, `licitacoes`,
+35 páginas estáticas em `frontend/`. As de entrada do menu: `index`, `edicao`, `licitacoes`, `eleicoes`,
 `proposicoes`, `legislacao`, `mapa-brasil`, `mapa-satelite`, `mapa-avioes`, `mapa-embarcacoes`,
 `mapa-cameras`, `mapas`, `indicadores`, `tribunais`, `manchetes`, `reguladores`, `diretorios`,
 `territorio`, `clima`, `contas`, `energia`, `comex`, `fipe`, `agro`, `rss`, `calendario`,

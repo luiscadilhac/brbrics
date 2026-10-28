@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9633564064128096" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eleições 2026 — candidatos e coligações — BrBRICS</title>
+<meta name="description" content="Todos os candidatos das Eleições 2026: cargo, partido, número, UF, cidade e situação da registro. Planilha oficial do TSE, atualizada diariamente.">
+<link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
+<link rel="stylesheet" href="style.css?v=54">
+<link rel="stylesheet" href="pro.css?v=54">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=50" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions">
+      <input id="busca" type="search" placeholder="Buscar no portal...">
+    </div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">Planilha oficial do TSE · Eleições 2026</p>
+    <h1>Candidatos <span class="hl">e coligações</span></h1>
+    <p class="sub">Registro de todas as candidaturas de 2026 — cargo, partido, número, estado e situação
+      — direto da base de <a href="https://dadosabertos.tse.jus.br/dataset/candidatos-2026" target="_blank" rel="noopener" style="color:var(--marca)">dados abertos do TSE</a>.
+      O portal <b>não mostra CPF, data de nascimento, e-mail nem título de eleitor</b>.</p>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Quadro geral</h2><span class="tag" id="el-att"></span></div>
+    <div id="el-kpi" class="grid3"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+    <div class="grid2" style="margin-top:18px">
+      <div><h3>Cargos com mais candidaturas</h3><div id="el-cargos"></div></div>
+      <div><h3>Partidos</h3><div id="el-partidos"></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Procurar candidatura</h2><span class="tag" id="el-cont"></span></div>
+    <div class="toolbar">
+      <input id="f-nome" type="search" placeholder="Nome, nome de urna ou cidade…" style="min-width:240px;flex:1;max-width:340px">
+      <select id="f-uf"><option value="">UF: todas</option></select>
+      <select id="f-cargo"><option value="">Cargo: todos</option></select>
+      <select id="f-partido"><option value="">Partido: todos</option></select>
+      <input id="f-situacao" type="search" placeholder="Situação (ex.: indefer)" style="max-width:170px">
+      <button class="btn" id="btn-buscar">Procurar</button>
+      <button class="btn" id="btn-limpar" type="button">Limpar</button>
+      <button class="btn" id="btn-salvar" type="button" title="Guarda este filtro neste navegador, sem cadastro">★ Salvar filtro</button>
+    </div>
+    <div id="el-favoritos" class="toolbar" style="display:none"></div>
+    <div id="el-lista" class="list"><div class="skel"></div><div class="skel"></div></div>
+    <div class="toolbar" id="el-pag" style="justify-content:center"></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Como ler a situação do registro</h2></div>
+    <p class="muted">A coluna <b>situação</b> vem do TSE e muda durante o período de registros: uma candidatura
+    pode estar <em>aguardando julgamento</em>, <em>deferida</em> (aprovada), <em>deferida em recurso</em> ou
+    <em>indeferida</em>. Só depois do julgamento final é que se sabe quem estará na urna.</p>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fonte: TSE / Dados Abertos.</div>
+    <div class="flinks"><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="privacidade.html">Privacidade (LGPD)</a><a href="contato.html">Contato</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=52"></script>
+<script>
+var _pagina=1, _total=0;
+var el=function(id){return document.getElementById(id);};
+
+function chaveFiltro(){
+  var q=[];
+  if(el('f-uf').value) q.push('uf='+encodeURIComponent(el('f-uf').value));
+  if(el('f-cargo').value) q.push('cargo='+encodeURIComponent(el('f-cargo').value));
+  if(el('f-partido').value) q.push('partido='+encodeURIComponent(el('f-partido').value));
+  if(el('f-nome').value.trim()) q.push('nome='+encodeURIComponent(el('f-nome').value.trim()));
+  if(el('f-situacao').value.trim()) q.push('situacao='+encodeURIComponent(el('f-situacao').value.trim()));
+  return 'eleicoes.html'+(q.length?'?'+q.join('&'):'');
+}
+function rotuloFiltro(){
+  var p=[];
+  if(el('f-cargo').value) p.push(el('f-cargo').value);
+  if(el('f-uf').value) p.push('em '+el('f-uf').value);
+  if(el('f-partido').value) p.push('do '+el('f-partido').value);
+  if(el('f-nome').value.trim()) p.push('contendo "'+el('f-nome').value.trim()+'"');
+  return p.length?('Filtro: '+p.join(' ')):'Filtro: todos os candidatos';
+}
+function lerURL(){
+  var q=new URLSearchParams(location.search);
+  if(q.get('uf')) el('f-uf').value=q.get('uf');
+  if(q.get('cargo')) el('f-cargo').value=q.get('cargo');
+  if(q.get('partido')) el('f-partido').value=q.get('partido');
+  if(q.get('nome')) el('f-nome').value=q.get('nome');
+  if(q.get('situacao')) el('f-situacao').value=q.get('situacao');
+}
+function urlAPI(pagina){
+  var q=[];
+  if(el('f-uf').value) q.push('uf='+encodeURIComponent(el('f-uf').value));
+  if(el('f-cargo').value) q.push('cargo='+encodeURIComponent(el('f-cargo').value));
+  if(el('f-partido').value) q.push('partido='+encodeURIComponent(el('f-partido').value));
+  if(el('f-nome').value.trim()) q.push('nome='+encodeURIComponent(el('f-nome').value.trim()));
+  if(el('f-situacao').value.trim()) q.push('situacao='+encodeURIComponent(el('f-situacao').value.trim()));
+  q.push('pagina='+pagina); q.push('tamanho=30');
+  return '/api/eleicoes?'+q.join('&');
+}
+
+function carregarResumo(){
+  jget('/api/eleicoes/resumo').then(function(r){
+    el('el-att').textContent='planilha lida '+horaBR(r.atualizadoEm);
+    el('el-kpi').innerHTML=
+      '<article class="news-card"><div class="news-body"><h4>Candidaturas</h4><p style="font-size:26px;margin:6px 0"><b style="color:var(--marca)">'+numBR(r.total)+'</b></p><small class="muted">registro na base do TSE</small></div></article>'
+      +'<article class="news-card"><div class="news-body"><h4>Cargos</h4><p style="font-size:26px;margin:6px 0"><b style="color:var(--marca)">'+(r.porCargo||[]).length+'</b></p><small class="muted">na planilha deste ciclo</small></div></article>'
+      +'<article class="news-card"><div class="news-body"><h4>Partidos</h4><p style="font-size:26px;margin:6px 0"><b style="color:var(--marca)">'+(r.porPartido||[]).length+'</b></p><small class="muted">com candidatura (top 30)</small></div></article>';
+    var cargos=(r.porCargo||[]).slice(0,7).map(function(x){return '<div class="rank"><span class="n">'+esc(x.total)+'</span><div>'+esc(x.nome)+'</div></div>';}).join('');
+    var partidos=(r.porPartido||[]).slice(0,7).map(function(x){return '<div class="rank"><span class="n">'+esc(x.total)+'</span><div>'+esc(x.nome)+'</div></div>';}).join('');
+    el('el-cargos').innerHTML=cargos||emptyHTML('Sem cargos');
+    el('el-partidos').innerHTML=partidos||emptyHTML('Sem partidos');
+    var ufs=(r.porUf||[]).map(function(x){return x.nome;}).sort();
+    if(ufs.length){var sel=el('f-uf');ufs.forEach(function(u){var o=document.createElement('option');o.value=u;o.textContent=u+'/'+u;sel.appendChild(o);});}
+    var cp=(r.porCargo||[]).map(function(x){return x.nome;}).sort();
+    if(cp.length){var s2=el('f-cargo');cp.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;s2.appendChild(o);});}
+    var pp=(r.porPartido||[]).map(function(x){return x.nome;}).sort();
+    if(pp.length){var s3=el('f-partido');pp.forEach(function(p){var o=document.createElement('option');o.value=p;o.textContent=p;s3.appendChild(o);});}
+  }).catch(function(e){ el('el-kpi').innerHTML='<p class="muted">Quadro indisponível agora: '+esc(e.message||'erro')+'</p>'; });
+}
+
+function carregarLista(pagina){
+  _pagina=pagina||1;
+  el('el-lista').innerHTML='<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+  el('el-pag').innerHTML='';
+  jget(urlAPI(_pagina)).then(function(r){
+    _total=r.totalfiltrado||0;
+    el('el-cont').textContent=numBR(_total)+' candidatura'+(_total===1?'':'s');
+    var cs=r.candidatos||[];
+    if(!cs.length){ el('el-lista').innerHTML=emptyHTML('Nenhuma candidatura com esse filtro','Troque o cargo, a UF ou parte do nome.'); return; }
+    el('el-lista').innerHTML=cs.map(function(c){
+      return '<article><div style="display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap">'
+        +'<div><h3 style="margin:0 0 4px;font-size:17px">'+esc(c.nomeUrna||c.nome)
+        +(c.numero?' <span class="tag">'+esc(c.numero)+'</span>':'')+'</h3>'
+        +'<p style="margin:2px 0" class="muted">'+esc(c.nome)+'</p>'
+        +'<p style="margin:6px 0 0"><span class="tag">'+esc(c.cargo||'—')+'</span> '
+        +'<span class="tag">'+esc(c.partido||'—')+'</span> '
+        +'<span class="tag">'+esc(c.uf||'—')+'</span>'+(c.municipio?' <span class="tag">'+esc(c.municipio)+'</span>':'')+'</p>'
+        +'<p style="margin:8px 0 0"><b>Situação:</b> '+esc(c.situacao||'—')
+        +(c.coligacao?' · <span class="muted">'+esc(c.coligacao)+'</span>':'')
+        +(c.ocupacao?' · <span class="muted">'+esc(c.ocupacao)+'</span>':'')+'</p></div>'
+        +'<div>'+favBtnHTML(c.nome+'|'+c.cargo+'|'+c.uf+'|'+c.numero, (c.nomeUrna||c.nome)+' — '+c.cargo)+'</div>'
+        +'</div></article>';
+    }).join('');
+    var ult=Math.ceil(_total/30);
+    if(ult>1){
+      var btn=function(p,tx,des){return '<button class="btn" type="button"'+(des?' disabled':'')+' onclick="carregarLista('+p+')">'+tx+'</button>';};
+      el('el-pag').innerHTML=btn(Math.max(_pagina-1,1),'← anterior',_pagina<=1)
+        +'<span class="muted" style="align-self:center">página '+_pagina+' de '+numBR(ult)+'</span>'
+        +btn(Math.min(_pagina+1,ult),'próxima →',_pagina>=ult);
+    }
+  }).catch(function(e){ el('el-lista').innerHTML='<p class="muted">Busca indisponível agora: '+esc(e.message||'erro')+'</p>'; });
+}
+
+function mostrarFavoritos(){
+  var caixa=el('el-favoritos');
+  try{
+    var l=favGet().filter(function(x){return /^(GOVERNADOR|SENADOR|DEPUTADO|PRESIDENTE|VICE)/.test(x.t||'')||/eleicoes/.test(x.u||'');});
+    if(!l.length){caixa.style.display='none';caixa.innerHTML='';return;}
+    caixa.style.display='flex';
+    caixa.innerHTML='<span class="muted">Suas buscas salvas:</span>'+l.slice(0,8).map(function(x){
+      return '<span class="tag" style="cursor:pointer" data-apply="'+escA(x.t)+'">'+esc(x.t)+'</span>';}).join('');
+  }catch(e){caixa.style.display='none';}
+}
+document.addEventListener('click',function(ev){
+  var alvo=ev.target.closest?ev.target.closest('[data-apply]'):null;
+  if(!alvo) return;
+  var partes=String(alvo.getAttribute('data-apply')).split('|');
+  if(partes.length>=4){ el('f-cargo').value=partes[1]||''; el('f-uf').value=partes[2]||''; el('f-nome').value=partes[0]||''; el('f-partido').value=''; carregarLista(1); mostrarFavoritos(); }
+});
+
+el('btn-buscar').addEventListener('click',function(){carregarLista(1);mostrarFavoritos();});
+el('btn-limpar').addEventListener('click',function(){
+  ['f-nome','f-situacao'].forEach(function(i){el(i).value='';});
+  ['f-uf','f-cargo','f-partido'].forEach(function(i){el(i).value='';});
+  history.replaceState(null,'','eleicoes.html');
+  carregarLista(1); mostrarFavoritos();
+});
+el('btn-salvar').addEventListener('click',function(){
+  var on=favToggle(chaveFiltro(), rotuloFiltro(), 'Eleições 2026');
+  toast(on?'Filtro salvo neste navegador':'Filtro removido');
+  mostrarFavoritos();
+});
+['f-uf','f-cargo','f-partido'].forEach(function(i){el(i).addEventListener('change',function(){carregarLista(1);});});
+['f-nome','f-situacao'].forEach(function(i){el(i).addEventListener('keydown',function(ev){if(ev.key==='Enter')carregarLista(1);});});
+
+lerURL();
+carregarResumo();
+carregarLista(1);
+mostrarFavoritos();
+</script>
+<script src="app.js?v=50"></script>
+</body>
+</html>
