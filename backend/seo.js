@@ -51,15 +51,16 @@ function hstsMiddleware(req, res, next) {
   res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   next();
 }
-// www e raiz sao o mesmo portal: o www entrega a raiz em vez de manter uma
-// copia paralela do site inteiro indexada em dois enderecos.
+// www, o endereco provisorio do Render e a raiz sao o mesmo portal: um unico host
+// canonico, para o site nao ficar indexado em tres enderecos diferentes.
 function hostOficial(req, res, next) {
-  if (req.get('host') === 'www.brbrics.com.br') {
+  var h = req.get('host') || '';
+  if (h === 'www.brbrics.com.br' || h === 'brbrics.onrender.com') {
     return res.redirect(301, 'https://brbrics.com.br' + (req.originalUrl || '/'));
   }
   next();
 }
-// Estes dois precisam rodar ANTES do express.static, sena o arquivo servido na
+// Estes dois precisam rodar ANTES do express.static, senao o arquivo servido na
 // linha de cima encerra a resposta e nenhum header/redirect chega na pagina.
 function aplicarCabecalhos(app) {
   app.use(hstsMiddleware);
