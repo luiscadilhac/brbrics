@@ -6,8 +6,8 @@
 <title>Mapa do Brasil — BrBRICS</title>
 <meta name="description" content="Mapa interativo do Brasil com malha oficial do IBGE, estados e municípios. Camadas de satélite e focos de calor do INPE.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=51">
-<link rel="stylesheet" href="pro.css?v=51">
+<link rel="stylesheet" href="style.css?v=54">
+<link rel="stylesheet" href="pro.css?v=54">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   #map { height: 70vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
@@ -177,7 +177,7 @@ function carregarFocos(uf) {
     amostra.forEach(function(f) {
       if (f.lat == null || f.lon == null) return;
       var forte = String(f.intensidade || '').toUpperCase().indexOf('ALTO') >= 0 || (f.frp != null && f.frp >= 30);
-      var cor = forte ? '#f87171' : '#86EFAC';
+      var cor = '#FF2D20';
       L.circleMarker([f.lat, f.lon], { radius: forte ? 6 : 4, color: cor, fillColor: cor, fillOpacity: 0.75, weight: 1 })
         .bindPopup('<b>' + esc(f.municipio || 'Local') + ' — ' + esc(f.uf || '') + '</b><br><small>Satélite: ' + esc(f.satelite || '—') + '</small><br><small>Data (GMT): ' + esc(f.datahora || '—') + '</small>')
         .addTo(focosLayer);

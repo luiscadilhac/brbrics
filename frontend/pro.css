@@ -188,7 +188,7 @@ tr.clickable:hover td{color:var(--marca);}
 .navgrp .sub a.active{background:rgba(59,130,246,.28);color:var(--pos-deep);box-shadow:inset 0 0 0 1px rgba(125,211,252,.6)}
 .navgrp:hover .navtop,.navgrp:focus-within .navtop{background:rgba(59,130,246,.12);color:var(--pos-deep);box-shadow:inset 0 0 0 1px rgba(125,211,252,.3)}
 .nav .navtop.active{background:rgba(59,130,246,.28);color:var(--pos-deep);box-shadow:inset 0 0 0 1px rgba(125,211,252,.7)}
-.hamb{display:none;background:transparent;border:1px solid #4a4a55;color:var(--acc);border-radius:10px;padding:6px 11px;font-size:18px;cursor:pointer;line-height:1}
+.hamb{display:none;background:transparent;border:1px solid #4a4a55;color:var(--ico-vivo);border-radius:10px;padding:6px 11px;font-size:18px;cursor:pointer;line-height:1}
 .hamb:hover{background:rgba(125,211,252,.1)}
 @media(max-width:900px){
  .hamb{display:inline-block}
