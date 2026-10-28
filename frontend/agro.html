@@ -64,7 +64,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=51"></script>
+<script src="common.js?v=52"></script>
 <script>
 jget('/api/ibge/estados').then(function(r){
   var sel=document.getElementById('pam-uf');
@@ -76,7 +76,7 @@ document.getElementById('btn-pam').onclick=function(){
   var ano=document.getElementById('pam-ano-in').value.replace(/\D/g,'')||'2024';
   document.getElementById('pam-ano').textContent=ano;
   document.getElementById('res-pam').innerHTML='<div class="skel"></div><div class="skel"></div>';
-  jget('/api/ibge/pam?produto='+prod+'&uf='+uf+'&ano='+ano).then(function(r){
+  ibgePam(prod,uf,ano).then(function(r){
     var html=(r.series||[]).map(function(s){
       var rows=(s.dados||[]).slice(0,15);
       var max=rows.length?rows[0].valor||1:1;

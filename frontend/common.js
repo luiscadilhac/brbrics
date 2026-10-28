@@ -248,6 +248,31 @@ function ibgeMunicipio(cod){
     return {fonte:'IBGE - Localidades + Estimativas de População',municipio:{id:m.id,nome:m.nome,uf:sigla,regiao:regiao,regiaoImediata:((m['regiao-imediata']||{}).nome)||''},populacao:pop};
   }).catch(function(){return jget('/api/ibge/municipio/'+cod);});
 }
+function numBR(v){var n=parseFloat(String(v==null?'':v).replace(/\./g,'').replace(',','.'));return isNaN(n)?null:n;}
+function ibgeNomes(nome){
+  return ibgeFonte('/api/v2/censos/nomes/'+encodeURIComponent(nome)).then(function(a){
+    return {fonte:'IBGE - Nomes no Brasil',nome:nome,resultados:Array.isArray(a)?a:[]};
+  }).catch(function(){return jget('/api/ibge/nomes?nome='+encodeURIComponent(nome));});
+}
+function ibgePam(produto,uf,ano){
+  var loc = uf==='all' ? 'N3[all]' : (/^\d{7}$/.test(uf) ? 'N6['+uf+']' : 'N3['+uf+']');
+  var cat = (produto==='all') ? '782[all]' : '782['+String(produto).replace(/\D/g,'')+']';
+  return ibgeFonte('/api/v3/agregados/5457/periodos/'+ano+'/variaveis/214,215?localidades='+loc+'&classificacao='+cat).then(function(d){
+    var series=(d||[]).map(function(s){
+      var dados=[];
+      (s.resultados||[]).forEach(function(rr){
+        var prodNome='';
+        try{var c=(rr.classificacoes||[])[0];var ks=Object.keys(c.categoria||{});prodNome=ks.length?c.categoria[ks[0]]:'';}catch(e){}
+        (rr.series||[]).forEach(function(x){
+          dados.push({localidade:x.localidade.nome,ibge:x.localidade.id,produto:prodNome,valor:numBR((x.serie||{})[ano]),bruto:(x.serie||{})[ano]});
+        });
+      });
+      dados.sort(function(a,b){return (b.valor||0)-(a.valor||0);});
+      return {variavel:s.variavel,unidade:s.unidade,dados:dados.slice(0,60)};
+    });
+    return {fonte:'IBGE/PAM - Produção Agrícola Municipal',ano:ano,series:series};
+  }).catch(function(){return jget('/api/ibge/pam?produto='+produto+'&uf='+uf+'&ano='+ano);});
+}
 function tempoRel(d){try{var t=new Date(d).getTime();if(isNaN(t))return '';var s=(Date.now()-t)/1000;if(s<0)s=0;if(s<90)return 'agora mesmo';if(s<3600){var m=Math.floor(s/60);return 'há '+m+' min';}if(s<86400){var h=Math.floor(s/3600);return 'há '+h+'h';}var dd=Math.floor(s/86400);if(dd<7)return 'há '+dd+' dias';if(dd<30){var w=Math.floor(dd/7);return w>1?('há '+w+' semanas'):'há 1 semana';}var mo=Math.floor(dd/30);if(mo<12)return mo>1?('há '+mo+' meses'):'há 1 mês';var an=Math.floor(mo/12);return an>1?('há '+an+' anos'):'há 1 ano';}catch(e){return '';}}
 function tempoLeitura(txt){var w=String(txt||'').trim().split(/\s+/);var n=(w.length===1&&w[0]==='')?0:w.length;return Math.max(1,Math.round(n/180))+' min de leitura';}
 function ytId(u){try{var m=String(u||'').match(/(?:youtube\.com\/(?:watch\?[^#]*v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/i);return m?m[1]:'';}catch(e){return '';}}

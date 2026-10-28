@@ -62,7 +62,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=51"></script>
+<script src="common.js?v=52"></script>
 <script>
 jget('/api/ibge/estados').then(function(r){
   var sel=document.getElementById('uf');
@@ -93,7 +93,7 @@ function buscarNome(){
   var nome=document.getElementById('nome').value.trim();
   if(!nome){toast('Digite um nome');return;}
   document.getElementById('res-nome').innerHTML='<div class="skel"></div>';
-  jget('/api/ibge/nomes?nome='+encodeURIComponent(nome)).then(function(r){
+  ibgeNomes(nome).then(function(r){
     var rows=(r.resultados||[]);
     if(!rows.length){document.getElementById('res-nome').innerHTML=emptyHTML('Nome não encontrado','Tente outra grafia.');return;}
     var html='<table><thead><tr><th>Período</th><th>Frequência</th><th>Sexo/Local</th></tr></thead><tbody>';
