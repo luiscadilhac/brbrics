@@ -338,7 +338,7 @@ function preaquecer(){
   ['/api/licitacoes','/api/proposicoes','/api/indicadores','/api/focus','/api/tribunais/noticias','/api/reguladores','/api/manchetes','/api/ibge/noticias','/api/ibge/estados','/api/fipe/marcas?tipo=carros','/api/mercado/resumo','/sitemap.xml',
    '/api/legislacao/votacoes','/api/legislacao/agenda','/api/legislacao/senado',
    '/api/dou','/api/edicao/destaques',
-   '/api/emendas','/api/repasses','/api/deputados','/api/deputados/gastos/ranking'].forEach(function(p){
+   '/api/emendas','/api/repasses','/api/deputados','/api/deputados/gastos/ranking','/api/orgao/nomes'].forEach(function(p){
      getJSON(base+p, {}, 20000).catch(function(){});
    });
 }
@@ -384,6 +384,8 @@ try {
   emendas.registrarEmendas(app, cacheGet, cacheSet, getJSON);
   repasses.registrarRepasses(app, cacheGet, cacheSet, getJSON);
   deputados.registrarDeputados(app, cacheGet, cacheSet, getJSON, getJSONFast);
+  var orgaos = require('./orgaos');
+  orgaos.registrarOrgaos(app, cacheGet, cacheSet, getJSON);
 } catch(e){ console.log('Modulo tribunais indisponivel:', e.message); }
 
 // ---- Canonical HTML pages (SEO + social cards) ----

@@ -56,6 +56,7 @@ O backend expõe ~65 rotas sob `/api/*`, todas com cache em memória. As princip
 |---|---|
 | Diário Oficial | `/api/dou`, `/api/edicao/destaques`, `/api/resumo` |
 | Licitações | `/api/licitacoes`, `/api/licitacao/*` |
+| Órgãos | `/api/orgao` (`cnpj,ano,fundo`), `/api/orgao/nomes` (`q`) |
 | Congresso | `/api/proposicoes`, `/api/proposicao/:id`, `/api/deputados`, `/api/deputado/:id`, `/api/legislacao/*` |
 | Tribunais | `/api/tribunais`, `/api/tribunais/{buscar,detalhe,feed,noticias,recentes,tema}` |
 | Economia | `/api/indicadores`, `/api/focus`, `/api/economia`, `/api/mercado/{resumo,bolsa,cripto,ptax}` |
@@ -71,6 +72,18 @@ lista `CORE` de `frontend/sw.js` (com `CACHE_NAME` incremented).
 O mesmo módulo publica o feed **do próprio portal** em `/rss.xml` (alias `/feed`, `application/rss+xml`,
 cache de 15 min). É o mecanismo de "aviso" do BrBRICS: não guarda nada em servidor nem pede cadastro —
 quem quer ser avisado assina o endereço, e a página `rss.html` explica e dá o link para copiar.
+
+A ficha de órgão ([frontend/orgao.html](frontend/orgao.html)) só usa o que a consulta pública do PNCP
+permite: `GET /v1/contratos?cnpjOrgao=` devolve os contratos do órgão com fornecedor, valor e objeto,
+mas **não existe busca por nome de órgão nem por CNPJ de fornecedor** — por isso o índice pesquisável
+(`/api/orgao/nomes`) é montado varrendo publicações recentes de algumas modalidades, uma chamada por
+vez com pausa. O PNCP devolve 429 a pedidos em paralelo e é instável: a mesma página de 10 contratos
+já levou 0,2s e 38s (medido em 2026-10-28). Por isso a ficha é coletada em páginas pequenas e *um
+passo por vez*: [backend/orgaos.js](backend/orgaos.js) puxa página enquanto a fonte responde rápido
+(até 8s por pedido, alvo de 20 contratos) e, quando a fonte enrola, `/api/orgao?fundo=1` responde na
+hora `{"aguardando":true,"coletados":N}` e o pedido seguinte continua de onde parou — a página
+pergunta a cada 5s, até 90s. A ficha guarda no cache 6h (30min se a coleta veio incompleta, marcada
+`parcial`) e mantém o último resultado bom como reserva para quando a fonte falha.
 
 ## Convenções e cuidados
 
@@ -88,7 +101,7 @@ quem quer ser avisado assina o endereço, e a página `rss.html` explica e dá o
 
 ## Páginas
 
-34 páginas estáticas em `frontend/`. As de entrada do menu: `index`, `edicao`, `licitacoes`,
+35 páginas estáticas em `frontend/`. As de entrada do menu: `index`, `edicao`, `licitacoes`, `orgao`,
 `proposicoes`, `legislacao`, `mapa-brasil`, `mapa-satelite`, `mapa-avioes`, `mapa-embarcacoes`,
 `mapa-cameras`, `mapas`, `indicadores`, `tribunais`, `manchetes`, `reguladores`, `diretorios`,
 `territorio`, `clima`, `contas`, `energia`, `comex`, `fipe`, `agro`, `rss`, `calendario`,

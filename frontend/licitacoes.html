@@ -39,6 +39,9 @@
     </div>
   </div>
   <div class="navgrp">
+    <a class="navtop" href="orgao.html">Órgãos</a>
+  </div>
+  <div class="navgrp">
     <a class="navtop" href="proposicoes.html">Congresso</a>
     <div class="sub">
       <a href="proposicoes.html">Proposições Recentes</a>
@@ -146,6 +149,8 @@ function pncpLink(o){var ctrl=o.numeroControlePNCP||'';if(ctrl)return 'https://p
 function renderLic(rows){
   document.getElementById('tb').innerHTML=rows.map(function(o){
     var org=o.orgaoEntidade?o.orgaoEntidade.razaoSocial:'';
+    var cnpjOrg=o.orgaoEntidade?String(o.orgaoEntidade.cnpj||'').replace(/\D/g,''):'';
+    var orgLink=(cnpjOrg.length===14)?('<a href="orgao.html?cnpj='+cnpjOrg+'" onclick="event.stopPropagation()" title="Ver os contratos deste orgao">'+esc(org)+'</a>'):esc(org);
     var u=o.unidadeOrgao?((o.unidadeOrgao.ufSigla||'')+' - '+(o.unidadeOrgao.municipioNome||'')):'';
     var val=o.valorTotalEstimado?('R$ '+Number(o.valorTotalEstimado).toLocaleString('pt-BR',{minimumFractionDigits:2})):'—';
     var mod='<span class="mod '+modPNCP(o.modalidadeNome)+'" title="'+esc(o.modalidadeNome||'Modalidade')+'"></span>';
@@ -154,7 +159,7 @@ function renderLic(rows){
     var local=o.numeroControlePNCP?('/licitacao/'+encodeURIComponent(o.numeroControlePNCP)):'';
     var det=(local?('<a class="btn ghost" href="'+local+'" onclick="event.stopPropagation()">Detalhe</a>'):'');
     var clk=local?(' onclick="location.href=this.dataset.lnk" data-lnk="'+escA(local)+'" title="Ver detalhes da contratacao"'):(lnk?(' onclick="window.open(this.dataset.lnk,\'_blank\',\'noopener\')" data-lnk="'+escA(lnk)+'" title="Abrir edital no PNCP"'):'');
-    return '<tr'+(local||lnk?' class="clickable"':'')+clk+'><td>'+mod+esc((o.objetoCompra||'').slice(0,140))+'<br>'+prazoHtml+'</td><td>'+esc(org)+'</td><td>'+esc(u)+'</td><td>'+esc((o.dataPublicacaoPncp||'').slice(0,10))+'</td><td>'+esc(val)+'</td><td style="white-space:nowrap">'+det+(lnk?' <a class="btn ghost" href="'+lnk+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">PNCP</a>':(local?'':'—'))+'</td></tr>';
+    return '<tr'+(local||lnk?' class="clickable"':'')+clk+'><td>'+mod+esc((o.objetoCompra||'').slice(0,140))+'<br>'+prazoHtml+'</td><td>'+orgLink+'</td><td>'+esc(u)+'</td><td>'+esc((o.dataPublicacaoPncp||'').slice(0,10))+'</td><td>'+esc(val)+'</td><td style="white-space:nowrap">'+det+(lnk?' <a class="btn ghost" href="'+lnk+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">PNCP</a>':(local?'':'—'))+'</td></tr>';
   }).join('')||'<tr><td colspan="6">'+emptyHTML('Sem registros no período','Ajuste os filtros ou o período.')+'</td></tr>';
 }
 var _pg=1,_totalPg=1,_tam=20;
