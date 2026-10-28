@@ -6,8 +6,8 @@
 <title>Mapa de Embarcações — BrBRICS</title>
 <meta name="description" content="Rastreamento de embarcações e navios na costa brasileira via AIS (Automatic Identification System).">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=50">
-<link rel="stylesheet" href="pro.css?v=50">
+<link rel="stylesheet" href="style.css?v=51">
+<link rel="stylesheet" href="pro.css?v=51">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   #map { height: 70vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
@@ -46,7 +46,7 @@
     <div class="stat-card"><div class="stat-val" id="stat-fonte">—</div><div class="stat-lab">Fonte de dados</div></div>
   </div>
 
-  <div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--muted)">
+  <div style="background:var(--card2);border:1px solid var(--pos-deep);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--muted)">
     <strong>⚠️ Sobre os dados AIS:</strong> Fontes gratuitas de AIS (MarineTraffic, VesselFinder, AIS Hub) exigem API key para dados em tempo real.
     Cadastre-se gratuitamente, obtenha a chave e informe no backend <code>backend/mapas.js</code> (rota <code>/api/mapas/embarcacoes</code>) para ativar o rastreio ao vivo.
   </div>
@@ -65,22 +65,22 @@
 
   <div id="map"></div>
 
-  <div id="lista-navios" style="display:none;max-height:300px;overflow-y:auto;background:var(--card2);border-radius:10px;padding:12px;margin-bottom:16px;border:1px solid var(--line)"></div>
+  <div id="lista-navios" style="display:none;max-height:300px;overflow-y:auto;background:var(--card2);border-radius:10px;padding:12px;margin-bottom:16px;border:1px solid var(--pos-deep)"></div>
 
   <section class="card">
     <div class="card-h"><h2>🔗 Fontes públicas de dados AIS</h2></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
-      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--pos-deep)">
         <h4 style="margin:0 0 8px;color:var(--marca)">MarineTraffic</h4>
         <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Rastreamento de navios global. Plano gratuito com dados atrasados.</p>
         <a href="https://www.marinetraffic.com/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">MarineTraffic →</a>
       </div>
-      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--pos-deep)">
         <h4 style="margin:0 0 8px;color:var(--marca)">VesselFinder</h4>
         <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Posições AIS em tempo real de embarcações mundo afora.</p>
         <a href="https://www.vesselfinder.com/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">VesselFinder →</a>
       </div>
-      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--pos-deep)">
         <h4 style="margin:0 0 8px;color:var(--marca)">AIS Hub</h4>
         <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Rede comunitária de receptores AIS com dados públicos.</p>
         <a href="https://www.aishub.net/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">AIS Hub →</a>

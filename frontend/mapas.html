@@ -16,8 +16,8 @@
 <meta property="og:image" content="https://brbrics.com.br/logo-brics.png?v=50">
 <meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://brbrics.com.br/mapas.html">
-<link rel="stylesheet" href="style.css?v=50">
-<link rel="stylesheet" href="pro.css?v=50">
+<link rel="stylesheet" href="style.css?v=51">
+<link rel="stylesheet" href="pro.css?v=51">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
@@ -54,7 +54,7 @@
     <div class="card-h"><h2>📌 Pontos oficiais — Google Meu Mapas</h2><a href="https://mymaps.google.com" target="_blank" rel="noopener">Criar mapa no Google</a></div>
     <div class="toolbar" style="flex-wrap:wrap;gap:10px">
       <p class="muted" style="margin:0 0 10px 0">Desenhe pontos, linhas e áreas no mapa (órgãos públicos, tribunais, fiscais, etc.) e incorpore no site.</p>
-      <div style="display:flex;align-items:center;justify-content:center;max-width:100%;aspect-ratio:16/9;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg2);color:var(--muted);font-size:13px;line-height:1.5;padding:12px;text-align:center">
+      <div style="display:flex;align-items:center;justify-content:center;max-width:100%;aspect-ratio:16/9;border:1px solid var(--pos-deep);border-radius:8px;overflow:hidden;background:var(--bg2);color:var(--muted);font-size:13px;line-height:1.5;padding:12px;text-align:center">
         📍 <b>Cole aqui o iframe do Google Meu Mapas</b><br>
         <span style="font-size:12px;color:var(--muted)">Passo: mymaps.google.com → Criar mapa → adicionar pontos → Compartilhar → Incorporar no meu site → copiar código.</span>
       </div>
@@ -139,15 +139,15 @@
     <h2>Dados Governamentais — incorporados diretamente (sem sair do site)</h2>
     <p>Buscas diretas via fetch para APIs públicas: BrasilAPI, PNCP, IBGE, Querido Diário (feed). Nenhum link externo obrigatório.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px;margin-bottom:20px">
-      <div style="background:var(--card2);border:1px solid var(--line);padding:15px;border-radius:8px">
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:15px;border-radius:8px">
         <h3 style="margin-top:0">BrasilAPI — CEP exemplo</h3>
         <div id="brasilapi-box">Carregando...</div>
       </div>
-      <div style="background:var(--card2);border:1px solid var(--line);padding:15px;border-radius:8px">
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:15px;border-radius:8px">
         <h3 style="margin-top:0">PNCP — licitações recentes</h3>
         <div id="pncp-box">Carregando...</div>
       </div>
-      <div style="background:var(--card2);border:1px solid var(--line);padding:15px;border-radius:8px">
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:15px;border-radius:8px">
         <h3 style="margin-top:0">Querido Diário — feed</h3>
         <p style="font-size:12px;color:var(--muted)">Diários oficiais pesquisáveis de 5.000+ cidades. Para incorporação direta, use feed de uma cidade específica.</p>
         <a href="https://queridodiario.ok.org.br/" target="_blank" rel="noopener" style="font-size:12px">Acessar feed (opcional)</a>
@@ -174,11 +174,11 @@
   <section style="max-width:1200px;margin:30px auto;padding:0 20px">
     <h2>1. Bases Geográficas — todos os repositórios</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
-      <div style="background:var(--card2);border:1px solid var(--line);padding:18px;border-radius:10px"><h3>tilacog/br-atlas</h3><p class="small">TopoJSON/GeoJSON do IBGE. BSD 3-Clause. Gera Brasil, estados e municípios.</p></div>
-      <div style="background:var(--card2);border:1px solid var(--line);padding:18px;border-radius:10px"><h3>cristoferluch/GeoDadosBrasil</h3><p class="small">GeoJSON 3 níveis: mínimo (leve), intermediário, máximo. Escolha o leve para mapa rápido.</p></div>
-      <div style="background:var(--card2);border:1px solid var(--line);padding:18px;border-radius:10px"><h3>ggondim/ibge-cidades-com-poligonos</h3><p class="small">Municípios já cruzados com polígonos. Liga código do município a licitação/despesa.</p></div>
-      <div style="background:var(--card2);border:1px solid var(--line);padding:18px;border-radius:10px"><h3>0e1/localidades</h3><p class="small">Coordenadas, bandeiras, gentílicos das UFs. <strong>ODbL — exige citar fonte.</strong></p></div>
-      <div style="background:var(--card2);border:1px solid var(--line);padding:18px;border-radius:10px"><h3>igorjba/malha</h3><p class="small">5.570 municípios com indicadores IBGE. Referência de 5 métodos de classificação de cores.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:18px;border-radius:10px"><h3>tilacog/br-atlas</h3><p class="small">TopoJSON/GeoJSON do IBGE. BSD 3-Clause. Gera Brasil, estados e municípios.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:18px;border-radius:10px"><h3>cristoferluch/GeoDadosBrasil</h3><p class="small">GeoJSON 3 níveis: mínimo (leve), intermediário, máximo. Escolha o leve para mapa rápido.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:18px;border-radius:10px"><h3>ggondim/ibge-cidades-com-poligonos</h3><p class="small">Municípios já cruzados com polígonos. Liga código do município a licitação/despesa.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:18px;border-radius:10px"><h3>0e1/localidades</h3><p class="small">Coordenadas, bandeiras, gentílicos das UFs. <strong>ODbL — exige citar fonte.</strong></p></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:18px;border-radius:10px"><h3>igorjba/malha</h3><p class="small">5.570 municípios com indicadores IBGE. Referência de 5 métodos de classificação de cores.</p></div>
     </div>
   </section>
 
@@ -196,9 +196,9 @@
   <section style="max-width:1200px;margin:30px auto;padding:0 20px">
     <h2>3. Fontes de Dados — incorporadas diretamente</h2>
     <div class="grid-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
-      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>jxnxts/mcp-brasil</h3><p class="small"><strong>Catálogo de APIs.</strong> Câmara, Senado, Portal Transparência, TCU, PNCP/ComprasNet, DataJud/CNJ, STF/STJ/TST, TSE, IBGE, TCEs, INPE. Não exige chave na maioria.</p></div>
-      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>BrasilAPI</h3><p class="small">CEP, CNPJ, bancos, câmbio. Útil para enriquecer registros de fornecedores.</p></div>
-      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>Querido Diário (OK Brasil)</h3><p class="small">5.000+ diários oficiais, pesquisáveis. Entra como feed de atos municipais.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>jxnxts/mcp-brasil</h3><p class="small"><strong>Catálogo de APIs.</strong> Câmara, Senado, Portal Transparência, TCU, PNCP/ComprasNet, DataJud/CNJ, STF/STJ/TST, TSE, IBGE, TCEs, INPE. Não exige chave na maioria.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>BrasilAPI</h3><p class="small">CEP, CNPJ, bancos, câmbio. Útil para enriquecer registros de fornecedores.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Querido Diário (OK Brasil)</h3><p class="small">5.000+ diários oficiais, pesquisáveis. Entra como feed de atos municipais.</p></div>
     </div>
   </section>
 
@@ -215,9 +215,9 @@
   <section style="max-width:1200px;margin:30px auto;padding:0 20px">
     <h2>6. Painéis incorporados — funcionando no site</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
-      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>Mapa interativo IBGE</h3><p>Malha oficial de estados + cor por licitação.</p><a href="mapa-brasil.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>Focos de calor (INPE)</h3><p>Malha do IBGE + focos das últimas 48h direto do BDQueimadas.</p><a href="mapa-satelite.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--line);padding:16px;border-radius:10px"><h3>Aviões, embarcações e câmeras</h3><p>ADS-B da OpenSky, rede portuária e câmeras públicas.</p><a href="mapa-avioes.html">Aviões</a> · <a href="mapa-embarcacoes.html">Embarcações</a> · <a href="mapa-cameras.html">Câmeras</a></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Mapa interativo IBGE</h3><p>Malha oficial de estados + cor por licitação.</p><a href="mapa-brasil.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Focos de calor (INPE)</h3><p>Malha do IBGE + focos das últimas 48h direto do BDQueimadas.</p><a href="mapa-satelite.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Aviões, embarcações e câmeras</h3><p>ADS-B da OpenSky, rede portuária e câmeras públicas.</p><a href="mapa-avioes.html">Aviões</a> · <a href="mapa-embarcacoes.html">Embarcações</a> · <a href="mapa-cameras.html">Câmeras</a></div>
     </div>
   </section>
 
