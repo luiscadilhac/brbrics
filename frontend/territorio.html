@@ -62,7 +62,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=50"></script>
+<script src="common.js?v=51"></script>
 <script>
 jget('/api/ibge/estados').then(function(r){
   var sel=document.getElementById('uf');
@@ -72,7 +72,7 @@ document.getElementById('uf').onchange=function(){
   var uf=this.value, sel=document.getElementById('mun');
   sel.innerHTML='<option value="">Carregando...</option>';
   if(!uf){sel.innerHTML='<option value="">Escolha a UF primeiro</option>';return;}
-  jget('/api/ibge/municipios?uf='+encodeURIComponent(uf)).then(function(r){
+  ibgeMunicipios(uf).then(function(r){
     sel.innerHTML='<option value="">Escolha o município</option>'+(r.municipios||[]).map(function(m){return '<option value="'+m.id+'">'+esc(m.nome)+'</option>';}).join('');
   }).catch(function(){sel.innerHTML='<option value="">Erro ao carregar</option>';});
 };
@@ -80,7 +80,7 @@ document.getElementById('btn-mun').onclick=function(){
   var cod=document.getElementById('mun').value;
   if(!cod){toast('Escolha o município');return;}
   document.getElementById('st-mun').textContent='Buscando...';
-  jget('/api/ibge/municipio/'+cod).then(function(r){
+  ibgeMunicipio(cod).then(function(r){
     var m=r.municipio||{}, p=r.populacao||{};
     document.getElementById('st-mun').textContent='';
     document.getElementById('res-mun').innerHTML='<div class="kpis">'
@@ -107,7 +107,7 @@ function buscarNome(){
 }
 document.getElementById('btn-nome').onclick=buscarNome;
 document.getElementById('nome').addEventListener('keydown',function(e){if(e.key==='Enter')buscarNome();});
-jget('/api/ibge/noticias?qtd=6').then(function(r){
+ibgeNoticias(6,'').then(function(r){
   var html=(r.noticias||[]).map(function(n){
     var img=n.imagem?'<div class="rss-img" style="margin:6px 0"><a href="'+n.link+'" target="_blank" rel="noopener"><img src="'+esc(n.imagem)+'" alt="" style="width:100%;height:auto;border-radius:8px;max-height:150px;object-fit:cover"></a></div>':'';
     var rel=tempoRel(n.data);

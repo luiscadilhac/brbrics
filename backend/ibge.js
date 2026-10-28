@@ -3,29 +3,28 @@ var IBGE1 = 'https://servicodados.ibge.gov.br/api/v1';
 var IBGE2 = 'https://servicodados.ibge.gov.br/api/v2';
 var IBGE3 = 'https://servicodados.ibge.gov.br/api/v3';
 var DIA = 86400000;
+// As 27 UFs sao informacao fixa: estados nao mudam de codigo, nome nem regiao.
+// A fonte atende navegadores no Brasil mas deixa o servidor no exterior pendurado,
+// e a lista indisponivel derrubava o coroplote e os seletores de tres paginas.
+var UFS = [
+  [11,'RO','Rondônia','Norte'],[12,'AC','Acre','Norte'],[13,'AM','Amazonas','Norte'],
+  [14,'RR','Roraima','Norte'],[15,'PA','Pará','Norte'],[16,'AP','Amapá','Norte'],
+  [17,'TO','Tocantins','Norte'],[21,'MA','Maranhão','Nordeste'],[22,'PI','Piauí','Nordeste'],
+  [23,'CE','Ceará','Nordeste'],[24,'RN','Rio Grande do Norte','Nordeste'],[25,'PB','Paraíba','Nordeste'],
+  [26,'PE','Pernambuco','Nordeste'],[27,'AL','Alagoas','Nordeste'],[28,'SE','Sergipe','Nordeste'],
+  [29,'BA','Bahia','Nordeste'],[31,'MG','Minas Gerais','Sudeste'],[32,'ES','Espírito Santo','Sudeste'],
+  [33,'RJ','Rio de Janeiro','Sudeste'],[35,'SP','São Paulo','Sudeste'],[41,'PR','Paraná','Sul'],
+  [42,'SC','Santa Catarina','Sul'],[43,'RS','Rio Grande do Sul','Sul'],[50,'MS','Mato Grosso do Sul','Centro-Oeste'],
+  [51,'MT','Mato Grosso','Centro-Oeste'],[52,'GO','Goiás','Centro-Oeste'],[53,'DF','Distrito Federal','Centro-Oeste']
+];
 function numBR(v){ var n=parseFloat(String(v==null?'':v).replace(/\./g,'').replace(',','.')); return isNaN(n)?null:n; }
 function registrarIBGE(app, cacheGet, cacheSet, getJSON){
   function erro502(res,e){ res.status(502).json({erro:'IBGE indisponível', detalhe:String((e&&e.message)||e).slice(0,200)}); }
 
   // UFs
   app.get('/api/ibge/estados', function(req,res){
-    var hit=cacheGet('ibge_ufs'); if(hit) return res.json(hit);
-    // Lista quase estatica, mas uma instabilidade dela derruba o coroplote do
-    // portal inteiro: prazo longo, segunda tentativa e nada de cachear vazio.
-    function tenta(restam){
-      return getJSON(IBGE1+'/localidades/estados?orderBy=nome', {}, 30000).then(function(r){
-        if(!Array.isArray(r.data) || !r.data.length) throw new Error('IBGE devolveu a lista de estados vazia');
-        return r;
-      }).catch(function(e){
-        if(restam<=1) throw e;
-        return new Promise(function(ok){ setTimeout(ok, 1500); }).then(function(){ return tenta(restam-1); });
-      });
-    }
-    tenta(2).then(function(r){
-      var out={fonte:'IBGE - Localidades', total:(r.data||[]).length,
-        estados:(r.data||[]).map(function(e){return {id:e.id, sigla:e.sigla, nome:e.nome, regiao:(e.regiao||{}).nome||''};})};
-      cacheSet('ibge_ufs',out,7*DIA); res.json(out);
-    }).catch(function(e){erro502(res,e);});
+    res.json({fonte:'IBGE - Localidades (tabela embutida)', total:UFS.length,
+      estados:UFS.map(function(u){return {id:u[0], sigla:u[1], nome:u[2], regiao:u[3]};})});
   });
 
   // Municípios por UF (sigla ou código)

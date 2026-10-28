@@ -64,7 +64,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=50"></script>
+<script src="common.js?v=51"></script>
 <script>
 jget('/api/ibge/estados').then(function(r){
   var sel=document.getElementById('pam-uf');
@@ -93,7 +93,7 @@ document.getElementById('btn-pam').onclick=function(){
   }).catch(function(e){document.getElementById('res-pam').innerHTML='<p class="muted">Erro: '+esc(e.message)+'</p>';});
 };
 var AGROKW=['agro','soja','milho','café','cafe','safra','lavoura','pecuária','pecuaria','leite','trigo','arroz','feijão','feijao','cana','algodão','algodao','fruta','hortali','pampa','rural','colheita','plantio','irrigação','irrigacao','agricultura','pesca'];
-jget('/api/ibge/noticias?tipo=noticia&qtd=30').then(function(r){
+ibgeNoticias(30,'noticia').then(function(r){
   var items=(r.noticias||[]).filter(function(n){
     var t=((n.titulo||'')+' '+(n.resumo||'')).toLowerCase();
     return AGROKW.some(function(k){return t.indexOf(k)>=0;});
