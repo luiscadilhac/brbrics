@@ -111,7 +111,7 @@
   <section class="hero" style="padding:28px 0;text-align:center">
     <p class="kicker">Ficha de cada órgão público</p>
     <h1>Órgãos <span class="hl">e o que contrataram</span></h1>
-    <p class="sub">Digite o nome de um órgão, de uma cidade ou o CNPJ. Veja os contratos publicados no PNCP: com quem contratou, por quanto e para quê.</p>
+    <p class="sub">Digite o nome de um órgão, de uma cidade ou o CNPJ. Veja os contratos publicados no PNCP: com quem contratou, por quanto e para quê. A busca lista os órgãos que publicaram nos últimos três meses; se o seu não aparecer, digite os 14 números do CNPJ.</p>
   </section>
 
   <section class="card">
@@ -182,8 +182,13 @@ function hoje(){ var d = new Date(); return d.getFullYear() + '-' + dois(d.getMo
 function carregaIndice(){
   el('status').textContent = 'Procurando órgãos…';
   return jget('/api/orgao/nomes').then(function(r){
+    if (r.construindo) {
+      el('status').textContent = 'Montando a lista de órgãos — o PNCP está sendo varrido agora; leva cerca de um minuto na primeira visita. A página tenta de novo sozinha.';
+      setTimeout(carregaIndice, 10000);
+      return;
+    }
     ORGAOS = r.orgaos || [];
-    el('status').textContent = ORGAOS.length + ' órgãos ativos';
+    el('status').textContent = ORGAOS.length + ' órgãos ativos' + (r.atualizando ? ' (renovando a lista agora)' : '');
     var ufs = {}; ORGAOS.forEach(function(o){ if (o.uf) ufs[o.uf] = 1; });
     var sel = el('uf');
     Object.keys(ufs).sort().forEach(function(u){

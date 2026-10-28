@@ -75,15 +75,18 @@ quem quer ser avisado assina o endereço, e a página `rss.html` explica e dá o
 
 A ficha de órgão ([frontend/orgao.html](frontend/orgao.html)) só usa o que a consulta pública do PNCP
 permite: `GET /v1/contratos?cnpjOrgao=` devolve os contratos do órgão com fornecedor, valor e objeto,
-mas **não existe busca por nome de órgão nem por CNPJ de fornecedor** — por isso o índice pesquisável
-(`/api/orgao/nomes`) é montado varrendo publicações recentes de algumas modalidades, uma chamada por
-vez com pausa. O PNCP devolve 429 a pedidos em paralelo e é instável: a mesma página de 10 contratos
-já levou 0,2s e 38s (medido em 2026-10-28). Por isso a ficha é coletada em páginas pequenas e *um
-passo por vez*: [backend/orgaos.js](backend/orgaos.js) puxa página enquanto a fonte responde rápido
-(até 8s por pedido, alvo de 20 contratos) e, quando a fonte enrola, `/api/orgao?fundo=1` responde na
-hora `{"aguardando":true,"coletados":N}` e o pedido seguinte continua de onde parou — a página
-pergunta a cada 5s, até 90s. A ficha guarda no cache 6h (30min se a coleta veio incompleta, marcada
-`parcial`) e mantém o último resultado bom como reserva para quando a fonte falha.
+mas **não existe busca por nome de órgão nem por CNPJ de fornecedor** — e `ufSigla`/`municipioNome`
+são ignorados pelo `publicacao` (medido em 2026-10-28). Por isso o índice pesquisável
+(`/api/orgao/nomes`) é montado varrendo as 12 modalidades, uma chamada por vez com pausa de 700ms
+(~360 órgãos dos últimos 3 meses; `tamanhoPagina` acima de 50 dá 400). A varredura dura ~1 minuto,
+então quem chega enquanto ela roda recebe a última lista boa marcada `atualizando`, ou
+`{"construindo":true}` na primeira vez — a página mostra o aviso e tenta de novo sozinha.
+O PNCP também é instável: a mesma página de 10 contratos já levou 0,2s e 38s. Por isso a ficha é
+coletada em páginas pequenas e *um passo por vez*: [backend/orgaos.js](backend/orgaos.js) puxa página
+enquanto a fonte responde rápido (até 8s por pedido, alvo de 20 contratos) e, quando a fonte enrola,
+`/api/orgao?fundo=1` responde na hora `{"aguardando":true,"coletados":N}` e o pedido seguinte continua
+de onde parou — a página pergunta a cada 5s, até 90s. A ficha fica 6h no cache (30min se a coleta
+veio incompleta, marcada `parcial`) e o último resultado bom serve de reserva quando a fonte falha.
 
 ## Convenções e cuidados
 

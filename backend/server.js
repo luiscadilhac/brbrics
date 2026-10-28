@@ -338,9 +338,12 @@ function preaquecer(){
   ['/api/licitacoes','/api/proposicoes','/api/indicadores','/api/focus','/api/tribunais/noticias','/api/reguladores','/api/manchetes','/api/ibge/noticias','/api/ibge/estados','/api/fipe/marcas?tipo=carros','/api/mercado/resumo','/sitemap.xml',
    '/api/legislacao/votacoes','/api/legislacao/agenda','/api/legislacao/senado',
    '/api/dou','/api/edicao/destaques',
-   '/api/emendas','/api/repasses','/api/deputados','/api/deputados/gastos/ranking','/api/orgao/nomes'].forEach(function(p){
+   '/api/emendas','/api/repasses','/api/deputados','/api/deputados/gastos/ranking'].forEach(function(p){
      getJSON(base+p, {}, 20000).catch(function(){});
    });
+  // O indice de orgaos varre as 12 modalidades do PNCP (~1 minuto de chamadas em sequencia).
+  // So comeca depois de o poeira baixar, para nao disputar a janela de 429 com a homepage.
+  setTimeout(function(){ getJSON(base+'/api/orgao/nomes', {}, 120000).catch(function(){}); }, 90000);
 }
 setTimeout(preaquecer, 3000);
 

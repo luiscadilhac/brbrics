@@ -4,7 +4,9 @@
 //   Nao existe busca por nome de orgao nem por CNPJ de fornecedor, por isso o indice de
 //   nomes e feito varrendo as publicacoes recentes (uma chamada por modalidade, com pausa).
 var BASE = 'https://pncp.gov.br/api/consulta/v1';
-var MODALIDADES_IDX = [4, 5, 6, 8, 9];
+// Varre as 12 modalidades porque o PNCP nao tem busca por nome de orgao, nem por UF,
+// nem por municipio (medido em 2026-10-28: ufSigla e municipioNome sao ignorados).
+var MODALIDADES_IDX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 var PAUSA = 700;
 
 function dois(n){ return String(n).padStart(2, '0'); }
@@ -16,6 +18,7 @@ function soDigitos(v){ return String(v || '').replace(/\D/g, ''); }
 // para a pagina nao ficar em branco quando a fonte atrasa ou da erro, e faz um
 // trabalho por vez porque ele fecha a porta para pedidos em paralelo.
 var ULTIMO = {};
+var EM_IDX = false;
 var TRABALHO = {};
 var AUSENTE = {};
 
@@ -42,6 +45,14 @@ function registrarOrgaos(app, cacheGet, cacheSet, getJSON){
     };
     var hit = cacheGet(ck);
     if(hit) return res.json(Object.assign({ filtro: q || null }, limitar(hit)));
+    var reserva = pegaReserva('idx');
+    // A varredura completa dura ~1 minuto, entao quem chega enquanto ela roda leva a
+    // ultima lista boa (ou um "construindo" honesto) em vez de ficar esperando.
+    if(EM_IDX){
+      if(reserva) return res.json(Object.assign({ filtro: q || null, atualizando: true }, limitar(reserva)));
+      return res.json({ orgaos: [], construindo: true, aviso: 'Montando a lista de orgaos a partir do PNCP; na primeira visita isso leva cerca de um minuto.' });
+    }
+    EM_IDX = true;
 
     var hoje = new Date();
     var ini = fmtPNCP(new Date(hoje.getFullYear(), hoje.getMonth() - 3, 1));
@@ -82,7 +93,7 @@ function registrarOrgaos(app, cacheGet, cacheSet, getJSON){
         .sort(function(a, b){ return b.vistas - a.vistas || a.nome.localeCompare(b.nome); });
       var corpo = { fonte: 'PNCP', orgaos: orgaos, atualizadoEm: Date.now(),
         amostra: { inicio: ini, fim: fim, modalidades: MODALIDADES_IDX } };
-      if(orgaos.length){ cacheSet(ck, corpo, 12 * 3600000); guardaChave('idx', corpo); }
+      if(orgaos.length){ cacheSet(ck, corpo, falhas ? 2 * 3600000 : 12 * 3600000); guardaChave('idx', corpo); }
       if(!orgaos.length){
         var reso = pegaReserva('idx');
         if(reso) return res.json(Object.assign({ filtro: q || null }, limitar(reso)));
@@ -93,7 +104,7 @@ function registrarOrgaos(app, cacheGet, cacheSet, getJSON){
       var reso = pegaReserva('idx');
       if(reso) return res.json(Object.assign({ filtro: q || null }, limitar(reso)));
       res.status(500).json({ erro: 'Indice de orgaos indisponivel', detalhe: e.message });
-    });
+    }).then(function(){ EM_IDX = false; });
   });
 
   // ---- leitura do orgao no PNCP ----
