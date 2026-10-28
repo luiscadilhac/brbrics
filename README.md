@@ -56,7 +56,6 @@ O backend expõe ~65 rotas sob `/api/*`, todas com cache em memória. As princip
 |---|---|
 | Diário Oficial | `/api/dou`, `/api/edicao/destaques`, `/api/resumo` |
 | Licitações | `/api/licitacoes`, `/api/licitacao/*` |
-| Eleições | `/api/eleicoes` (filtros `uf,cargo,partido,nome,situacao,pagina,tamanho`), `/api/eleicoes/resumo` |
 | Congresso | `/api/proposicoes`, `/api/proposicao/:id`, `/api/deputados`, `/api/deputado/:id`, `/api/legislacao/*` |
 | Tribunais | `/api/tribunais`, `/api/tribunais/{buscar,detalhe,feed,noticias,recentes,tema}` |
 | Economia | `/api/indicadores`, `/api/focus`, `/api/economia`, `/api/mercado/{resumo,bolsa,cripto,ptax}` |
@@ -73,11 +72,6 @@ O mesmo módulo publica o feed **do próprio portal** em `/rss.xml` (alias `/fee
 cache de 15 min). É o mecanismo de "aviso" do BrBRICS: não guarda nada em servidor nem pede cadastro —
 quem quer ser avisado assina o endereço, e a página `rss.html` explica e dá o link para copiar.
 
-A ficha de Eleições ([frontend/eleicoes.html](frontend/eleicoes.html)) exporta o resultado filtrado em
-CSV (ponto e vírgula + BOM, formato que o Excel pt-BR espera) e guarda filtros no `localStorage` do
-navegador. Nenhum dos dois toca em dado pessoal: os únicos campos que saem do servidor são os 12
-públicos listados em `CAMPOS`/`abreviar()` em [backend/eleicoes.js](backend/eleicoes.js).
-
 ## Convenções e cuidados
 
 - **Encoding**: os ficheiros são UTF-8 e alguns `.html` têm BOM. Não corras scripts avulsos de
@@ -86,17 +80,15 @@ públicos listados em `CAMPOS`/`abreviar()` em [backend/eleicoes.js](backend/ele
   lixo tipo `Licitae7fces`).
 - **Dados pessoais**: o portal não cadastra ninguém e não envia e-mail — as rotas de newsletter e
   alerta de busca foram removidas por isso (guardavam e-mail em `dados/`, que o plano free do Render
-  apaga a cada deploy). Na ficha de Eleições, `backend/eleicoes.js` descarta `NR_CPF_CANDIDATO`,
-  `DT_NASCIMENTO`, `DS_EMAIL` e o título de eleitor **na leitura da planilha do TSE**, para que nenhum
-  dado pessoal entre no cache nem chegue ao navegador. Manter assim: é o que sustenta a promessa do
-  `privacidade.html`.
+  apaga a cada deploy). Nenhum endpoint deve guardar dado pessoal em cache nem entregá-lo ao
+  navegador: é o que sustenta a promessa do `privacidade.html`.
 - **Validar antes de commitar**: `node --check` em cada `.js` tocado, e confirmar em
   `http://localhost:3000` que o menu e os dados aparecem.
 - Não há testes automatizados nem linter; a verificação é feita a correr o servidor.
 
 ## Páginas
 
-35 páginas estáticas em `frontend/`. As de entrada do menu: `index`, `edicao`, `licitacoes`, `eleicoes`,
+34 páginas estáticas em `frontend/`. As de entrada do menu: `index`, `edicao`, `licitacoes`,
 `proposicoes`, `legislacao`, `mapa-brasil`, `mapa-satelite`, `mapa-avioes`, `mapa-embarcacoes`,
 `mapa-cameras`, `mapas`, `indicadores`, `tribunais`, `manchetes`, `reguladores`, `diretorios`,
 `territorio`, `clima`, `contas`, `energia`, `comex`, `fipe`, `agro`, `rss`, `calendario`,

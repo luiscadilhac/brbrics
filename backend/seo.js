@@ -1,7 +1,7 @@
 // BrBRICS - modulo SEO: robots.txt + sitemap.xml + RSS geral (sem chave)
 var PAGINAS=[
   ['/','daily'],['/index.html','daily'],['/manchetes.html','daily'],['/edicao.html','weekly'],
-  ['/licitacoes.html','daily'],['/eleicoes.html','daily'],['/proposicoes.html','daily'],['/legislacao.html','weekly'],
+  ['/licitacoes.html','daily'],['/proposicoes.html','daily'],['/legislacao.html','weekly'],
   ['/indicadores.html','daily'],['/tribunais.html','weekly'],['/reguladores.html','daily'],
   ['/busca.html','weekly'],['/diretorios.html','monthly'],['/sobre.html','monthly'],
   ['/areas.html','weekly'],['/territorio.html','weekly'],['/clima.html','daily'],
