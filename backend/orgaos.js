@@ -1,12 +1,13 @@
 // BrBRICS - modulo Orgaos: ficha de cada orgao publico montada a partir dos contratos do PNCP
 // O que a consulta do PNCP permite:
 //   GET /v1/contratos?cnpjOrgao=  -> contratos daquele orgao (com fornecedor, valor e objeto)
-//   Nao existe busca por nome de orgao nem por CNPJ de fornecedor, por isso o indice de
-//   nomes e feito varrendo as publicacoes recentes (uma chamada por modalidade, com pausa).
+//   Nao existe busca por CNPJ de fornecedor, entao a pagina e de orgaos, nao de fornecedores.
 var BASE = 'https://pncp.gov.br/api/consulta/v1';
-// Varre as 12 modalidades porque o PNCP nao tem busca por nome de orgao, nem por UF,
-// nem por municipio (medido em 2026-10-28: ufSigla e municipioNome sao ignorados).
+// O indice de nomes so pode ser montado varrendo publicacoes: o PNCP nao tem busca por nome de
+// orgao, nem por UF, nem por municipio (medido em 2026-10-28: ufSigla e municipioNome ignorados).
+// Varre as 12 modalidades, duas paginas de 50 em cada, uma chamada por vez com pausa.
 var MODALIDADES_IDX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+var PAGINAS_IDX = [1, 2];
 var PAUSA = 700;
 
 function dois(n){ return String(n).padStart(2, '0'); }
@@ -44,15 +45,16 @@ function registrarOrgaos(app, cacheGet, cacheSet, getJSON){
       }) };
     };
     var hit = cacheGet(ck);
-    if(hit) return res.json(Object.assign({ filtro: q || null }, limitar(hit)));
+    if(hit) return res.json(Object.assign({ filtro: q || null, atualizando: EM_IDX }, limitar(hit)));
     var reserva = pegaReserva('idx');
-    // A varredura completa dura ~1 minuto, entao quem chega enquanto ela roda leva a
-    // ultima lista boa (ou um "construindo" honesto) em vez de ficar esperando.
+    // A varredura dura de 1 a varios minutos (o PNCP chega a levar 20s por chamada), entao
+    // quem chega enquanto ela roda leva o que ja foi coletado, marcado "atualizando".
     if(EM_IDX){
       if(reserva) return res.json(Object.assign({ filtro: q || null, atualizando: true }, limitar(reserva)));
-      return res.json({ orgaos: [], construindo: true, aviso: 'Montando a lista de orgaos a partir do PNCP; na primeira visita isso leva cerca de um minuto.' });
+      return res.json({ orgaos: [], construindo: true, aviso: 'Montando a lista de orgaos a partir do PNCP.' });
     }
     EM_IDX = true;
+    var inicioIdx = Date.now();
 
     var hoje = new Date();
     var ini = fmtPNCP(new Date(hoje.getFullYear(), hoje.getMonth() - 3, 1));
@@ -60,21 +62,35 @@ function registrarOrgaos(app, cacheGet, cacheSet, getJSON){
     var mapa = {};
     var falhas = 0;
 
+    // 35s e o prazo real: com 20s a varredura parou em 213 orgaos porque as chamadas mais
+    // lentas (medido: ate 25s) morriam no prazo e a modalidade inteira se perdia.
+    // 429 e diferente de vazio: o PNCP fecha a porta quando o ritmo sobe (medido em 2026-10-29:
+    // pagina 2 inteira comecou a levar 429 na sequencia), entao a pausa cresce e a varredura
+    // para de bater na porta em vez de queimar o resto das modalidades.
+    var pausaAtual = PAUSA;
+    var recusa = 0;
+
     function chama(url, tentativa){
-      return getJSON(url, {}, 20000).then(function(r){
+      return getJSON(url, {}, 35000).then(function(r){
+        if(r.status === 204) return { data: [] };   // pagina sem publicacoes: resposta boa
         if(r.status === 200 && r.data && typeof r.data === 'object') return r.data;
-        if(tentativa < 2) return espera(1500).then(function(){ return chama(url, tentativa + 1); });
+        if(r.status === 429){ recusa++; pausaAtual = Math.min(pausaAtual + 1200, 6000); }
+        else recusa = 0;
+        if(tentativa < 2 && recusa < 4)
+          return espera(r.status === 429 ? 12000 : 1500).then(function(){ return chama(url, tentativa + 1); });
         return null;
       }).catch(function(){
-        if(tentativa < 2) return espera(1500).then(function(){ return chama(url, tentativa + 1); });
+        if(tentativa < 2 && recusa < 4) return espera(1500).then(function(){ return chama(url, tentativa + 1); });
         return null;
       });
     }
 
-    function varre(i){
-      if(i >= MODALIDADES_IDX.length) return Promise.resolve();
+    // Duas paginas por modalidade: com uma so o indice fica em ~360 orgaos; com duas,
+    // se o PNCP cooperativear, passa de 800 (medido em 2026-10-28).
+    function varre(i, pagina){
+      if(i >= MODALIDADES_IDX.length || recusa >= 4) return Promise.resolve();
       var url = BASE + '/contratacoes/publicacao?dataInicial=' + ini + '&dataFinal=' + fim +
-                '&codigoModalidadeContratacao=' + MODALIDADES_IDX[i] + '&pagina=1&tamanhoPagina=50';
+                '&codigoModalidadeContratacao=' + MODALIDADES_IDX[i] + '&pagina=' + pagina + '&tamanhoPagina=50';
       return chama(url, 1).then(function(d){
         if(!d){ falhas++; return; }
         (d.data || []).forEach(function(x){
@@ -82,29 +98,68 @@ function registrarOrgaos(app, cacheGet, cacheSet, getJSON){
           var cnpj = soDigitos(oe.cnpj);
           if(cnpj.length !== 14) return;
           if(!mapa[cnpj]) mapa[cnpj] = { cnpj: cnpj, nome: oe.razaoSocial || '', unidade: un.nomeUnidade || '',
-            uf: un.ufSigla || '', municipio: un.municipioNome || '', esfera: oe.esferaId || '', poder: oe.poderId || '', vistas: 0 };
+            uf: un.ufSigla || '', municipio: un.municipioNome || '', vistas: 0 };
           mapa[cnpj].vistas++;
         });
-      }).then(function(){ return espera(PAUSA); }).then(function(){ return varre(i + 1); });
+      }).then(function(){ publica('curto'); }).then(function(){ return espera(pausaAtual); })
+        .then(function(){ return varre(i + 1, pagina); });
     }
 
-    varre(0).then(function(){
-      var orgaos = Object.keys(mapa).map(function(k){ return mapa[k]; })
-        .sort(function(a, b){ return b.vistas - a.vistas || a.nome.localeCompare(b.nome); });
-      var corpo = { fonte: 'PNCP', orgaos: orgaos, atualizadoEm: Date.now(),
-        amostra: { inicio: ini, fim: fim, modalidades: MODALIDADES_IDX } };
-      if(orgaos.length){ cacheSet(ck, corpo, falhas ? 2 * 3600000 : 12 * 3600000); guardaChave('idx', corpo); }
-      if(!orgaos.length){
+    function corpoDa(){
+      return { fonte: 'PNCP',
+        orgaos: Object.keys(mapa).map(function(k){ return mapa[k]; })
+          .sort(function(a, b){ return b.vistas - a.vistas || a.nome.localeCompare(b.nome); }),
+        atualizadoEm: Date.now(),
+        amostra: { inicio: ini, fim: fim, modalidades: MODALIDADES_IDX, paginas: PAGINAS_IDX } };
+    }
+
+    // A cada chamada ja coletada vai indo para o cache e para a reserva: assim a lista
+    // aparece em segundos e cresce sozinha, em vez de ficar em branco ate o fim da varredura.
+    function publica(depois){
+      var corpo = corpoDa();
+      if(!corpo.orgaos.length) return corpo;
+      if(depois === 'curto'){ cacheSet(ck, corpo, 60000); guardaChave('idx', corpo); }
+      else { cacheSet(ck, corpo, falhas ? 2 * 3600000 : 12 * 3600000); guardaChave('idx', corpo); }
+      return corpo;
+    }
+
+    // Quem chegou no comeco espera no maximo 20s; depois disso a resposta sai com o que
+    // houver e a varredura continua em segundo plano. O vigia e repetido porque a primeira
+    // chamada do PNCP pode levar 25s: com um timer so, quem chegou antes ficava preso
+    // ate o fim da varredura inteira.
+    var respondido = false;
+    function atende(corpo){
+      if(respondido || res.headersSent) return;
+      respondido = true;
+      clearInterval(vigia);
+      res.json(Object.assign({ filtro: q || null, atualizando: true, parcial: falhas > 0 }, limitar(corpo)));
+    }
+    function garimpador(){
+      if(respondido || res.headersSent) return;
+      var corpo = corpoDa();
+      if(corpo.orgaos.length >= 30 || Date.now() - inicioIdx > 20000) atende(corpo);
+    }
+    var vigia = setInterval(garimpador, 3000);
+
+    varre(0, PAGINAS_IDX[0]).then(function(){
+      return varre(0, PAGINAS_IDX[1]);
+    }).then(function(){
+      var corpo = publica('fim');
+      if(respondido || res.headersSent) return;
+      if(!corpo.orgaos.length){
         var reso = pegaReserva('idx');
         if(reso) return res.json(Object.assign({ filtro: q || null }, limitar(reso)));
-        return res.status(503).json({ erro: 'PNCP ocupado agora', detalhe: 'tente de novo em alguns minutos' });
+        res.status(503).json({ erro: 'PNCP ocupado agora', detalhe: 'tente de novo em alguns minutos' });
+        return;
       }
+      respondido = true;
       res.json(Object.assign({ filtro: q || null, parcial: falhas > 0 }, limitar(corpo)));
     }).catch(function(e){
+      if(res.headersSent) return;
       var reso = pegaReserva('idx');
       if(reso) return res.json(Object.assign({ filtro: q || null }, limitar(reso)));
       res.status(500).json({ erro: 'Indice de orgaos indisponivel', detalhe: e.message });
-    }).then(function(){ EM_IDX = false; });
+    }).then(function(){ clearInterval(vigia); EM_IDX = false; });
   });
 
   // ---- leitura do orgao no PNCP ----

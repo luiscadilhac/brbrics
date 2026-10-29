@@ -77,10 +77,17 @@ A ficha de órgão ([frontend/orgao.html](frontend/orgao.html)) só usa o que a 
 permite: `GET /v1/contratos?cnpjOrgao=` devolve os contratos do órgão com fornecedor, valor e objeto,
 mas **não existe busca por nome de órgão nem por CNPJ de fornecedor** — e `ufSigla`/`municipioNome`
 são ignorados pelo `publicacao` (medido em 2026-10-28). Por isso o índice pesquisável
-(`/api/orgao/nomes`) é montado varrendo as 12 modalidades, uma chamada por vez com pausa de 700ms
-(~360 órgãos dos últimos 3 meses; `tamanhoPagina` acima de 50 dá 400). A varredura dura ~1 minuto,
-então quem chega enquanto ela roda recebe a última lista boa marcada `atualizando`, ou
-`{"construindo":true}` na primeira vez — a página mostra o aviso e tenta de novo sozinha.
+(`/api/orgao/nomes`) é montado varrendo as 12 modalidades em 2 páginas de 50 cada, uma chamada por vez
+com pausa de 700ms. O tamanho do índice depende de quanto o PNCP aguenta o ritmo: na melhor medição
+foram 808 órgãos (2026-10-28); num dia carregado, com 429 no meio da varredura, 669 (2026-10-29). A
+primeira página sozinha rende ~360. Acima de `tamanhoPagina=50` a fonte dá 400, e chamada com prazo de
+20s morre antes de responder — o prazo é 35s porque a mesma consulta já levou 25s. Quando vêm 429, a
+pausa cresce sozinha e a varredura para de bater na porta em vez de queimar as modalidades restantes.
+**A lista é publicada em pedaços**: depois de cada chamada o resultado parcial vai para o cache (60s)
+e para a reserva, e quem chegou no começo é liberado em no máximo 20s com o que já existe, marcado
+`atualizando` — a página busca de novo até 3 vezes, de 20 em 20 segundos, e a lista cresce sozinha sem
+recarregar. Na medição, o primeiro visitante recebeu 46 órgãos em 9s e a lista chegou a 669 em 3min.
+Se ainda não há nada, vem `{"construindo":true}` e o aviso aparece.
 O PNCP também é instável: a mesma página de 10 contratos já levou 0,2s e 38s. Por isso a ficha é
 coletada em páginas pequenas e *um passo por vez*: [backend/orgaos.js](backend/orgaos.js) puxa página
 enquanto a fonte responde rápido (até 8s por pedido, alvo de 20 contratos) e, quando a fonte enrola,

@@ -1,6 +1,6 @@
 // BrBRICS - Service Worker (rede primeiro em tudo; cache so como fallback offline)
 // iOS Safari: sem skipWaiting/clients.claim para evitar travamento
-var CACHE_NAME = 'brbrics-v56';
+var CACHE_NAME = 'brbrics-v57';
 var CORE = ['/index.html','/tribunais.html','/reguladores.html','/manchetes.html','/areas.html','/legislacao.html','/licitacoes.html','/orgao.html','/proposicoes.html','/indicadores.html','/edicao.html','/sobre.html','/busca.html','/diretorios.html','/territorio.html','/clima.html','/contas.html','/energia.html','/comex.html','/fipe.html','/agro.html','/rss.html','/calendario.html','/style.css?v=50','/pro.css?v=50','/common.js?v=50','/app.js?v=50','/tribunais-page.js?v=50','/legislacao-page.js?v=50','/areas.js?v=50','/logo-brics.png?v=50','/favicon.ico?v=50','/favicon.png?v=50','/manifest.json?v=50'];
 self.addEventListener('install', function(e){
   e.waitUntil(caches.open(CACHE_NAME).then(function(c){

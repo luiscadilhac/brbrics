@@ -179,23 +179,38 @@ function dois(n){ return String(n).padStart(2, '0'); }
 function hoje(){ var d = new Date(); return d.getFullYear() + '-' + dois(d.getMonth() + 1) + '-' + dois(d.getDate()); }
 
 // ---------- lista de órgãos (indice do PNCP, filtrado no proprio navegador) ----------
-function carregaIndice(){
-  el('status').textContent = 'Procurando órgãos…';
+// O PNCP demora para varrer tudo, então o servidor devolve a lista em construção e ela
+// cresce sozinha. A página volta a buscar até 3 vezes, de 20 em 20 segundos, e para quando
+// a lista parar de crescer — assim ninguém precisa recarregar para ver os órgãos novos.
+var RENOVAS = 3;
+var UFS_FEITOS = false;
+function carregaIndice(semAviso){
+  if (!semAviso) el('status').textContent = 'Procurando órgãos…';
   return jget('/api/orgao/nomes').then(function(r){
     if (r.construindo) {
       el('status').textContent = 'Montando a lista de órgãos — o PNCP está sendo varrido agora; leva cerca de um minuto na primeira visita. A página tenta de novo sozinha.';
-      setTimeout(carregaIndice, 10000);
+      setTimeout(function(){ carregaIndice(true); }, 10000);
       return;
     }
-    ORGAOS = r.orgaos || [];
-    el('status').textContent = ORGAOS.length + ' órgãos ativos' + (r.atualizando ? ' (renovando a lista agora)' : '');
-    var ufs = {}; ORGAOS.forEach(function(o){ if (o.uf) ufs[o.uf] = 1; });
-    var sel = el('uf');
-    Object.keys(ufs).sort().forEach(function(u){
-      var op = document.createElement('option'); op.value = u; op.textContent = u; sel.appendChild(op);
-    });
-    desenhaOrgaos(ORGAOS.slice(0, 40));
+    var vieram = r.orgaos || [];
+    var cresceu = vieram.length > ORGAOS.length;
+    ORGAOS = vieram;
+    el('status').textContent = ORGAOS.length + ' órgãos ativos' +
+      (r.atualizando ? ' — renovando a lista agora' + (cresceu ? ', ela cresce sozinha' : '') : '');
+    if (!UFS_FEITOS) {
+      var ufs = {}; ORGAOS.forEach(function(o){ if (o.uf) ufs[o.uf] = 1; });
+      var sel = el('uf'), escolhido = sel.value;
+      sel.length = 1;
+      Object.keys(ufs).sort().forEach(function(u){
+        var op = document.createElement('option'); op.value = u; op.textContent = u; sel.appendChild(op);
+      });
+      sel.value = escolhido;
+      if (!r.atualizando) UFS_FEITOS = true;
+    }
+    if (el('q').value.trim() || el('uf').value) filtra();
+    else desenhaOrgaos(ORGAOS.slice(0, 40));
     mostraSalvos();
+    if (r.atualizando && cresceu && RENOVAS > 0) { RENOVAS--; setTimeout(function(){ carregaIndice(true); }, 20000); }
   }).catch(function(e){
     el('status').textContent = '';
     el('tb-org').innerHTML = '<tr><td colspan="5">' + emptyHTML('A lista de órgãos não veio agora', e.message + ' — recarregue a página.') + '</td></tr>';
@@ -233,7 +248,8 @@ function desenhaOrgaos(lista){
 function mostraSalvos(){
   var favs = favGet().filter(function(f){ return /orgao\.html\?cnpj=/.test(f.u || ''); });
   if (!favs.length) return;
-  var extra = '<p class="muted">Salvos por você: ' + favs.map(function(f){
+  if (el('achei').querySelector('.salvos-org')) return;
+  var extra = '<p class="muted salvos-org">Salvos por você: ' + favs.map(function(f){
     var m = /[?&]cnpj=(\d+)/.exec(f.u);
     return '<span class="tag" style="cursor:pointer" data-abre="' + (m ? m[1] : '') + '" data-nome="' + escA(f.t) + '">' + esc(f.t) + '</span>';
   }).join(' ') + '</p>';
