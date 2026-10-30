@@ -365,7 +365,8 @@ function montaSats() {
 
   populaSelects();
   listaGrupos();
-  $id('status').textContent = SATS.length + ' satélites posicionados pelo motor SGP4 no seu navegador' +
+  var de = /SATNOGS/.test(DADOS.fonte || '') ? 'da SATNOGS' : 'do CelesTrak';
+  $id('status').textContent = SATS.length + ' satélites posicionados pelo motor SGP4 no seu navegador, com elementos ' + de +
     (DADOS.aviso ? ' — ' + DADOS.aviso : '') + (DADOS.stale ? ' — elementos de dias atrás, que ainda servem' : '');
   atualiza();
 }
