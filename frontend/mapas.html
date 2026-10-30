@@ -217,7 +217,10 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
       <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Mapa interativo IBGE</h3><p>Malha oficial de estados + cor por licitação.</p><a href="mapa-brasil.html">Ver →</a></div>
       <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Focos de calor (INPE)</h3><p>Malha do IBGE + focos das últimas 48h direto do BDQueimadas.</p><a href="mapa-satelite.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Aviões, embarcações e câmeras</h3><p>ADS-B da OpenSky, rede portuária e câmeras públicas.</p><a href="mapa-avioes.html">Aviões</a> · <a href="mapa-embarcacoes.html">Embarcações</a> · <a href="mapa-cameras.html">Câmeras</a></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Aviões ao vivo (ADS-B)</h3><p>Transponder ADS-B lido pela rede comunitária adsb.lol, com reserva na OpenSky. As aeronaves avançam no mapa entre uma leitura e outra.</p><a href="mapa-avioes.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Embarcações ao vivo (AIS)</h3><p>Posição, rumo e velocidade emitidos pelo transponder AIS, coletados pela rede aberta Open Waters nos portos, na costa e nos rios.</p><a href="mapa-embarcacoes.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Satélites em órbita</h3><p>Elementos orbitais do CelesTrak propagados pelo motor SGP4 (satellite.js) no seu navegador: onde está cada satélite agora, por país e finalidade.</p><a href="mapa-orbita.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Câmeras públicas</h3><p>Endereços oficiais de trânsito, clima e monitoramento, reunidos num mapa só.</p><a href="mapa-cameras.html">Ver →</a></div>
     </div>
   </section>
 
@@ -230,7 +233,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=52"></script>
+<script src="common.js?v=53"></script>
 <script src="app.js?v=50"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>

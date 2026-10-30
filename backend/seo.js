@@ -8,7 +8,9 @@ var PAGINAS=[
   ['/contas.html','weekly'],['/energia.html','weekly'],['/comex.html','weekly'],
   ['/fipe.html','monthly'],['/agro.html','weekly'],['/painel.html','monthly'],
   ['/contato.html','monthly'],['/privacidade.html','monthly'],['/mapas.html','weekly'],
-  ['/rss.html','daily'],['/calendario.html','monthly']
+  ['/rss.html','daily'],['/calendario.html','monthly'],
+  ['/mapa-brasil.html','weekly'],['/mapa-satelite.html','daily'],['/mapa-avioes.html','daily'],
+  ['/mapa-embarcacoes.html','daily'],['/mapa-orbita.html','daily'],['/mapa-cameras.html','weekly']
 ];
 function escX(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 // Host canonico do portal. Sitemap, robots e RSS nao podem sair no host da

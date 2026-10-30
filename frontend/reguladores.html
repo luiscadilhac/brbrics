@@ -38,6 +38,7 @@
       <a href="mapa-satelite.html">Satélite e Focos (INPE)</a>
       <a href="mapa-avioes.html">Aviões (ADS-B)</a>
       <a href="mapa-embarcacoes.html">Embarcações (AIS)</a>
+      <a href="mapa-orbita.html">Satélites em Órbita</a>
       <a href="mapa-cameras.html">Câmeras Online</a>
     </div>
   </div>
@@ -99,7 +100,7 @@
 <div class="toolbar" id="tabs" style="gap:8px;margin-bottom:6px"><button class="btn ghost active" data-cat="">Todos</button><button class="btn ghost" data-cat="reg">Agências reguladoras</button><button class="btn ghost" data-cat="min">Ministérios</button></div>
 <div class="toolbar" id="filtros" style="gap:8px;margin-bottom:14px"></div>
 <div id="carousel" class="carousel" style="display:none"><div class="car-track" id="car-track"></div><button class="car-nav prev" id="car-prev" aria-label="Anterior">&#10094;</button><button class="car-nav next" id="car-next" aria-label="Próxima">&#10095;</button><div class="car-dots" id="car-dots"></div></div><div id="feed" class="list"><p class="muted">Clique em carregar.</p></div></main>
-<script src="common.js?v=52">
+<script src="common.js?v=53">
 // ===== Carrossel (fotos do /api/manchetes, reg+min) =====
 var _carItems=[],_carIdx=0,_carTimer=null;
 function _fmtData(d){if(!d)return '';try{return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}

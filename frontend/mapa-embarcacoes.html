@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapa de Embarcações — BrBRICS</title>
-<meta name="description" content="Rastreamento de embarcações e navios na costa brasileira via AIS (Automatic Identification System).">
+<meta name="description" content="Navios navegando na costa e nos rios do Brasil em tempo real pelo AIS (Automatic Identification System) da rede aberta Open Waters, sem cadastro e sem chave de API.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
 <link rel="stylesheet" href="style.css?v=54">
 <link rel="stylesheet" href="pro.css?v=54">
@@ -15,12 +15,22 @@
   .layer-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
   .layer-row label { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
   .layer-row input { accent-color: var(--marca); }
+  .layer-row select { background: var(--card2); color: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 13px; }
   .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
   .btn-sm:hover { transform: translateY(-1px); }
   .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
   .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
   .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .legend { background: var(--card); padding: 14px 16px; border-radius: 12px; font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .navio-icone { background: none; border: none; }
+  .navio-giro { width: 22px; height: 22px; transform-origin: 50% 50%; transition: transform .9s linear; }
+  .navio-giro svg { display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.7)); }
+  .navio-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; cursor: pointer; font-size: 13px; }
+  .navio-card:hover { border-color: var(--acc); }
+  .navio-card b { color: var(--paper); }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+  .chips span { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; }
 </style>
 </head>
 <body>
@@ -35,76 +45,131 @@
 </header>
 <main class="wrap">
   <section class="hero" style="padding:28px 0;text-align:center">
-    <p class="kicker">🚢 Embarcações — AIS (Automatic Identification System)</p>
-    <h1>Rastreamento de Navios na Costa Brasileira</h1>
-    <p class="sub">Posições de embarcações via AIS. Fontes públicas exigem cadastro para dados em tempo real completo.</p>
+    <p class="kicker">🚢 Embarcações ao vivo — AIS</p>
+    <h1>Navios navegando pelo litoral e pelos rios do Brasil</h1>
+    <p class="sub">Cada posição vem do transponder AIS da própria embarcação, coletado pela rede aberta de receptores Open Waters. Os navios que estão em movimento avançam no mapa entre uma leitura e outra. Sem cadastro e sem chave de API.</p>
   </section>
 
   <div class="stat-row">
-    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Embarcações detectadas</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última atualização</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-fonte">—</div><div class="stat-lab">Fonte de dados</div></div>
-  </div>
-
-  <div style="background:var(--card2);border:1px solid var(--pos-deep);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--muted)">
-    <strong>⚠️ Sobre os dados AIS:</strong> Fontes gratuitas de AIS (MarineTraffic, VesselFinder, AIS Hub) exigem API key para dados em tempo real.
-    Cadastre-se gratuitamente, obtenha a chave e informe no backend <code>backend/mapas.js</code> (rota <code>/api/mapas/embarcacoes</code>) para ativar o rastreio ao vivo.
+    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Embarcações captadas</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-navegando">—</div><div class="stat-lab">Efetivamente navegando</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última leitura</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-fonte" style="font-size:15px">—</div><div class="stat-lab">Fonte de dados</div></div>
   </div>
 
   <div class="layer-panel">
-    <div class="layer-row"><strong style="color:var(--paper)">Camadas:</strong></div>
+    <div class="layer-row"><strong style="color:var(--paper)">Camadas e filtros:</strong></div>
     <div class="layer-row">
       <label><input type="checkbox" id="lyr-osm" checked> OpenStreetMap</label>
       <label><input type="checkbox" id="lyr-satelite"> Satélite (Esri)</label>
-      <label><input type="checkbox" id="lyr-navios" checked> Embarcações (markers)</label>
+      <label><input type="checkbox" id="lyr-navios" checked> Embarcações</label>
+      <label><input type="checkbox" id="lyr-portos" checked> Portos de referência</label>
+      <label><input type="checkbox" id="lyr-movimento" checked> Movimento contínuo entre leituras</label>
+      <label><input type="checkbox" id="flt-navegando" checked> Só quem está em movimento</label>
+    </div>
+    <div class="layer-row">
+      <span class="muted" style="font-size:13px">Tipo:</span>
+      <select id="flt-tipo"><option value="">Todos</option></select>
+      <span class="muted" style="font-size:13px">Região:</span>
+      <select id="flt-caixa"><option value="">Todas</option></select>
     </div>
     <div class="layer-row" style="margin-top:8px">
       <button class="btn-sm" id="btn-atualizar">Atualizar agora</button>
+      <span class="muted" style="font-size:12px;margin-left:10px">Leitura nova a cada 2 minutos</span>
     </div>
+    <div class="layer-row chips" style="margin-top:10px">
+      <span style="color:var(--acc)">▲ navegando</span>
+      <span style="color:var(--marca)">● fundeado / parado</span>
+      <span style="color:var(--ico-vivo)">⚓ porto organizador</span>
+    </div>
+    <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Consultando os receptores AIS…</p>
   </div>
 
   <div id="map"></div>
 
-  <div id="lista-navios" style="display:none;max-height:300px;overflow-y:auto;background:var(--card2);border-radius:10px;padding:12px;margin-bottom:16px;border:1px solid var(--pos-deep)"></div>
+  <div class="legend">
+    <strong style="color:var(--paper)">📋 Como ler:</strong> o ícone apontado para o rumo é um navio; o ponto verde está fundeado ou atracado; o ⚓ é a boca do porto, camada fixa de referência. Clique para ver nome, MMSI, bandeira, tipo, calado e destino. Quem está em movimento avança no mapa pela própria velocidade reportada no AIS até a próxima leitura.
+  </div>
+
+  <div id="lista-navios" style="display:none;max-height:320px;overflow-y:auto;background:var(--card2);border-radius:10px;padding:12px;margin-bottom:16px;border:1px solid var(--line)"></div>
 
   <section class="card">
-    <div class="card-h"><h2>🔗 Fontes públicas de dados AIS</h2></div>
+    <div class="card-h"><h2>🔗 De onde vêm os dados</h2></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
-      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--pos-deep)">
-        <h4 style="margin:0 0 8px;color:var(--marca)">MarineTraffic</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Rastreamento de navios global. Plano gratuito com dados atrasados.</p>
-        <a href="https://www.marinetraffic.com/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">MarineTraffic →</a>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--marca)">Open Waters AIS</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Rede aberta de receptores AIS com end-point público em GeoJSON. É a fonte das posições deste mapa.</p>
+        <a href="https://openwaters.io/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">openwaters.io →</a>
       </div>
-      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--pos-deep)">
-        <h4 style="margin:0 0 8px;color:var(--marca)">VesselFinder</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Posições AIS em tempo real de embarcações mundo afora.</p>
-        <a href="https://www.vesselfinder.com/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">VesselFinder →</a>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--marca)">Sistema AIS</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Todo navio acima de 300 toneladas é obrigado a emitir posição, rumo e velocidade por AIS. É um sinal de rádio aberto, recebido por antenas costeiras.</p>
+        <a href="https://www.imo.org/en/MediaCentre/HotTopics/Pages/AIS.aspx" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">O que a OMI diz →</a>
       </div>
-      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--pos-deep)">
-        <h4 style="margin:0 0 8px;color:var(--marca)">AIS Hub</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Rede comunitária de receptores AIS com dados públicos.</p>
-        <a href="https://www.aishub.net/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">AIS Hub →</a>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
+        <h4 style="margin:0 0 8px;color:var(--marca)">Portos organizadores</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">A camada fixa de portos é compilação própria do BrBRICS, com coordenadas aproximadas das bocas de portos brasileiros.</p>
+        <a href="diretorios.html" style="color:var(--marca);font-size:12px">Diretórios do portal →</a>
       </div>
     </div>
   </section>
 </main>
 <footer>
   <div class="wrap foot">
-    <div><b>BrBRICS</b> — dados AIS de embarcações e OpenStreetMap.</div>
-    <div class="flinks"><a href="mapa-satelite.html">Satélite</a><a href="mapa-avioes.html">Aviões</a><a href="mapa-brasil.html">Mapa Brasil</a><a href="mapa-cameras.html">Câmeras</a></div>
+    <div><b>BrBRICS</b> — dados AIS da rede aberta Open Waters e mapa base OpenStreetMap.</div>
+    <div class="flinks"><a href="mapa-orbita.html">Satélites</a><a href="mapa-avioes.html">Aviões</a><a href="mapa-satelite.html">Focos de calor</a><a href="mapa-brasil.html">Mapa Brasil</a><a href="mapa-cameras.html">Câmeras</a></div>
   </div>
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=52"></script>
+<script src="common.js?v=53"></script>
 <script src="app.js?v=50"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// Estado
 var map = null;
 var layers = {};
 var naviosLayer = null;
-var naviosMarkers = [];
+var portosLayer = null;
+var FLOTA = [];
+var PORTOS = [];
+var DADOS = null;
+var lendo = false;
+
+function num(v, default_) { return (typeof v === 'number' && isFinite(v)) ? v : default_; }
+function br(v) { return Number(v || 0).toLocaleString('pt-BR'); }
+function txt(s) {
+  if (s === undefined || s === null || s === '' || s === '—') return '—';
+  return esc(s);
+}
+
+var CASCO = '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">' +
+  '<path d="M12 2.2c1.9 3 2.9 6 2.9 8.9v6.2c0 2.1-1.3 3.6-2.9 3.6s-2.9-1.5-2.9-3.6v-6.2c0-2.9 1-5.9 2.9-8.9z" fill="COR"/>' +
+  '<path d="M5.5 13.6 4.1 17c-.3.9.2 1.7 1.1 1.7h1.6" fill="none" stroke="COR" stroke-width="1.4" stroke-linecap="round"/>' +
+  '<path d="M18.5 13.6 19.9 17c.3.9-.2 1.7-1.1 1.7h-1.6" fill="none" stroke="COR" stroke-width="1.4" stroke-linecap="round"/></svg>';
+
+function iconeNavio(n) {
+  var cor = n.navegando ? '#7DD3FC' : '#86EFAC';
+  var glifo = CASCO.replace(/COR/g, cor);
+  if (!n.navegando) return L.divIcon({ className: 'navio-icone', html: '<div style="width:12px;height:12px;margin:5px;border-radius:50%;background:' + cor + '"></div>', iconSize: [22, 22], iconAnchor: [11, 11] });
+  var rumo = num(n.rumo, 0);
+  return L.divIcon({
+    className: 'navio-icone',
+    html: '<div class="navio-giro" style="transform:rotate(' + rumo + 'deg)">' + glifo + '</div>',
+    iconSize: [22, 22], iconAnchor: [11, 11]
+  });
+}
+
+function popupNavio(n) {
+  return '<b>' + txt(n.nome) + '</b><br>' +
+    txt(n.tipo) + (n.bandeira ? ' · ' + txt(n.bandeira) : '') + '<br>' +
+    'MMSI ' + txt(n.mmsi) + (n.imo ? ' · IMO ' + txt(n.imo) : '') + '<br>' +
+    (n.indicativo ? 'Indicativo ' + txt(n.indicativo) + '<br>' : '') +
+    'Velocidade: ' + txt(n.velocidade_kt) + ' nós (' + txt(n.velocidade_kmh) + ' km/h)<br>' +
+    'Rumo: ' + txt(n.rumo) + '° · Situação: ' + txt(n.status) + '<br>' +
+    (n.destino ? 'Destino: ' + txt(n.destino) + '<br>' : '') +
+    (n.comprimento ? 'Comprimento: ' + txt(n.comprimento) + ' m' + (n.calado ? ' · Calado ' + txt(n.calado) + ' m' : '') + '<br>' : '') +
+    '<small>Capitania/região: ' + txt(n.caixa) + ' · AIS ' + txt(n.fonteAis) + '</small>';
+}
 
 function initMap() {
   map = L.map('map').setView([-14.2, -51.9], 4);
@@ -122,91 +187,184 @@ function initMap() {
     attribution: '&copy; Esri, Maxar, Earthstar Geographics'
   });
 
-  naviosLayer = L.layerGroup().addTo(map);
+  naviosLayer = L.layerGroup();
+  portosLayer = L.layerGroup();
 }
 
-function toggleLayer(id, layer) {
-  var cb = document.getElementById(id);
-  if (!cb) return;
-  if (cb.checked) {
-    if (!map.hasLayer(layer)) layer.addTo(map);
-  } else {
-    map.removeLayer(layer);
+function filtros() {
+  return {
+    osm: document.getElementById('lyr-osm').checked,
+    satelite: document.getElementById('lyr-satelite').checked,
+    navios: document.getElementById('lyr-navios').checked,
+    portos: document.getElementById('lyr-portos').checked,
+    movimento: document.getElementById('lyr-movimento').checked,
+    soMovimento: document.getElementById('flt-navegando').checked,
+    tipo: document.getElementById('flt-tipo').value,
+    caixa: document.getElementById('flt-caixa').value
+  };
+}
+
+function sincronizarCamadas() {
+  var f = filtros();
+  [['osm', layers.osm], ['satelite', layers.satelite], ['navios', naviosLayer], ['portos', portosLayer]].forEach(function(par) {
+    if (f[par[0]]) { if (!map.hasLayer(par[1])) par[1].addTo(map); }
+    else map.removeLayer(par[1]);
+  });
+}
+
+function refazMarcadores() {
+  var f = filtros();
+  naviosLayer.clearLayers();
+  FLOTA = [];
+  (DADOS ? DADOS.embarcacoes : []).forEach(function(n) {
+    if (f.soMovimento && !n.navegando) return;
+    if (f.tipo && n.tipo !== f.tipo) return;
+    if (f.caixa && n.caixa !== f.caixa) return;
+    var m = L.marker([n.lat, n.lon], { icon: iconeNavio(n) });
+    m.bindPopup(popupNavio(n));
+    naviosLayer.addLayer(m);
+    FLOTA.push({ d: n, m: m, lat: n.lat, lon: n.lon, rumo: num(n.rumo, 0),
+                 kmh: num(n.velocidade_kmh, 0), t: Date.now() });
+    n.__flota = FLOTA.length - 1;
+  });
+  listaNavios();
+  avisa();
+}
+
+function desenhaPortos() {
+  portosLayer.clearLayers();
+  PORTOS.forEach(function(p) {
+    var mk = L.circleMarker([p.lat, p.lon], {
+      radius: 7, color: '#FF2D20', fillColor: '#FF2D20', fillOpacity: 0.25, weight: 2
+    });
+    mk.bindPopup('<b>⚓ ' + esc(p.nome) + '</b><br>' + txt(p.tipo) + ' · ' + txt(p.uf) +
+      '<br><small>Hidrovia/zona: ' + txt(p.hidrovia) + '</small>');
+    portosLayer.addLayer(mk);
+  });
+}
+
+function populaSelects() {
+  var tipos = {}, caixas = {};
+  (DADOS ? DADOS.embarcacoes : []).forEach(function(n) {
+    if (n.tipo) tipos[n.tipo] = 1;
+    if (n.caixa) caixas[n.caixa] = 1;
+  });
+  [['flt-tipo', tipos], ['flt-caixa', caixas]].forEach(function(par) {
+    var sel = document.getElementById(par[0]);
+    var escolhido = sel.value;
+    sel.length = 1;
+    Object.keys(par[1]).sort().forEach(function(k) {
+      var op = document.createElement('option');
+      op.value = k; op.textContent = k;
+      sel.appendChild(op);
+    });
+    sel.value = escolhido;
+  });
+}
+
+// Entre duas leituras AIS o casco avança na direção do próprio rumo,
+// na velocidade que a embarcação reportou no transponder.
+function avanca() {
+  if (!filtros().movimento) return;
+  var agora = Date.now();
+  for (var i = 0; i < FLOTA.length; i++) {
+    var f = FLOTA[i];
+    var seg = (agora - f.t) / 1000;
+    if (seg <= 0 || f.kmh < 0.9) { f.t = agora; continue; }
+    var km = f.kmh * seg / 3600;
+    var rad = f.rumo * Math.PI / 180;
+    f.lat += km * Math.cos(rad) / 111.32;
+    f.lon += km * Math.sin(rad) / (111.32 * Math.cos(f.lat * Math.PI / 180));
+    f.t = agora;
+    f.m.setLatLng([f.lat, f.lon]);
   }
 }
 
-function esc(s) { return String(s || '—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function listaNavios() {
+  var caixa = document.getElementById('lista-navios');
+  var ordenados = FLOTA.slice().sort(function(a, b) { return num(b.d.velocidade_kt, 0) - num(a.d.velocidade_kt, 0); });
+  var html = '';
+  ordenados.slice(0, 100).forEach(function(f) {
+    var n = f.d;
+    html += '<div class="navio-card" data-flota="' + FLOTA.indexOf(f) + '">' +
+      '<b>' + txt(n.nome) + '</b>' + (n.navegando ? '' : ' · <span class="muted">parado</span>') +
+      '<br><span class="muted">' + txt(n.tipo) + ' · ' + txt(n.bandeira) +
+      ' · ' + txt(n.velocidade_kt) + ' nós · rumo ' + txt(n.rumo) + '° · ' + txt(n.caixa) + '</span>' +
+      '</div>';
+  });
+  if (!html) { caixa.style.display = 'none'; caixa.innerHTML = ''; return; }
+  caixa.style.display = 'block';
+  caixa.innerHTML = html;
+}
 
-function carregarNavios() {
+function avisa() {
+  var st = document.getElementById('status-dados');
+  if (!st || !DADOS) return;
+  var f = filtros();
+  var naTela = FLOTA.length;
+  if (DADOS.aoVivo === false) {
+    st.textContent = DADOS.aviso || 'O AIS ao vivo não respondeu agora.';
+  } else {
+    st.textContent = br(DADOS.total) + ' embarcações captadas, ' + br(DADOS.navegando) + ' navegando — ' +
+      br(naTela) + ' no mapa' + (f.soMovimento ? ' (filtro: só em movimento)' : '') +
+      (DADOS.stale ? ' — ' + (DADOS.aviso || 'última leitura válida') : '');
+  }
+}
+
+function carregarNavios(recado) {
+  if (lendo) return;
+  lendo = true;
+  var st = document.getElementById('status-dados');
+  if (st && !recado) st.textContent = 'Consultando os receptores AIS…';
+
   fetch('/api/mapas/embarcacoes').then(function(r){ return r.json(); }).then(function(d) {
-    naviosLayer.clearLayers();
-    naviosMarkers = [];
-
-    document.getElementById('stat-total').textContent = d.total || 0;
+    DADOS = d;
+    PORTOS = d.portos || [];
+    document.getElementById('stat-total').textContent = br(d.total || 0);
+    document.getElementById('stat-navegando').textContent = br(d.navegando || 0);
     document.getElementById('stat-atualizacao').textContent = horaBR(d.atualizadoEm);
     document.getElementById('stat-fonte').textContent = d.fonte || 'AIS';
-
-    var lista = document.getElementById('lista-navios');
-    var html = '';
-
-    if (d.aviso) {
-      html = '<div style="background:var(--card2);border-radius:8px;padding:8px;margin:6px 0;font-size:13px;color:var(--muted)">' + esc(d.aviso) + '</div>';
-    }
-
-    (d.embarcacoes || []).slice(0, 100).forEach(function(n) {
-      var lat = Number(n.lat), lon = Number(n.lon);
-      if (lat === 0 && lon === 0) return;
-      var aoVivo = n.aoVivo !== false;
-      var cor = '#FF2D20';
-      var marker = L.circleMarker([lat, lon], {
-        radius: aoVivo ? 5 : 7, color: cor, fillColor: '#FF2D20', fillOpacity: 0.85, weight: 1.5
-      });
-      marker.bindPopup(
-        '<b>' + (aoVivo ? '🚢 ' : '⚓ ') + esc(n.nome) + '</b><br>' +
-        (aoVivo
-          ? '<small>MMSI: ' + esc(n.mmsi) + ' | Tipo: ' + esc(n.tipo) + '</small><br>' +
-            '<small>Velocidade: ' + esc(n.velocidade) + ' nós</small><br>' +
-            '<small>Direção: ' + esc(n.direcao) + '°</small><br>' +
-            '<small>Bandeira: ' + esc(n.bandeira) + '</small>'
-          : '<small>' + esc(n.tipo) + ' · ' + esc(n.uf) + '</small><br>' +
-            '<small>Hidrovia/zona: ' + esc(n.hidrovia || '—') + '</small>')
-      );
-      naviosMarkers.push(marker);
-      naviosLayer.addLayer(marker);
-
-      html += '<div style="background:var(--card2);border-radius:8px;padding:8px;margin:6px 0;font-size:13px">' +
-        '<b>' + esc(n.nome) + '</b><br>' +
-        '<span class="muted">' + (aoVivo
-          ? 'MMSI: ' + esc(n.mmsi) + ' · Tipo: ' + esc(n.tipo) + ' · Vel: ' + esc(n.velocidade) + ' nós'
-          : esc(n.tipo) + ' · ' + esc(n.uf) + ' · ' + esc(n.hidrovia || '—')) + '</span>' +
-        '</div>';
-    });
-
-    if (html) {
-      lista.style.display = 'block';
-      lista.innerHTML = html;
-    } else {
-      lista.style.display = 'none';
-    }
+    populaSelects();
+    desenhaPortos();
+    refazMarcadores();
+    sincronizarCamadas();
   }).catch(function(e) {
+    if (st) st.textContent = 'Falha ao consultar o AIS: ' + e.message;
     toast('Erro ao carregar embarcações: ' + e.message);
-  });
+  }).then(function(){ lendo = false; });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   initMap();
 
-  document.getElementById('lyr-osm').onchange = function() { toggleLayer('lyr-osm', layers.osm); };
-  document.getElementById('lyr-satelite').onchange = function() { toggleLayer('lyr-satelite', layers.satelite); };
-  document.getElementById('lyr-navios').onchange = function() { toggleLayer('lyr-navios', naviosLayer); };
+  ['lyr-osm', 'lyr-satelite', 'lyr-navios', 'lyr-portos'].forEach(function(id) {
+    document.getElementById(id).onchange = sincronizarCamadas;
+  });
+  ['flt-navegando'].forEach(function(id) {
+    document.getElementById(id).onchange = function() { if (DADOS) refazMarcadores(); };
+  });
+  ['flt-tipo', 'flt-caixa'].forEach(function(id) {
+    document.getElementById(id).onchange = function() { if (DADOS) refazMarcadores(); };
+  });
 
-  document.getElementById('btn-atualizar').onclick = carregarNavios;
+  document.getElementById('btn-atualizar').onclick = function() { carregarNavios(true); };
+
+  document.getElementById('lista-navios').onclick = function(ev) {
+    var card = ev.target.closest ? ev.target.closest('.navio-card') : null;
+    if (!card || card.dataset.flota === undefined) return;
+    var f = FLOTA[Number(card.dataset.flota)];
+    if (!f) return;
+    map.setView([f.lat, f.lon], 10);
+    if (!map.hasLayer(naviosLayer)) naviosLayer.addTo(map);
+    f.m.openPopup();
+  };
 
   carregarNavios();
-  setInterval(carregarNavios, 300000);
+  setInterval(carregarNavios, 120000);
+  setInterval(avanca, 1000);
 });
 
-if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; }
+if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; };
 </script>
 </body>
 </html>

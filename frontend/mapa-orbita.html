@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Satélites em Órbita — BrBRICS</title>
+<meta name="description" content="Satélites em órbita da Terra agora — brasileiros, chineses, americanos, russos e europeus — calculados a partir dos elementos orbitais do CelesTrak com o motor SGP4 do satellite.js.">
+<link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
+<link rel="stylesheet" href="style.css?v=54">
+<link rel="stylesheet" href="pro.css?v=54">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  #map { height: 72vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
+  .layer-panel { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+  .layer-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+  .layer-row label { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .layer-row input { accent-color: var(--marca); }
+  .layer-row select { background: var(--card2); color: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 13px; }
+  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  .btn-sm:hover { transform: translateY(-1px); }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
+  .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .legend { background: var(--card); padding: 14px 16px; border-radius: 12px; font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+  .chips span { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; background: var(--card2); }
+  .relogio { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--paper); }
+  #lista-sats { max-height: 340px; overflow-y: auto; }
+  .sat-card { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; font-size: 13px; }
+  .sat-card b { color: var(--paper); }
+  .pastilha { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=50" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">🛰️ Órbita baixa e geoestacionária — neste instante</p>
+    <h1>Satélites brasileiros, chineses, americanos, russos e europeus no céu</h1>
+    <p class="sub">O portal baixa os elementos orbitais publicados pelo CelesTrak e calcula a posição de cada satélite no seu navegador, com o motor SGP4 da biblioteca aberta satellite.js. Não é foto de satélite: é a conta de onde ele está neste segundo.</p>
+  </section>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Satélites rastreados</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-brasil">—</div><div class="stat-lab">Sobre o Brasil agora</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-altura">—</div><div class="stat-lab">Altitude média (km)</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-elementos" style="font-size:15px">—</div><div class="stat-lab">Elementos orbitais de</div></div>
+  </div>
+
+  <div class="layer-panel">
+    <div class="layer-row"><strong style="color:var(--paper)">Ver a órbita:</strong></div>
+    <div class="layer-row">
+      <span class="muted" style="font-size:13px">País:</span>
+      <select id="flt-pais"><option value="">Todos</option></select>
+      <span class="muted" style="font-size:13px">Finalidade:</span>
+      <select id="flt-rot"><option value="">Todas</option></select>
+      <span class="muted" style="font-size:13px">Ritmo:</span>
+      <select id="flt-tempo">
+        <option value="1">Tempo real</option>
+        <option value="10">10× mais rápido</option>
+        <option value="60">1 hora por minuto</option>
+        <option value="300">5 horas por minuto</option>
+      </select>
+    </div>
+    <div class="layer-row">
+      <label><input type="checkbox" id="lyr-osm" checked> OpenStreetMap</label>
+      <label><input type="checkbox" id="lyr-satelite"> Satélite (Esri)</label>
+      <label><input type="checkbox" id="lyr-brasil"> Só o que está sobre o Brasil</label>
+      <label><input type="checkbox" id="lyr-caixa" checked> Caixa de contagem do Brasil</label>
+      <button class="btn-sm" id="btn-rastro">Limpar rastro</button>
+    </div>
+    <div class="layer-row chips" style="margin-top:6px">
+      <span><i class="pastilha" style="background:#7DD3FC"></i>Estados Unidos</span>
+      <span><i class="pastilha" style="background:#FF6B35"></i>China</span>
+      <span><i class="pastilha" style="background:#E18DFF"></i>Rússia</span>
+      <span><i class="pastilha" style="background:#86EFAC"></i>Europa e Reino Unido</span>
+      <span><i class="pastilha" style="background:#FFD60A"></i>Brasil</span>
+      <span><i class="pastilha" style="background:#A7A7B3"></i>Outro / não informado</span>
+    </div>
+    <div class="layer-row" style="margin-top:6px">
+      <span class="muted" style="font-size:13px">Hora simulada (UTC): <span class="relogio" id="hora-sim">—</span></span>
+    </div>
+    <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Baixando os elementos orbitais do CelesTrak…</p>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="legend">
+    <strong style="color:var(--paper)">📋 Como ler:</strong> cada ponto é um satélite na posição que ele ocupa neste instante, calculada a partir do último TLE publicado. Clique em um ponto para ver o nome, a altitude e desenhar o rastro da órbita (45 minutos para trás e 45 para frente). A coluna de país é uma estimativa a partir do nome do objeto e da constelação a que ele pertence — satélites militares costumam vir sem bandeira. Geoestacionários ficam parados sobre a linha do Equador; os de órbita baixa atravessam o mapa.
+  </div>
+
+  <section class="card">
+    <div class="card-h"><h2>🛰️ O que está sendo rastreado</h2></div>
+    <div id="lista-sats" class="muted" style="font-size:14px">Aguarde a leitura dos elementos orbitais…</div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — elementos orbitais do CelesTrak, contas com satellite.js, mapa base OpenStreetMap.</div>
+    <div class="flinks"><a href="mapa-avioes.html">Aviões</a><a href="mapa-embarcacoes.html">Embarcações</a><a href="mapa-satelite.html">Focos de calor</a><a href="mapa-brasil.html">Mapa Brasil</a><a href="mapa-cameras.html">Câmeras</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=53"></script>
+<script src="app.js?v=50"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var map = null, layers = {}, satLayer = null, caixaLayer = null, trilhaLayer = null;
+var DADOS = null, SAT = null, SATS = [], lendo = false, renovas = 2;
+var marcoReal = Date.now(), marcoSim = Date.now(), fator = 1;
+var CAIXA_BR = { lamin: -34, lamax: 6, lomin: -75, lomax: -32 };
+var COR_PAIS = { 'Estados Unidos': '#7DD3FC', 'China': '#FF6B35', 'Rússia': '#E18DFF',
+  'Europa e Reino Unido': '#86EFAC', 'Brasil': '#FFD60A', 'Outro ou não informado': '#A7A7B3' };
+
+function br(v) { return Number(v || 0).toLocaleString('pt-BR'); }
+function txt(s) { return (s === undefined || s === null || s === '') ? '—' : esc(s); }
+function corDe(s) { return COR_PAIS[s.pais] || '#A7A7B3'; }
+
+function horaSimulada() {
+  return new Date(marcoSim + (Date.now() - marcoReal) * fator);
+}
+
+function initMap() {
+  map = L.map('map').setView([-14, -50], 3);
+  // O container mede a altura em vh: sem recalcular depois do layout o Leaflet
+  // projeta tudo em 0,0 e o mapa parece em branco.
+  setTimeout(function(){ map.invalidateSize(); }, 200);
+  window.addEventListener('load', function(){ map.invalidateSize(); });
+  window.addEventListener('resize', function(){ map.invalidateSize(); });
+
+  layers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+  layers.satelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; Esri, Maxar, Earthstar Geographics'
+  });
+
+  satLayer = L.layerGroup().addTo(map);
+  trilhaLayer = L.layerGroup().addTo(map);
+  caixaLayer = L.layerGroup().addTo(map);
+  L.rectangle([[CAIXA_BR.lamin, CAIXA_BR.lomin], [CAIXA_BR.lamax, CAIXA_BR.lomax]], {
+    color: '#86EFAC', weight: 1.2, dashArray: '6 8', fillOpacity: 0, opacity: 0.55, interactive: false
+  }).addTo(caixaLayer);
+}
+
+function sincronizarCamadas() {
+  [['lyr-osm', layers.osm], ['lyr-satelite', layers.satelite], ['lyr-caixa', caixaLayer]].forEach(function(par) {
+    var ligado = document.getElementById(par[0]).checked;
+    if (ligado) { if (!map.hasLayer(par[1])) par[1].addTo(map); }
+    else map.removeLayer(par[1]);
+  });
+}
+
+function carregaDados() {
+  if (lendo) return;
+  lendo = true;
+  fetch('/api/mapas/orbita').then(function(r){ return r.json(); }).then(function(d) {
+    lendo = false;
+    DADOS = d;
+    document.getElementById('stat-elementos').textContent = horaBR(d.atualizadoEm);
+    if (!SAT) {
+      document.getElementById('status-dados').textContent =
+        'Elementos orbitais na mão (' + br(d.total) + ' objetos). Falta a biblioteca de contas carregar…';
+      return;
+    }
+    monta();
+    if (d.atualizando && renovas > 0) {
+      renovas--;
+      setTimeout(carregaDados, 40000);
+    }
+  }).catch(function(e) {
+    lendo = false;
+    document.getElementById('status-dados').textContent = 'Falha ao ler os elementos orbitais: ' + e.message;
+  });
+}
+
+function monta() {
+  SATS = [];
+  (DADOS.grupos || []).forEach(function(g) {
+    (g.sats || []).forEach(function(s) {
+      var rec = null;
+      try { rec = SAT.twoline2satrec(s.l1, s.l2); } catch (e) { rec = null; }
+      if (!rec || rec.error) return;
+      SATS.push({ nome: s.nome, pais: s.pais, rot: g.rot, rec: rec, lat: null, lon: null,
+                  alt: 0, sobreBrasil: false, marc: null, visivel: false });
+    });
+  });
+  document.getElementById('stat-total').textContent = br(SATS.length);
+  populaSelects();
+  montaMarcadores();
+  var aviso = DADOS.erro ? DADOS.aviso : (DADOS.aviso || '');
+  document.getElementById('status-dados').textContent =
+    SATS.length + ' satélites com órbita calculada no seu navegador' + (aviso ? ' — ' + aviso : '') +
+    (DADOS.stale ? ' — os elementos orbitais são de dias atrás, mas ainda servem' : '');
+  listaGrupos();
+  atualiza();
+}
+
+function populaSelects() {
+  var paises = {}, rots = {};
+  SATS.forEach(function(s) { if (s.pais) paises[s.pais] = 1; if (s.rot) rots[s.rot] = 1; });
+  [['flt-pais', paises], ['flt-rot', rots]].forEach(function(par) {
+    var sel = document.getElementById(par[0]), escolhido = sel.value;
+    sel.length = 1;
+    Object.keys(par[1]).sort().forEach(function(k) {
+      var op = document.createElement('option');
+      op.value = k; op.textContent = k; sel.appendChild(op);
+    });
+    sel.value = escolhido;
+  });
+}
+
+function montaMarcadores() {
+  satLayer.clearLayers();
+  SATS.forEach(function(s) { s.marc = null; s.visivel = false; });
+}
+
+function marcadorDe(s) {
+  if (!s.marc) {
+    var cor = corDe(s);
+    s.marc = L.circleMarker([s.lat || 0, s.lon || 0], {
+      radius: 4, color: cor, weight: 1, fillColor: cor, fillOpacity: 0.9
+    });
+    s.marc.on('click', function() {
+      s.marc.bindPopup(popupSat(s));
+      mostraTrilha(s);
+    });
+  }
+  return s.marc;
+}
+
+function propoe(s, data) {
+  var p;
+  try { p = SAT.propagate(s.rec, data); } catch (e) { return null; }
+  if (!p || !p.position || p.position.x === undefined) return null;
+  var geo;
+  try { geo = SAT.eciToGeodetic(p.position, SAT.gstime(data)); } catch (e) { return null; }
+  if (!geo || geo.longitude === undefined) return null;
+  return { lat: SAT.degreesLat(geo.latitude), lon: SAT.degreesLong(geo.longitude), alt: geo.height };
+}
+
+function atualiza() {
+  if (!SAT || !SATS.length) return;
+  var data = horaSimulada();
+  var soBr = document.getElementById('lyr-brasil').checked;
+  var pais = document.getElementById('flt-pais').value;
+  var rot = document.getElementById('flt-rot').value;
+  var sobre = 0, soma = 0, cont = 0;
+
+  for (var i = 0; i < SATS.length; i++) {
+    var s = SATS[i];
+    var g = propoe(s, data);
+    if (!g || !isFinite(g.lat) || !isFinite(g.lon)) { s.sobreBrasil = false; esconde(s); continue; }
+    s.lat = g.lat; s.lon = g.lon; s.alt = g.alt;
+    s.sobreBrasil = g.lat > CAIXA_BR.lamin && g.lat < CAIXA_BR.lamax &&
+                    g.lon > CAIXA_BR.lomin && g.lon < CAIXA_BR.lomax;
+    if (s.sobreBrasil) sobre++;
+    soma += g.alt; cont++;
+
+    // a contagem e a media sao do conjunto todo; o filtro so decide o que aparece no mapa
+    var naSelecao = (!pais || s.pais === pais) && (!rot || s.rot === rot);
+    var deveEstar = naSelecao && (!soBr || s.sobreBrasil);
+    if (deveEstar) {
+      var m = marcadorDe(s);
+      m.setLatLng([g.lat, g.lon]);
+      if (!s.visivel) { satLayer.addLayer(m); s.visivel = true; }
+    } else esconde(s);
+  }
+
+  document.getElementById('stat-brasil').textContent = br(sobre);
+  document.getElementById('stat-altura').textContent = cont ? br(Math.round(soma / cont)) : '—';
+  document.getElementById('hora-sim').textContent = data.toISOString().slice(0, 16).replace('T', ' ');
+}
+
+function esconde(s) {
+  if (s.visivel && s.marc) satLayer.removeLayer(s.marc);
+  s.visivel = false;
+}
+
+function mostraTrilha(s) {
+  trilhaLayer.clearLayers();
+  var atras = [], frente = [];
+  var passoMs = 60000, minutos = 45;
+  var base = horaSimulada().getTime();
+  var ok = true;
+  for (var m = -minutos; m <= minutos; m++) {
+    var g = propoe(s, new Date(base + m * passoMs));
+    if (!g || !isFinite(g.lat)) { ok = false; break; }
+    if (m < 0) atras.push([g.lat, g.lon]); else frente.push([g.lat, g.lon]);
+  }
+  if (!ok) { toast('Dá para ver a ficha, mas a órbita deste objeto já expirou.'); return; }
+  // a linha cruza a antemeridiano: quebrar evita riscar o mapa de um lado ao outro
+  quebra(atras).concat(quebra(frente)).forEach(function(seg) {
+    if (seg.length > 1) {
+      L.polyline(seg, { color: corDe(s), weight: 1.6, opacity: 0.85, dashArray: '4 6', interactive: false }).addTo(trilhaLayer);
+    }
+  });
+  s.marc.bindPopup(popupSat(s)).openPopup();
+}
+
+function quebra(pontos) {
+  var saida = [], atual = [];
+  for (var i = 0; i < pontos.length; i++) {
+    if (i && Math.abs(pontos[i][1] - pontos[i - 1][1]) > 180) { saida.push(atual); atual = []; }
+    atual.push(pontos[i]);
+  }
+  if (atual.length) saida.push(atual);
+  return saida;
+}
+
+function popupSat(s) {
+  return '<b>' + txt(s.nome) + '</b><br>' + txt(s.rot) + ' · ' + txt(s.pais) + '<br>' +
+    'Altitude: ' + br(Math.round(s.alt || 0)) + ' km<br>' +
+    'Sob seus pés em: ' + (s.lat || 0).toFixed(2) + '°, ' + (s.lon || 0).toFixed(2) + '°<br>' +
+    '<small>Rastro de 45 minutos para trás e para frente desenhado no mapa.</small>';
+}
+
+function listaGrupos() {
+  var caixa = document.getElementById('lista-sats');
+  var por = {};
+  SATS.forEach(function(s) {
+    var k = s.rot || 'Outros';
+    if (!por[k]) por[k] = { total: 0, paises: {} };
+    por[k].total++;
+    por[k].paises[s.pais] = (por[k].paises[s.pais] || 0) + 1;
+  });
+  var html = '';
+  Object.keys(por).sort().forEach(function(k) {
+    var partes = Object.keys(por[k].paises).sort().map(function(q) { return q + ': ' + por[k].paises[q]; });
+    html += '<div class="sat-card"><b>' + esc(k) + '</b> — ' + por[k].total + ' objetos<br>' +
+      '<span class="muted">' + esc(partes.join(' · ')) + '</span></div>';
+  });
+  caixa.innerHTML = html || '<span class="muted">Nenhum grupo respondeu agora.</span>';
+}
+
+window.__satelitePronto = function(lib) {
+  SAT = lib;
+  if (DADOS) monta();
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  initMap();
+  sincronizarCamadas();
+  ['lyr-osm', 'lyr-satelite', 'lyr-caixa'].forEach(function(id) {
+    document.getElementById(id).onchange = sincronizarCamadas;
+  });
+  ['flt-pais', 'flt-rot', 'lyr-brasil'].forEach(function(id) {
+    document.getElementById(id).onchange = atualiza;
+  });
+  document.getElementById('flt-tempo').onchange = function() {
+    marcoSim = horaSimulada().getTime();
+    marcoReal = Date.now();
+    fator = Number(this.value) || 1;
+    atualiza();
+  };
+  document.getElementById('btn-rastro').onclick = function() { trilhaLayer.clearLayers(); };
+
+  carregaDados();
+  setInterval(carregaDados, 3 * 3600000);
+  setInterval(atualiza, 1000);
+  setTimeout(function() {
+    if (!SAT) document.getElementById('status-dados').textContent =
+      'A biblioteca aberta de contas orbitais (satellite.js) não carregou. Recarregue a página — sem ela não dá para calcular as posições.';
+  }, 12000);
+});
+
+if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; };
+</script>
+<script type="module">
+import * as satellite from 'https://cdn.jsdelivr.net/npm/satellite.js@7.1.0/+esm';
+if (window.__satelitePronto) window.__satelitePronto(satellite);
+</script>
+</body>
+</html>

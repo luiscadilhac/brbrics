@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapa de Aviões — BrBRICS</title>
-<meta name="description" content="Rastreamento de aeronaves em tempo real sobre o Brasil via OpenSky Network (ADS-B), sem necessidade de chave de API.">
+<meta name="description" content="Aeronaves sobre o Brasil em tempo real pelo transponder ADS-B da rede comunitária adsb.lol, com as posições avançando entre uma leitura e outra. Sem chave de API.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
 <link rel="stylesheet" href="style.css?v=54">
 <link rel="stylesheet" href="pro.css?v=54">
@@ -21,6 +21,15 @@
   .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
   .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .legend { background: var(--card); padding: 14px 16px; border-radius: 12px; font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .aviao-icone { background: none; border: none; }
+  .aviao-giro { width: 26px; height: 26px; transform-origin: 50% 50%; transition: transform .9s linear; }
+  .aviao-giro svg { display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.7)); }
+  .aviao-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; cursor: pointer; font-size: 13px; }
+  .aviao-card:hover { border-color: var(--acc); }
+  .aviao-card b { color: var(--paper); }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+  .chips span { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; }
 </style>
 </head>
 <body>
@@ -36,14 +45,15 @@
 <main class="wrap">
   <section class="hero" style="padding:28px 0;text-align:center">
     <p class="kicker">✈️ Aviões em Tempo Real — ADS-B</p>
-    <h1>Rastreamento de Aeronaves sobre o Brasil</h1>
-    <p class="sub">Dados da OpenSky Network (ADS-B). Atualização a cada minuto. Sem necessidade de chave de API.</p>
+    <h1>Aeronaves voando sobre o Brasil</h1>
+    <p class="sub">Cada avião vem do transponder ADS-B reportado pela rede comunitária adsb.lol. Entre uma leitura e outra a posição avança pela própria velocidade e rumo, então a frota se mexe no mapa. Sem cadastro e sem chave de API.</p>
   </section>
 
   <div class="stat-row">
-    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Aeronaves detectadas</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última atualização</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-fonte">—</div><div class="stat-lab">Fonte de dados</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Aeronaves na tela</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-altocruzeiro">—</div><div class="stat-lab">Em cruzeiro (acima de 3.000 m)</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última leitura</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-fonte" style="font-size:15px">—</div><div class="stat-lab">Fonte de dados</div></div>
   </div>
 
   <div class="layer-panel">
@@ -51,44 +61,87 @@
     <div class="layer-row">
       <label><input type="checkbox" id="lyr-osm" checked> OpenStreetMap</label>
       <label><input type="checkbox" id="lyr-satelite"> Satélite (Esri)</label>
-      <label><input type="checkbox" id="lyr-avioes" checked> Aviões (markers)</label>
+      <label><input type="checkbox" id="lyr-avioes" checked> Aviões</label>
+      <label><input type="checkbox" id="lyr-movimento" checked> Movimento contínuo entre leituras</label>
     </div>
     <div class="layer-row" style="margin-top:8px">
       <button class="btn-sm" id="btn-atualizar">Atualizar agora</button>
-      <span class="muted" style="font-size:12px;margin-left:10px">Atualização automática: 60s</span>
+      <span class="muted" style="font-size:12px;margin-left:10px">Leitura nova a cada 30 segundos</span>
     </div>
-    <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Consultando a OpenSky Network (ADS-B)…</p>
+    <div class="layer-row chips" style="margin-top:10px">
+      <span style="color:var(--acc)">■ em cruzeiro</span>
+      <span style="color:var(--marca)">■ baixo / aproximação</span>
+      <span style="color:var(--neg)">■ transponder em emergência</span>
+    </div>
+    <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Consultando os receptores ADS-B…</p>
   </div>
 
   <div id="map"></div>
 
   <div class="legend">
-    <strong style="color:var(--paper)">📋 Como ler:</strong> Cada ícone azul é uma aeronave. Clique para ver código ICAO, chamada, altitude, velocidade e direção. Dados da OpenSky Network — cobertura global, sem cadastro.
+    <strong style="color:var(--paper)">📋 Como ler:</strong> a seta é um avião, apontada para o rumo que ele voa. Clique para ver matrícula, país, modelo, altitude, velocidade e razão de subida. A cada 30 segundos chega uma leitura nova do ADS-B; no intervalo, a posição é estimada pela última velocidade e rumo informados pela própria aeronave — por isso ela desliza pelo mapa.
   </div>
 
-  <div id="lista-avioes" style="display:none;max-height:300px;overflow-y:auto;background:var(--card2);border-radius:10px;padding:12px;margin-bottom:16px;border:1px solid var(--pos-deep)"></div>
+  <div id="lista-avioes" style="display:none;max-height:320px;overflow-y:auto;background:var(--card2);border-radius:10px;padding:12px;margin-bottom:16px;border:1px solid var(--line)"></div>
 </main>
 <footer>
   <div class="wrap foot">
-    <div><b>BrBRICS</b> — dados da OpenSky Network (ADS-B) e OpenStreetMap.</div>
-    <div class="flinks"><a href="mapa-satelite.html">Satélite</a><a href="mapa-brasil.html">Mapa Brasil</a><a href="mapa-embarcacoes.html">Embarcações</a><a href="mapa-cameras.html">Câmeras</a></div>
+    <div><b>BrBRICS</b> — dados ADS-B de adsb.lol, reserva OpenSky Network, mapa base OpenStreetMap.</div>
+    <div class="flinks"><a href="mapa-orbita.html">Satélites</a><a href="mapa-embarcacoes.html">Embarcações</a><a href="mapa-satelite.html">Focos de calor</a><a href="mapa-brasil.html">Mapa Brasil</a><a href="mapa-cameras.html">Câmeras</a></div>
   </div>
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=52"></script>
+<script src="common.js?v=53"></script>
 <script src="app.js?v=50"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
 <script>
-// Estado
 var map = null;
 var layers = {};
 var avioesLayer = null;
-var markerCluster = null;
-var avioesMarkers = [];
+var FROTA = [];          // cada item: dados do ADS-B + marcador + última posição estimada
+var RENOVACAO_MS = 30000;
+var lendo = false;
+
+function num(v, default_) { return (typeof v === 'number' && isFinite(v)) ? v : default_; }
+function br(v) { return Number(v || 0).toLocaleString('pt-BR'); }
+
+var GLIFO = '<svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">' +
+  '<path d="M21.5 15.5v-2l-8.5-5V2.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V8.5l-8.5 5v2l8.5-2.5v5.5l-2.5 1.5v1.5l4-1.2 4 1.2v-1.5L13 18.5V13l8.5 2.5z" fill="COR"/></svg>';
+
+function corDe(a) {
+  if (a.emergencia) return '#f87171';
+  var m = num(a.altitude_m, 0);
+  return m >= 3000 ? '#7DD3FC' : '#86EFAC';
+}
+
+function icone(a) {
+  var rumo = num(a.direcao, 0);
+  var glifo = GLIFO.replace('COR', corDe(a));
+  return L.divIcon({
+    className: 'aviao-icone',
+    html: '<div class="aviao-giro" style="transform:rotate(' + rumo + 'deg)">' + glifo + '</div>',
+    iconSize: [26, 26],
+    iconAnchor: [13, 13]
+  });
+}
+
+function popup(a) {
+  return '<b>' + txt(a.callsign) + '</b><br>' +
+    (a.matricula ? 'Matrícula ' + txt(a.matricula) + ' · ' + txt(a.pais) + '<br>' : '') +
+    (a.modelo ? txt(a.modelo) + '<br>' : '') +
+    'Altitude: ' + br(a.altitude_m) + ' m (' + br(a.altitude_ft) + ' pés)<br>' +
+    'Velocidade: ' + br(a.velocidade_kmh) + ' km/h (' + br(a.velocidade_kt) + ' nós)<br>' +
+    'Rumo: ' + txt(a.direcao) + '° · Sobe/desce: ' + br(a.vertical_ft_min) + ' pés/min<br>' +
+    (a.emergencia ? '<b style="color:#b00020">Emergência: ' + txt(a.emergencia) + '</b><br>' : '') +
+    (a.squawk ? 'Código SSR: ' + txt(a.squawk) + '<br>' : '') +
+    '<small>Visto há ' + (a.visto_ha == null ? '—' : br(a.visto_ha) + ' s') + ' · receptor ' + txt(a.origem) + '</small>';
+}
+
+function txt(s) {
+  if (s === undefined || s === null || s === '' || s === '—') return '—';
+  return esc(s);
+}
 
 function initMap() {
   map = L.map('map').setView([-14.2, -51.9], 4);
@@ -106,104 +159,136 @@ function initMap() {
     attribution: '&copy; Esri, Maxar, Earthstar Geographics'
   });
 
-  markerCluster = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
   avioesLayer = L.layerGroup();
 }
 
+function camadasLigadas() {
+  return {
+    osm: document.getElementById('lyr-osm').checked,
+    satelite: document.getElementById('lyr-satelite').checked,
+    avioes: document.getElementById('lyr-avioes').checked,
+    movimento: document.getElementById('lyr-movimento').checked
+  };
+}
+
 function sincronizarCamadas() {
-  [['lyr-osm', layers.osm], ['lyr-satelite', layers.satelite], ['lyr-avioes', null]].forEach(function(par) {
-    toggleLayer(par[0], par[1]);
+  var l = camadasLigadas();
+  [['osm', layers.osm], ['satelite', layers.satelite], ['avioes', avioesLayer]].forEach(function(par) {
+    if (l[par[0]]) { if (!map.hasLayer(par[1])) par[1].addTo(map); }
+    else map.removeLayer(par[1]);
   });
 }
 
-function toggleLayer(id, layer) {
-  var cb = document.getElementById(id);
-  if (!cb) return;
-  if (cb.checked) {
-    if (id === 'lyr-avioes') {
-      if (!map.hasLayer(markerCluster)) markerCluster.addTo(map);
-    } else {
-      if (!map.hasLayer(layer)) layer.addTo(map);
-    }
-  } else {
-    map.removeLayer(layer);
-    if (id === 'lyr-avioes') map.removeLayer(markerCluster);
+function desenha(avioes) {
+  avioesLayer.clearLayers();
+  FROTA = [];
+  var alto = 0;
+  avioes.forEach(function(a) {
+    if (a.lat == null || a.lon == null) return;
+    var m = L.marker([a.lat, a.lon], { icon: icone(a) });
+    m.bindPopup(popup(a));
+    avioesLayer.addLayer(m);
+    if (num(a.altitude_m, 0) >= 3000) alto++;
+    FROTA.push({ d: a, m: m, lat: a.lat, lon: a.lon, rumo: num(a.direcao, 0),
+                 kmh: num(a.velocidade_kmh, 0), t: Date.now() });
+    a.__frota = FROTA.length - 1;
+  });
+  document.getElementById('stat-altocruzeiro').textContent = br(alto);
+  return FROTA.length;
+}
+
+// Dead reckoning: a última velocidade e o último rumo reportados pela própria
+// aeronave empurram o marcador entre duas leituras do ADS-B.
+function avanca() {
+  if (!camadasLigadas().movimento) return;
+  var agora = Date.now();
+  for (var i = 0; i < FROTA.length; i++) {
+    var f = FROTA[i];
+    var seg = (agora - f.t) / 1000;
+    if (seg <= 0 || f.kmh < 40) { f.t = agora; continue; }
+    var km = f.kmh * seg / 3600;
+    var rad = f.rumo * Math.PI / 180;
+    f.lat += km * Math.cos(rad) / 111.32;
+    f.lon += km * Math.sin(rad) / (111.32 * Math.cos(f.lat * Math.PI / 180));
+    f.t = agora;
+    f.m.setLatLng([f.lat, f.lon]);
   }
 }
 
-function carregarAvioes() {
-  var st = document.getElementById('status-dados');
-  if (st) st.textContent = 'Consultando a OpenSky Network (ADS-B)…';
-  fetch('/api/mapas/avioes').then(function(r){ return r.json(); }).then(function(d) {
-    avioesLayer.clearLayers();
-    markerCluster.clearLayers();
-    avioesMarkers = [];
-
-    document.getElementById('stat-total').textContent = Number(d.total || 0).toLocaleString('pt-BR');
-    document.getElementById('stat-atualizacao').textContent = horaBR(d.atualizadoEm);
-    document.getElementById('stat-fonte').textContent = d.fonte || 'OpenSky';
-
-    var lista = document.getElementById('lista-avioes');
-    var html = '';
-
-    (d.avioes || []).slice(0, 300).forEach(function(a) {
-      if (a.lat == null || a.lon == null) return;
-      var marker = L.circleMarker([a.lat, a.lon], {
-        radius: 5, color: '#FF2D20', fillColor: '#FF2D20', fillOpacity: 0.85, weight: 1.5
-      });
-      marker.bindPopup(
-        '<b>✈️ ' + esc(a.callsign) + '</b><br>' +
-        '<small>ICAO: ' + esc(a.icao24) + ' | País: ' + esc(a.pais) + '</small><br>' +
-        '<small>Altitude: ' + esc(a.altitude) + ' m</small><br>' +
-        '<small>Velocidade: ' + esc(a.velocidade) + ' m/s</small><br>' +
-        '<small>Direção: ' + esc(a.direcao) + '°</small>'
-      );
-      avioesMarkers.push(marker);
-      markerCluster.addLayer(marker);
-
-      html += '<div class="aviao-card">' +
-        '<b>' + esc(a.callsign) + '</b><br>' +
-        '<span class="muted">ICAO: ' + esc(a.icao24) + ' · Alt: ' + esc(a.altitude) + 'm · Vel: ' + esc(a.velocidade) + 'm/s · Dir: ' + esc(a.direcao) + '°</span>' +
-        '</div>';
-    });
-
-    if (!map.hasLayer(markerCluster) && document.getElementById('lyr-avioes').checked) markerCluster.addTo(map);
-    if (html) {
-      lista.style.display = 'block';
-      lista.innerHTML = html;
-    } else {
-      lista.style.display = 'none';
-    }
-    if (st) {
-      if (d.erro) st.textContent = 'A OpenSky não respondeu agora: ' + d.erro;
-      else if (!avioesMarkers.length) st.textContent = 'Nenhuma aeronave com transponder ADS-B na área no momento.';
-      else st.textContent = Number(d.total).toLocaleString('pt-BR') + ' aeronaves com transponder sobre o Brasil' +
-        ((d.avioes || []).length > avioesMarkers.length ? ' (mapa mostra ' + avioesMarkers.length + ')' : '') +
-        (d.stale ? ' — última leitura válida' : '') + '. ' + (d.aviso || 'Atualiza sozinho a cada 60 segundos.');
-    }
-  }).catch(function(e) {
-    if (st) st.textContent = 'Falha ao consultar a OpenSky: ' + e.message;
-    toast('Erro ao carregar aviões: ' + e.message);
+function listaDomestica(avioes) {
+  var caixa = document.getElementById('lista-avioes');
+  var ordenados = avioes.filter(function(a) { return a.__frota !== undefined; })
+    .sort(function(a, b) { return num(b.altitude_m, 0) - num(a.altitude_m, 0); });
+  var html = '';
+  ordenados.slice(0, 120).forEach(function(a) {
+    html += '<div class="aviao-card" data-frota="' + a.__frota + '">' +
+      '<b>' + txt(a.callsign) + '</b>' + (a.modelo ? ' · ' + txt(a.modelo) : '') +
+      (a.emergencia ? ' · <b style="color:#f87171">EMERGÊNCIA</b>' : '') +
+      '<br><span class="muted">' + txt(a.matricula || a.icao24) + ' · ' + txt(a.pais) +
+      ' · ' + br(a.altitude_m) + ' m · ' + br(a.velocidade_kmh) + ' km/h · rumo ' + txt(a.direcao) + '°</span>' +
+      '</div>';
   });
+  if (!html) { caixa.style.display = 'none'; caixa.innerHTML = ''; return; }
+  caixa.style.display = 'block';
+  caixa.innerHTML = html;
 }
 
-function esc(s) { return String(s || '—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function carregarAvioes(avisoDe) {
+  if (lendo) return;
+  lendo = true;
+  var st = document.getElementById('status-dados');
+  if (st && !avisoDe) st.textContent = 'Consultando os receptores ADS-B…';
+
+  fetch('/api/mapas/avioes').then(function(r){ return r.json(); }).then(function(d) {
+    var avioes = d.avioes || [];
+    document.getElementById('stat-total').textContent = br(d.total || avioes.length);
+    document.getElementById('stat-atualizacao').textContent = horaBR(d.atualizadoEm);
+    document.getElementById('stat-fonte').textContent = d.fonte || 'ADS-B';
+
+    var naTela = desenha(avioes);
+    sincronizarCamadas();
+    listaDomestica(avioes);
+
+    if (st) {
+      if (d.erro) st.textContent = 'As duas fontes ADS-B não responderam agora: ' + d.erro;
+      else if (!naTela) st.textContent = 'Nenhum transponder ADS-B foi captado sobre o Brasil neste instante. Recarregue em um minuto.';
+      else st.textContent = br(d.total || naTela) + ' aeronaves captadas' +
+        (naTela < (d.total || naTela) ? ', ' + br(naTela) + ' com posição válida no mapa' : '') +
+        (d.stale ? ' — ' + (d.aviso || 'última leitura válida') : (d.aviso ? ' — ' + d.aviso : ' — as setas avançam sozinhas até a próxima leitura.'));
+    }
+  }).catch(function(e) {
+    if (st) st.textContent = 'Falha ao consultar o mapa de aviões: ' + e.message;
+    toast('Erro ao carregar aviões: ' + e.message);
+  }).then(function(){ lendo = false; });
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   initMap();
   sincronizarCamadas();
 
-  document.getElementById('lyr-osm').onchange = function() { toggleLayer('lyr-osm', layers.osm); };
-  document.getElementById('lyr-satelite').onchange = function() { toggleLayer('lyr-satelite', layers.satelite); };
-  document.getElementById('lyr-avioes').onchange = function() { toggleLayer('lyr-avioes', null); };
+  ['lyr-osm', 'lyr-satelite', 'lyr-avioes'].forEach(function(id) {
+    document.getElementById(id).onchange = sincronizarCamadas;
+  });
 
-  document.getElementById('btn-atualizar').onclick = carregarAvioes;
+  document.getElementById('btn-atualizar').onclick = function() { carregarAvioes(true); };
+
+  document.getElementById('lista-avioes').onclick = function(ev) {
+    var card = ev.target.closest ? ev.target.closest('.aviao-card') : null;
+    if (!card || card.dataset.frota === undefined) return;
+    var f = FROTA[Number(card.dataset.frota)];
+    if (!f) return;
+    map.setView([f.lat, f.lon], 7);
+    if (avioesLayer && !map.hasLayer(avioesLayer)) avioesLayer.addTo(map);
+    f.m.bindPopup(popup(f.d));
+    f.m.openPopup();
+  };
 
   carregarAvioes();
-  setInterval(carregarAvioes, 60000);
+  setInterval(carregarAvioes, RENOVACAO_MS);
+  setInterval(avanca, 1000);
 });
 
-if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; }
+if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; };
 </script>
 </body>
 </html>
