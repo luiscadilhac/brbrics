@@ -410,11 +410,16 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
     });
   });
 
-  // ---- Satelites em orbita: TLEs do CelesTrak, propagados no navegador (satellite.js) ----
+  // ---- Satelites em orbita: TLEs, propagados no navegador (satellite.js) ----
   // O CelesTrak nao aceita duas leituras do mesmo grupo antes de atualizar (responde 403
   // "GP data has not updated since your last request"), entao o cache e de 6h e o prazo da
   // reserva e de 4 dias. Os grupos cobrem navegacao (BeiDou/GPS/GLONASS/Galileo), estacoes
   // orbitais, internet por satellite, meteorologia e observacao da Terra.
+  // Do Render o CelesTrak nunca respondeu — a conexao fica pendurada ate o timeout, grupo
+  // apos grupo. Por isso ele e tentado primeiro, mas abandonado ja no segundo silencio, e
+  // existe uma segunda fonte: a base TLE publica da SATNOGS, um unico pedido que traz ~1.700
+  // objetos que a gente classifica por nome em grupos aqui mesmo. Vale para orbita real; so
+  // nao traz as constelacoes inteiras (GPS, Galileo) que a SATNOGS nao acompanha.
   var GRUPOS_ORBITA = [
     { g: 'stations', rot: 'Estações orbitais', cap: 30 },
     { g: 'beidou', rot: 'Navegação — BeiDou', cap: 60 },
@@ -447,6 +452,42 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
     return 'outros';
   }
 
+  // Quando a lista chega sem grupos (a reserva da SATNOGS), o grupo é deduzido pelo nome.
+  var GRUPO_POR_NOME = [
+    [/^(ISS|TIANGONG|CSS |SHENZHOU|TIANHE|WENTIAN|MENGTIAN|ORION)/, 'Estações orbitais'],
+    [/^(GPS|BEIDOU|GLONASS|GALILEO|NAVIC|QZS|IRNSS)/, 'Navegação por satélite'],
+    [/^(STARLINK|ONEWEB|KUIPER|ASTRANIS|AMAZON|INMARSAT|EUTELSAT|SES |TELESAT|TELSTAR)/, 'Internet e telecomunicações'],
+    [/^(GOES|NOAA|METEOSAT|MTG|MSG|METSAT|HIMAWARI|FENGYUN|FY |YUNHAI|JPSS|SUOMI|NPP|AQUA|TERRA|CALIPSO|CLOUDSAT)/, 'Meteorológicos'],
+    [/^(LANDSAT|SENTINEL|CBERS|AMAZONIA|YAOGAN|GAOFEN|GAOJING|ZIYUAN|RESURS|KANOPUS|WORLDVIEW|PLANET|SPOT|PLEIADES|SWOT|CARTOSAT|TIANPIN|IRS |RADARSAT|ICEEYE|DAITOU|HUIYAN)/, 'Observação da Terra'],
+    [/^(IRIDIUM|GLOBALSTAR|ORBCOMM|SPIRE|LEMUR|FALCON|SPACEX|AISTRE)/, 'Telecom e cubesats']
+  ];
+  function grupoDeNome(nome){
+    var n = semAcento(String(nome || ''));
+    for (var i = 0; i < GRUPO_POR_NOME.length; i++) if (GRUPO_POR_NOME[i][0].test(n)) return GRUPO_POR_NOME[i][1];
+    return 'Outros satélites';
+  }
+
+  // Reserva: a base TLE publica da SATNOGS cabe num pedido so (~1.700 objetos, ~540 kB).
+  function daSatnogs(){
+    return getJSON('https://db.satnogs.org/api/tle/?format=json', {}, 12000).then(function(r){
+      var lista = (r.status === 200 && Array.isArray(r.data)) ? r.data : [];
+      var baldes = {};
+      lista.forEach(function(o){
+        var nome = String(o.tle0 || '').replace(/^0 /, '').trim();
+        var l1 = String(o.tle1 || ''), l2 = String(o.tle2 || '');
+        if (!nome || !/^[12] /.test(l1) || !/^[12] /.test(l2)) return;
+        var rot = grupoDeNome(nome);
+        var g = baldes[rot] || (baldes[rot] = { rot: rot, grupo: 'satnogs', qtd: 0, sats: [] });
+        if (g.qtd >= 170) return;
+        var bloco = blocoDe(nome, '');
+        g.sats.push({ nome: nome.slice(0, 40), id: parseInt(o.norad_cat_id, 10) || 0,
+          l1: l1, l2: l2, bloco: bloco, pais: BLOCO_PAIS[bloco] });
+        g.qtd++;
+      });
+      return Object.keys(baldes).map(function(k){ return baldes[k] });
+    });
+  }
+
   // TLE em texto: nome, entao as duas linhas. O CelesTrak traz 16 caracteres por campo.
   function parseTLE(texto){
     var linhas = String(texto || '').split(/\r?\n/).filter(function(l){ return l.trim() !== '' });
@@ -470,18 +511,20 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
     var falhas = 0;
     var respondido = false;
     var inicio = Date.now();
+    var fonte = 'CelesTrak (TLE)';
 
     function corpo(extra){
       var total = grupos.reduce(function(a, g){ return a + g.qtd; }, 0);
       var c = {
-        fonte: 'CelesTrak (TLE) + satellite.js no navegador', total: total, grupos: grupos,
+        fonte: fonte + ' + satellite.js no navegador', total: total, grupos: grupos,
         atualizadoEm: new Date().toISOString()
       };
-      if (falhas) c.aviso = 'Nem todo grupo respondeu agora (' + falhas + ' de ' + GRUPOS_ORBITA.length + ' falharam).';
+      if (fonte === 'CelesTrak (TLE)' && falhas)
+        c.aviso = 'Nem todo grupo respondeu agora (' + falhas + ' de ' + GRUPOS_ORBITA.length + ' falharam).';
       return Object.assign(c, extra || {});
     }
 
-    // A varredura dos 9 grupos leva ~55s: quem chegou primeiro nao pode esperar tanto.
+    // A varredura dos grupos leva ~15s: quem chegou primeiro nao pode esperar tanto.
     // Libera o que ja veio e a varredura continua ate o fim, enchendo o cache.
     function libera(parcial){
       if (respondido || res.headersSent) return;
@@ -495,59 +538,75 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
       res.json(c);
     }
 
-    var vigia = setInterval(function(){
-      if (grupos.length && Date.now() - inicio > 20000) { clearInterval(vigia); libera(true); }
-    }, 3000);
-
-    function pegaGrupo(i){
-      if (i >= GRUPOS_ORBITA.length) return Promise.resolve();
-      var conf = GRUPOS_ORBITA[i];
-      var url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=' + conf.g + '&FORMAT=tle';
-      return getJSON(url, {}, 20000).then(function(r){
-        var texto = (r.status === 200 && typeof r.data === 'string') ? r.data : '';
-        var sats = parseTLE(texto).slice(0, conf.cap);
-        if (!sats.length) { falhas++; return; }
-        sats.forEach(function(s){
-          s.bloco = blocoDe(s.nome, conf.g);
-          s.pais = BLOCO_PAIS[s.bloco];
-        });
-        grupos.push({ rot: conf.rot, grupo: conf.g, qtd: sats.length, sats: sats });
-        if (grupos.length >= 4) { clearInterval(vigia); libera(true); }
-      }).catch(function(){ falhas++; })
-        .then(function(){ return espera(500); })
-        .then(function(){ return pegaGrupo(i + 1); });
+    function grava(){
+      clearInterval(vigia);
+      var boa = corpo();
+      var ttl = fonte === 'SATNOGS (TLE)' ? 4 * 3600000 : (falhas ? 2 * 3600000 : 6 * 3600000);
+      cacheSet(ck, boa, ttl);
+      guardarBoa(ck, boa);
+      libera(false);
     }
 
-    pegaGrupo(0).then(function(){
+    function semFonte(){
       clearInterval(vigia);
-      if (grupos.length) {
-        var boa = corpo();
-        cacheSet(ck, boa, falhas ? 2 * 3600000 : 6 * 3600000);
-        guardarBoa(ck, boa);
-        libera(false);
-        return;
-      }
       if (respondido || res.headersSent) return;
       respondido = true;
       var boa = UltimaBOA(ck);
       if (boa && Date.now() - boa.t < 4 * 86400000) {
         var velho = JSON.parse(JSON.stringify(boa.v));
         velho.stale = true;
-        velho.aviso = 'O CelesTrak não respondeu agora; mostrando os elementos orbitais de ' +
+        velho.aviso = 'Nenhuma fonte de elementos orbitais respondeu agora; mostrando os de ' +
                       horaLegivel(new Date(boa.t)) + ' (ainda servem para alguns dias).';
         return res.json(velho);
       }
-      res.json({ fonte: 'CelesTrak (TLE)', total: 0, grupos: [],
+      res.json({ fonte: 'CelesTrak / SATNOGS (TLE)', total: 0, grupos: [],
         erro: 'Elementos orbitais indisponíveis agora',
-        aviso: 'Não foi possível ler o CelesTrak. Recarregue em instantes.',
+        aviso: 'O CelesTrak e a SATNOGS não responderam. Recarregue em instantes.',
         atualizadoEm: new Date().toISOString() });
-    }).catch(function(){
-      clearInterval(vigia);
-      if (respondido || res.headersSent) return;
-      respondido = true;
-      res.json({ fonte: 'CelesTrak (TLE)', total: 0, grupos: [], erro: 'Falha na varredura',
-        atualizadoEm: new Date().toISOString() });
-    });
+    }
+
+    var vigia = setInterval(function(){
+      if (grupos.length && Date.now() - inicio > 20000) { clearInterval(vigia); libera(true); }
+    }, 3000);
+
+    function varreCelesTrak(){
+      return new Promise(function(resolve){
+        var mudos = 0;
+        function passo(i){
+          if (i >= GRUPOS_ORBITA.length) return resolve();
+          var conf = GRUPOS_ORBITA[i];
+          var url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=' + conf.g + '&FORMAT=tle';
+          getJSON(url, {}, 6000).then(function(r){
+            var texto = (r.status === 200 && typeof r.data === 'string') ? r.data : '';
+            var sats = parseTLE(texto).slice(0, conf.cap);
+            if (!sats.length) { falhas++; return; }
+            sats.forEach(function(s){
+              s.bloco = blocoDe(s.nome, conf.g);
+              s.pais = BLOCO_PAIS[s.bloco];
+            });
+            grupos.push({ rot: conf.rot, grupo: conf.g, qtd: sats.length, sats: sats });
+            if (grupos.length >= 4) { clearInterval(vigia); libera(true); }
+          }).catch(function(){ falhas++; mudos++; })
+            .then(function(){
+              // Dois silencios seguidos querem dizer que o host nao atende de IP de servidor:
+              // esperar os 9 grupos custaria quase um minuto para uma pagina que ja tem reserva.
+              if (mudos >= 2 || i + 1 >= GRUPOS_ORBITA.length) return resolve();
+              return espera(400).then(function(){ passo(i + 1) });
+            });
+        }
+        passo(0);
+      });
+    }
+
+    varreCelesTrak().then(function(){
+      if (grupos.length) return void grava();
+      fonte = 'SATNOGS (TLE)';
+      return daSatnogs().then(function(lista){
+        if (!lista.length) return void semFonte();
+        grupos = lista;
+        grava();
+      });
+    }).catch(function(){ semFonte(); });
   });
 
   // ---- Cameras online (lista de cameras publicas do Brasil) ----

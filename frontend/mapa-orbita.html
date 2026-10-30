@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Satélites em Órbita — BrBRICS</title>
-<meta name="description" content="Satélites em órbita da Terra agora — brasileiros, chineses, americanos, russos e europeus — calculados a partir dos elementos orbitais do CelesTrak com o motor SGP4 do satellite.js.">
+<meta name="description" content="Satélites em órbita da Terra agora — brasileiros, chineses, americanos, russos e europeus — calculados a partir dos elementos orbitais abertos (CelesTrak, SATNOGS) com o motor SGP4 do satellite.js.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
 <link rel="stylesheet" href="style.css?v=54">
 <link rel="stylesheet" href="pro.css?v=54">
@@ -46,7 +46,7 @@
   <section class="hero" style="padding:28px 0;text-align:center">
     <p class="kicker">🛰️ Órbita baixa e geoestacionária — neste instante</p>
     <h1>Satélites brasileiros, chineses, americanos, russos e europeus no céu</h1>
-    <p class="sub">O portal baixa os elementos orbitais publicados pelo CelesTrak e calcula a posição de cada satélite no seu navegador, com o motor SGP4 da biblioteca aberta satellite.js. Não é foto de satélite: é a conta de onde ele está neste segundo.</p>
+    <p class="sub">O portal baixa os elementos orbitais abertos — os conjuntos do CelesTrak e, quando ele não responde, a base da SATNOGS — e calcula a posição de cada satélite no seu navegador, com o motor SGP4 da biblioteca aberta satellite.js. Não é foto de satélite: é a conta de onde ele está neste segundo.</p>
   </section>
 
   <div class="stat-row">
@@ -89,7 +89,7 @@
     <div class="layer-row" style="margin-top:6px">
       <span class="muted" style="font-size:13px">Hora simulada (UTC): <span class="relogio" id="hora-sim">—</span></span>
     </div>
-    <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Baixando os elementos orbitais do CelesTrak…</p>
+    <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Baixando os elementos orbitais…</p>
   </div>
 
   <div id="map"></div>
@@ -105,7 +105,7 @@
 </main>
 <footer>
   <div class="wrap foot">
-    <div><b>BrBRICS</b> — elementos orbitais do CelesTrak, contas com satellite.js, mapa base OpenStreetMap.</div>
+    <div><b>BrBRICS</b> — elementos orbitais do CelesTrak ou da SATNOGS, contas com satellite.js, mapa base OpenStreetMap.</div>
     <div class="flinks"><a href="mapa-avioes.html">Aviões</a><a href="mapa-embarcacoes.html">Embarcações</a><a href="mapa-satelite.html">Focos de calor</a><a href="mapa-brasil.html">Mapa Brasil</a><a href="mapa-cameras.html">Câmeras</a></div>
   </div>
 </footer>

@@ -118,11 +118,26 @@ registo a ninguém:
   Terra). O CelesTrak responde **403 "GP data has not updated since your last request"** se o mesmo
   grupo for lido duas vezes antes de actualizar — daí o cache de 6h (2h quando um grupo falha) e a
   reserva de até 4 dias. O texto do TLE chega como string (`getJSON` não parseia), tratado por
-  `parseTLE`. Medido: 499–639 objetos por leitura, 56s na primeira varredura. **A conta é feita no
-  navegador** com o SGP4 do [satellite.js](https://www.npmjs.com/package/satellite.js) 7.1.0
+  `parseTLE`. **A conta é feita no navegador** com o SGP4 do
+  [satellite.js](https://www.npmjs.com/package/satellite.js) 7.1.0
   (`cdn.jsdelivr.net/npm/satellite.js@7.1.0/+esm`, importado como módulo ES); o backend só entrega
   elementos orbitais. O país é *estimado* do nome e da constelação (REGRA_BLOCO), porque o TLE militar
   não traz bandeira.
+- **O CelesTrak não atende o Render.** Medido em 2026-10-30: daqui de casa cada grupo responde em
+  ~1,2s; na produção as 9 ligações ficavam penduradas até o timeout e a rota só devolvia vazio depois
+  de 184s. Por isso a varredura **abandona no segundo silêncio seguidos** (6s por pedido) e cai na
+  segunda fonte: a base TLE pública da **SATNOGS** (`db.satnogs.org/api/tle/?format=json`), um pedido
+  só de ~540kB/1.700 objetos que `daSatnogs` agrupa por nome (`GRUPO_POR_NOME`). Medido: CelesTrak
+  entrega 499–639 objetos; a reserva SATNOGS entrega 287, em ~15s, e não traz as constelações inteiras
+  de GPS/Galileo porque a SATNOGS não os acompanha — por isso o CelesTrak continua sendo a primeira
+  tentativa e o `fonte` do payload diz qual deles alimentou aquela leitura.
+- Para exercitar o caminho de reserva sem tocar no código do site: a aplicação usa **`node-fetch`**
+  (linha 12 do `backend/server.js`), não o `fetch` global, então o stub tem de interceptar o módulo
+  (`Module._load`) e não o `global.fetch`. Subir uma segunda instância com `PORT=3100` basta para não
+  mexer na que está servindo o navegador.
+- A varredura é lenta de propósito (os grupos não aceitam leitura paralela), então a rota **libera a
+  resposta parcial**: o primeiro byte sai com 4 grupos prontos (~4s), com `atualizando:true`, e a
+  página volta a buscar o resto em 40s enquanto o cache do backend fecha os 9.
 
 ## Convenções e cuidados
 - **Encoding**: os ficheiros são UTF-8 e alguns `.html` têm BOM. Não corras scripts avulsos de
