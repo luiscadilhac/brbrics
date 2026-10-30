@@ -50,40 +50,5 @@ function registrarContas(app, cacheGet, cacheSet, getJSON){
       var out=normSiconfi(r,'RGF'); cacheSet(ck,out,6*3600000); res.json(out);
     }).catch(function(e){res.status(502).json({erro:'SICONFI indisponível', detalhe:String((e&&e.message)||e).slice(0,160)});});
   });
-  // ---- CGU / Portal da Transparência (exige token gratuito) ----
-  function cguToken(){ return process.env.TRANSPARENCIA_TOKEN||process.env.CGU_TOKEN||''; }
-  app.get('/api/contas/status', function(req,res){
-    res.json({cguToken:!!cguToken(),
-      como:'Cadastre um e-mail em portaldatransparencia.gov.br/api-de-dados e defina TRANSPARENCIA_TOKEN no servidor.'});
-  });
-  function semToken(res){
-    return res.status(503).json({erro:'Sem token CGU',
-      como:'Cadastre um e-mail em https://portaldatransparencia.gov.br/api-de-dados e defina a variável TRANSPARENCIA_TOKEN no servidor.'});
-  }
-  // Bolsa Família por município: /api/contas/bolsa?ibge=3550308&mesAno=202401&pagina=1
-  app.get('/api/contas/bolsa', function(req,res){
-    var tk=cguToken(); if(!tk) return semToken(res);
-    var ibge=String(req.query.ibge||'').replace(/\D/g,'');
-    var mesAno=String(req.query.mesAno||'').replace(/\D/g,'');
-    var pagina=String(req.query.pagina||'1').replace(/\D/g,'')||'1';
-    if(!ibge||mesAno.length!==6) return res.status(400).json({erro:'Informe ibge (7 dígitos) e mesAno (AAAAMM).'});
-    var ck='ct_bolsa_'+ibge+'_'+mesAno+'_'+pagina; var hit=cacheGet(ck); if(hit) return res.json(hit);
-    fetchJSON('https://api.portaldatransparencia.gov.br/api-de-dados/bolsa-familia-por-municipio?mesAno='+mesAno+'&codigoIbge='+ibge+'&pagina='+pagina,
-      {'chave-api-dados':tk,'Accept':'application/json'}).then(function(r){
-      var out={fonte:'CGU / Portal da Transparência', dados:r.data};
-      cacheSet(ck,out,24*3600000); res.json(out);
-    }).catch(function(e){res.status(502).json({erro:'CGU indisponível', detalhe:String((e&&e.message)||e).slice(0,160)});});
-  });
-  // Convênios (parâmetros repassados): /api/contas/convenios?cnpjOrgao=...&pagina=1 ...
-  app.get('/api/contas/convenios', function(req,res){
-    var tk=cguToken(); if(!tk) return semToken(res);
-    var qs=Object.keys(req.query).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(req.query[k]);}).join('&');
-    var ck='ct_conv_'+qs; var hit=cacheGet(ck); if(hit) return res.json(hit);
-    fetchJSON('https://api.portaldatransparencia.gov.br/api-de-dados/convenios?'+qs,
-      {'chave-api-dados':tk,'Accept':'application/json'}).then(function(r){
-      var out={fonte:'CGU / Portal da Transparência', dados:r.data, doc:'https://api.portaldatransparencia.gov.br/swagger-ui/index.html'};
-      cacheSet(ck,out,6*3600000); res.json(out);
-    }).catch(function(e){res.status(502).json({erro:'CGU indisponível', detalhe:String((e&&e.message)||e).slice(0,160)});});
-  });
 }
 module.exports={registrarContas:registrarContas};

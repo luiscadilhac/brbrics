@@ -23,9 +23,9 @@
 </header>
 <main class="wrap">
   <section class="hero" style="padding:28px 0;text-align:center">
-    <p class="kicker">Tesouro SICONFI · CGU Transparência</p>
+    <p class="kicker">Tesouro · SICONFI</p>
     <h1>Contas <span class="hl">públicas</span></h1>
-    <p class="sub">Receitas, despesas e restos a pagar de qualquer ente da federação (código IBGE). SICONFI sem chave; CGU com cadastro gratuito.</p>
+    <p class="sub">Receitas, despesas e restos a pagar de qualquer ente da federação (código IBGE), lidos direto do SICONFI do Tesouro Nacional — sem cadastro e sem chave.</p>
   </section>
 
   <section class="card">
@@ -40,16 +40,6 @@
     </div>
     <div id="res-ct"><p class="muted">Use o código IBGE da UF (2 dígitos) ou do município (7 dígitos). Ex.: 35 = São Paulo, 33 = Rio de Janeiro.</p></div>
   </section>
-
-  <section class="card">
-    <div class="card-h"><h2>Bolsa Família por município (CGU)</h2><span class="tag" id="cgu-status">verificando...</span></div>
-    <div class="toolbar">
-      <input id="bf-ibge" placeholder="IBGE do município (7 dígitos)" style="min-width:200px">
-      <input id="bf-mes" placeholder="Mês/Ano (AAAAMM)" value="202401" style="width:130px">
-      <button class="btn" id="btn-bf">Consultar</button>
-    </div>
-    <div id="res-bf"><p class="muted" id="cgu-msg">Verificando acesso à API da CGU...</p></div>
-  </section>
 </main>
 <footer>
   <div class="wrap foot">
@@ -61,15 +51,6 @@
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
 <script src="common.js?v=54"></script>
 <script>
-jget('/api/contas/status').then(function(r){
-  document.getElementById('cgu-status').textContent=r.cguToken?'token ativo':'sem token';
-  document.getElementById('cgu-msg').innerHTML=r.cguToken
-    ?'Token configurado. Consulte abaixo.'
-    :'Para usar este bloco, cadastre um e-mail em <a href="https://portaldatransparencia.gov.br/api-de-dados" target="_blank" rel="noopener">portaldatransparencia.gov.br/api-de-dados</a> e defina TRANSPARENCIA_TOKEN no servidor.';
-}).catch(function(){
-  var s=document.getElementById('cgu-status'); if(s) s.textContent='fora do ar';
-  var m=document.getElementById('cgu-msg'); if(m) m.innerHTML='Não foi possível verificar o acesso à API da CGU agora. Tente novamente mais tarde.';
-});
 document.getElementById('btn-ct').onclick=function(){
   var ente=document.getElementById('ct-ente').value.replace(/\D/g,'');
   var ano=document.getElementById('ct-ano').value.replace(/\D/g,'')||new Date().getFullYear();
@@ -87,23 +68,6 @@ document.getElementById('btn-ct').onclick=function(){
     html+=rows.slice(0,25).map(function(o){return '<tr>'+cols.map(function(c){var v=o[c];if(typeof v==='number')v=v.toLocaleString('pt-BR');return '<td>'+esc(String(v==null?'':v)).slice(0,60)+'</td>';}).join('')+'</tr>';}).join('');
     document.getElementById('res-ct').innerHTML=html+'</tbody></table></div>';
   }).catch(function(e){document.getElementById('res-ct').innerHTML='<p class="muted">Erro: '+esc(e.message)+'</p>';});
-};
-document.getElementById('btn-bf').onclick=function(){
-  var ibge=document.getElementById('bf-ibge').value.replace(/\D/g,'');
-  var mes=document.getElementById('bf-mes').value.replace(/\D/g,'');
-  if(ibge.length!==7||mes.length!==6){toast('IBGE com 7 dígitos e mês AAAAMM');return;}
-  document.getElementById('res-bf').innerHTML='<div class="skel"></div>';
-  jget('/api/contas/bolsa?ibge='+ibge+'&mesAno='+mes).then(function(r){
-    var rows=Array.isArray(r.dados)?r.dados:((r.dados&&r.dados.data)||[]);
-    if(!rows.length){document.getElementById('res-bf').innerHTML='<p class="muted">Nenhum registro de Bolsa Família para o município '+esc(ibge)+' em '+esc(mes)+'. Use mês/ano no formato AAAAMM e um código IBGE de 7 dígitos.</p>';return;}
-    document.getElementById('res-bf').innerHTML='<p class="muted">Fonte: '+esc(r.fonte||'')+' · '+rows.length+' registros</p>'
-    +'<div style="overflow-x:auto"><table><thead><tr><th>Beneficiário/Mês</th><th>Valor</th></tr></thead><tbody>'
-    +rows.slice(0,25).map(function(o){
-      var nome=o.nomeFavorecido||o.beneficiario||o.municipio||JSON.stringify(o).slice(0,60);
-      var val=o.valor!=null?Number(o.valor).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):(o.valorParcela||'');
-      return '<tr><td>'+esc(String(nome)).slice(0,80)+'</td><td>'+esc(String(val))+'</td></tr>';
-    }).join('')+'</tbody></table></div>';
-  }).catch(function(e){document.getElementById('res-bf').innerHTML='<p class="muted">'+esc(e.message)+' — veja <a href="https://portaldatransparencia.gov.br/api-de-dados" target="_blank" rel="noopener">como obter o token</a>.</p>';});
 };
 </script>
 <script src="app.js?v=50"></script>
