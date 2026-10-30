@@ -144,6 +144,22 @@ registo a ninguém:
 - A varredura é lenta de propósito (os grupos não aceitam leitura paralela), então a rota **libera a
   resposta parcial**: o primeiro byte sai com 4 grupos prontos (~4s), com `atualizando:true`, e a
   página volta a buscar o resto em 40s enquanto o cache do backend fecha os 9.
+- `globo-satelites.html` é a mesma leitura em três dimensões, sem rota nova: three.js 0.160
+  (`cdn.jsdelivr.net/npm/three@0.160.0/+esm`, 652kB) + a textura Blue Marble da NASA
+  (`three-globe/example/img/earth-blue-marble.jpg`). Convenções que valem teste:
+  lat/lon→vetor é a do three-globe (`phi=(90-lat)°`, `t=(lon+180)°`, `x=-r·sin phi·cos t`,
+  `y=r·cos phi`, `z=r·sin phi·sin t`), que bate com o `SphereGeometry` padrão e a equiretangular;
+  a câmera em `(d·sin fi·cos θ, d·cos fi, d·sin fi·sin θ)` olha para o alvo **sem** somar π ao θ;
+  o `Points` do three.js é quadrado por natureza — sem um `CanvasTexture` radial por trás, os
+  satélites viram quadradinhos. O dia e a noite vêm de `pontoSolar()`, que só funciona com
+  `SAT.gstime(data)` (a função, não o escalar devolvido por `propagate`).
+- **O navegador embutido do app não serve para validar o globo**: a aba fica `visibilityState: hidden`
+  e o `requestAnimationFrame` não dispara, então o laudo de animação não roda. Para ver a página de
+  verdade, renderizar com Chrome headless:
+  `chrome --headless=new --user-data-dir=<pasta> --window-size=1280,1500 --virtual-time-budget=30000 --enable-unsafe-swiftshader --screenshot=<saida.png> <url>`
+  (`--virtual-time-budget` faz o rAF andar em tempo virtual; `--enable-unsafe-swiftshader` libera o
+  WebGL por software). Para testar clique, basta gravar uma cópia temporária da página com um bloco
+  que chame `escolhe()` na posição projetada de um satélite — e apagar a cópia antes do commit.
 
 ## Convenções e cuidados
 - **Encoding**: os ficheiros são UTF-8 e alguns `.html` têm BOM. Não corras scripts avulsos de

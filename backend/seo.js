@@ -10,7 +10,7 @@ var PAGINAS=[
   ['/contato.html','monthly'],['/privacidade.html','monthly'],['/mapas.html','weekly'],
   ['/rss.html','daily'],['/calendario.html','monthly'],
   ['/mapa-brasil.html','weekly'],['/mapa-satelite.html','daily'],['/mapa-avioes.html','daily'],
-  ['/mapa-embarcacoes.html','daily'],['/mapa-orbita.html','daily'],['/mapa-cameras.html','weekly']
+  ['/mapa-embarcacoes.html','daily'],['/mapa-orbita.html','daily'],['/globo-satelites.html','daily'],['/mapa-cameras.html','weekly']
 ];
 function escX(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 // Host canonico do portal. Sitemap, robots e RSS nao podem sair no host da

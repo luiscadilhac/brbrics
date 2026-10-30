@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Globo 3D de Satélites — BrBRICS</title>
+<meta name="description" content="Terra em três dimensões com os satélites em órbita agora: gire o globo, aproxime, clique num satélite para segui-lo e veja a órbita e o rastro sobre o planeta. Dia e noite reais, calculados no seu navegador com o motor SGP4 do satellite.js.">
+<link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
+<link rel="stylesheet" href="style.css?v=54">
+<link rel="stylesheet" href="pro.css?v=54">
+<style>
+  #globo { position: relative; height: 76vh; min-height: 420px; width: 100%; border-radius: 14px;
+           overflow: hidden; background: #05070f; box-shadow: 0 6px 26px rgba(0,0,0,.45); margin-bottom: 14px; }
+  #globo canvas { display: block; touch-action: none; cursor: grab; }
+  .gl-msg { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 14px; font-size: 12.5px;
+            color: #cfd8e3; background: linear-gradient(180deg, rgba(5,7,15,0), rgba(5,7,15,.86)); pointer-events: none; }
+  .gl-relogio { position: absolute; top: 12px; left: 14px; font-size: 12.5px; color: #e8eef6;
+                background: rgba(5,7,15,.55); border: 1px solid rgba(255,255,255,.14); border-radius: 10px;
+                padding: 6px 10px; font-variant-numeric: tabular-nums; pointer-events: none; }
+  .gl-relogio b { font-size: 15px; }
+  .gl-ficha { position: absolute; top: 12px; right: 12px; width: min(300px, 52%); background: rgba(8,11,20,.92);
+              border: 1px solid rgba(255,255,255,.16); border-radius: 12px; padding: 12px 13px; color: #e8eef6;
+              font-size: 13px; display: none; }
+  .gl-ficha h3 { margin: 0 0 4px; font-size: 15px; color: #fff; padding-right: 18px; }
+  .gl-ficha dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 8px 0 0; font-size: 12.5px; }
+  .gl-ficha dt { color: #9fb0c4; } .gl-ficha dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+  .gl-ficha .fechar { position: absolute; top: 4px; right: 8px; cursor: pointer; color: #9fb0c4; font-size: 18px; background: none; border: 0; line-height: 1; }
+  .gl-botao { position: absolute; background: rgba(8,11,20,.82); color: #e8eef6; border: 1px solid rgba(255,255,255,.18);
+              border-radius: 9px; padding: 6px 11px; font-size: 12.5px; cursor: pointer; }
+  .gl-botao:hover { border-color: #fff; }
+  .gl-pilha { position: absolute; bottom: 44px; left: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .layer-panel { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+  .layer-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+  .layer-row label { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .layer-row input { accent-color: var(--marca); }
+  .layer-row select { background: var(--card2); color: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 13px; }
+  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  .btn-sm:hover { transform: translateY(-1px); }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
+  .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .legend { background: var(--card); padding: 14px 16px; border-radius: 12px; font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+  .chips span { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; background: var(--card2); }
+  .pastilha { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=50" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">🌍 A Terra em três dimensões — com o tráfego orbital em volta</p>
+    <h1>Globo 3D dos satélites que estão no céu neste instante</h1>
+    <p class="sub">Arraste para girar o planeta, use a roda do mouse (ou dois dedos) para chegar mais perto e clique em qualquer ponto para seguir aquele satélite. O dia e a noite são os de verdade: a luz vem da posição real do Sol agora. Cada ponto é a conta da órbita feita no seu navegador, a partir dos elementos orbitais abertos — não é imagem de satélite.</p>
+  </section>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Satélites no globo</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-brasil">—</div><div class="stat-lab">Sobre o Brasil agora</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-altura">—</div><div class="stat-lab">Altitude média (km)</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-elementos" style="font-size:15px">—</div><div class="stat-lab">Elementos orbitais de</div></div>
+  </div>
+
+  <div class="layer-panel">
+    <div class="layer-row">
+      <span class="muted" style="font-size:13px">País:</span>
+      <select id="flt-pais"><option value="">Todos</option></select>
+      <span class="muted" style="font-size:13px">Finalidade:</span>
+      <select id="flt-rot"><option value="">Todas</option></select>
+      <span class="muted" style="font-size:13px">Ritmo:</span>
+      <select id="flt-tempo">
+        <option value="1">Tempo real</option>
+        <option value="10">10× mais rápido</option>
+        <option value="60">1 hora por minuto</option>
+        <option value="300">5 horas por minuto</option>
+      </select>
+    </div>
+    <div class="layer-row">
+      <label><input type="checkbox" id="lyr-sol" checked> Dia e noite reais</label>
+      <label><input type="checkbox" id="lyr-orbitas"> Desenhar todas as órbitas</label>
+      <label><input type="checkbox" id="lyr-girar" checked> Girar sozinho</label>
+      <label><input type="checkbox" id="lyr-brasil"> Só o que está sobre o Brasil</label>
+      <button class="btn-sm" id="btn-brasil" type="button">Ver o Brasil</button>
+      <button class="btn-sm" id="btn-parar" type="button">Parar de seguir</button>
+    </div>
+    <div class="layer-row chips">
+      <span><i class="pastilha" style="background:#7DD3FC"></i>Estados Unidos</span>
+      <span><i class="pastilha" style="background:#FF6B35"></i>China</span>
+      <span><i class="pastilha" style="background:#E18DFF"></i>Rússia</span>
+      <span><i class="pastilha" style="background:#86EFAC"></i>Europa e Reino Unido</span>
+      <span><i class="pastilha" style="background:#FFD60A"></i>Brasil</span>
+      <span><i class="pastilha" style="background:#A7A7B3"></i>Outro / não informado</span>
+    </div>
+    <p id="status" class="muted" style="font-size:13px;margin:8px 0 0">Baixando os elementos orbitais e o motor 3D…</p>
+  </div>
+
+  <div id="globo">
+    <div class="gl-relogio"><b id="hora-sim">—</b><br><span id="hora-real" style="font-size:11.5px;color:#9fb0c4">—</span></div>
+    <div class="gl-ficha" id="ficha">
+      <button class="fechar" id="btn-fechar" type="button" title="Fechar">×</button>
+      <h3 id="ficha-nome">—</h3>
+      <div id="ficha-pais" style="font-size:12.5px;color:#9fb0c4">—</div>
+      <dl id="ficha-dados"></dl>
+    </div>
+    <div class="gl-pilha">
+      <button class="gl-botao" id="btn-aprox" type="button">+ Aproximar</button>
+      <button class="gl-botao" id="btn-afast" type="button">− Afastar</button>
+    </div>
+    <div class="gl-msg" id="msg-globo">Arraste para girar · roda do mouse ou pinça para aproximar · clique num ponto para ver a ficha e a órbita</div>
+  </div>
+
+  <div class="legend">
+    <strong style="color:var(--paper)">📋 Como ler:</strong> a esfera é a Terra, com a textura Blue Marble da NASA e a sombra do terminador dia/noite calculada para a hora que você está vendo. Cada ponto colorido é um satélite na distância orbital certa — órbita baixa fica rente ao planeta e geoestacionário fica num anel a 35.786 km. Ao clicar, a linha colorida é a órbita (20 minutos para cada lado) e a linha clara colada na superfície é o rastro que ele vai deixar no mapa. O país é <em>estimado</em> pelo nome do objeto e pela constelação; satélite militar costuma vir sem bandeira. Para a vista de mapa plano, com a caixa de contagem do Brasil, use <a href="mapa-orbita.html">Satélites em Órbita</a>.
+  </div>
+
+  <section class="card">
+    <div class="card-h"><h2>🛰️ O que está em órbita nesta leitura</h2></div>
+    <div id="lista-grupos" class="muted" style="font-size:14px">Aguarde a leitura dos elementos orbitais…</div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — globo com three.js, elementos orbitais do CelesTrak ou da SATNOGS, contas com satellite.js, textura da Terra Blue Marble (NASA).</div>
+    <div class="flinks"><a href="mapa-orbita.html">Órbita (mapa plano)</a><a href="mapa-avioes.html">Aviões</a><a href="mapa-embarcacoes.html">Embarcações</a><a href="mapas.html">Todos os mapas</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=54"></script>
+<script src="app.js?v=50"></script>
+<script type="module">
+var CDN_TRES = 'https://cdn.jsdelivr.net/npm/three@0.160.0/+esm';
+var CDN_SAT  = 'https://cdn.jsdelivr.net/npm/satellite.js@7.1.0/+esm';
+var TEXTURA  = 'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg';
+var RAIO_TERRA = 6371, MU = 398600.4418;
+var COR_PAIS = { 'Estados Unidos': '#7DD3FC', 'China': '#FF6B35', 'Rússia': '#E18DFF',
+  'Europa e Reino Unido': '#86EFAC', 'Brasil': '#FFD60A', 'Outro ou não informado': '#A7A7B3' };
+var CAIXA_BR = { lamin: -34, lamax: 6, lomin: -75, lomax: -32 };
+
+var THREE = null, SAT = null;
+var DADOS = null, SATS = [], visiveis = [], lendo = false, renovas = 2;
+var marcoReal = Date.now(), marcoSim = Date.now(), fator = 1;
+var cena, camera, render, terra, pontos, luzSol, luzFraca, grupoLinhas, marcador;
+var theta = -1.2, fi = 1.2, dist = 3.1, girando = true, seguindo = null;
+var arrastando = false, movi = 0, ponteiros = [], pincaAnt = 0;
+var ultimoMs = 0, desdeProp = 0, desdeLinhas = 0;
+var _vec = null, _rd = null, _alvo = null, _tela = null;
+
+function $id(i) { return document.getElementById(i); }
+function br(v) { return Number(v || 0).toLocaleString('pt-BR'); }
+function num(v, d) { var n = parseFloat(v); return isNaN(n) ? d : n; }
+function horaSimulada() { return new Date(marcoSim + (Date.now() - marcoReal) * fator); }
+
+// latitude/longitude -> ponto da esfera, na convenção da textura equiretangular do three.js
+function paraVec(lat, lon, raio, alvo) {
+  var phi = (90 - lat) * Math.PI / 180, t = (lon + 180) * Math.PI / 180;
+  return alvo.set(-raio * Math.sin(phi) * Math.cos(t), raio * Math.cos(phi), raio * Math.sin(phi) * Math.sin(t));
+}
+
+function montaCena() {
+  var caixa = $id('globo'), largura = caixa.clientWidth, altura = caixa.clientHeight;
+  try { render = new THREE.WebGLRenderer({ antialias: true }); }
+  catch (e) {
+    $id('status').textContent = 'Este navegador não liberou o 3D. A vista de mapa plano continua em Satélites em Órbita.';
+    return false;
+  }
+  render.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  render.setSize(largura, altura);
+  caixa.insertBefore(render.domElement, caixa.firstChild);
+
+  _vec = new THREE.Vector3(); _alvo = new THREE.Vector3(); _tela = new THREE.Vector2();
+  _rd = new THREE.Raycaster(); _rd.params.Points.threshold = 0.05;
+
+  cena = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(46, largura / altura, 0.05, 200);
+
+  terra = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 64),
+    new THREE.MeshPhongMaterial({ color: 0x243352, emissive: 0x0a1224, specular: 0x223044, shininess: 10 }));
+  cena.add(terra);
+  cena.add(new THREE.Mesh(new THREE.SphereGeometry(1.022, 64, 40),
+    new THREE.MeshBasicMaterial({ color: 0x4fa3ff, transparent: true, opacity: 0.13, side: THREE.BackSide })));
+
+  new THREE.TextureLoader().load(TEXTURA, function (tex) {
+    if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+    terra.material.map = tex; terra.material.color.set(0xffffff); terra.material.emissive.set(0x000000);
+    terra.material.needsUpdate = true;
+  }, undefined, function () {
+    $id('msg-globo').textContent = 'A textura da Terra não veio da CDN; o globo segue liso, mas os satélites continuam certos.';
+  });
+
+  var n = 2200, est = new Float32Array(n * 3);
+  for (var i = 0; i < n; i++) {
+    var u = Math.random() * 2 - 1, ang = Math.random() * Math.PI * 2, r = 40 + Math.random() * 30, s = Math.sqrt(1 - u * u);
+    est[i * 3] = r * s * Math.cos(ang); est[i * 3 + 1] = r * u; est[i * 3 + 2] = r * s * Math.sin(ang);
+  }
+  var gEst = new THREE.BufferGeometry();
+  gEst.setAttribute('position', new THREE.BufferAttribute(est, 3));
+  cena.add(new THREE.Points(gEst, new THREE.PointsMaterial({
+    color: 0xffffff, size: 2.2, sizeAttenuation: false, map: brilho(), transparent: true, depthWrite: false })));
+
+  // o Equador ajuda a ler a profundidade do globo
+  var eq = [];
+  for (var e = 0; e <= 128; e++) eq.push(paraVec(0, e / 128 * 360 - 180, 1.004, new THREE.Vector3()).clone());
+  var gEq = new THREE.BufferGeometry().setFromPoints(eq);
+  cena.add(new THREE.Line(gEq, new THREE.LineBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.28 })));
+
+  luzSol = new THREE.DirectionalLight(0xffffff, 1.3); cena.add(luzSol);
+  // o lado noturno precisa continuar legível: 0.42 de luz fria é a "lua cheia" do globo
+  luzFraca = new THREE.AmbientLight(0x8fb4ff, 0.42); cena.add(luzFraca);
+
+  pontos = new THREE.Points(new THREE.BufferGeometry(),
+    new THREE.PointsMaterial({ size: 8, sizeAttenuation: false, vertexColors: true,
+                               map: brilho(), transparent: true, depthWrite: false }));
+  cena.add(pontos);
+
+  grupoLinhas = new THREE.Group(); cena.add(grupoLinhas);
+  marcador = new THREE.Mesh(new THREE.SphereGeometry(0.016, 16, 12), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+  marcador.visible = false; cena.add(marcador);
+
+  window.addEventListener('resize', function () {
+    var l = caixa.clientWidth, a = caixa.clientHeight;
+    camera.aspect = l / a; camera.updateProjectionMatrix(); render.setSize(l, a);
+  });
+  apontaPara(-14, -52);
+  ligaControles(caixa);
+  return true;
+}
+
+// ponto redondo com borda suave: sem isto, o three.js desenha quadrados
+function brilho() {
+  var c = document.createElement('canvas'); c.width = c.height = 64;
+  var c2 = c.getContext('2d'), g = c2.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(.45, 'rgba(255,255,255,.9)');
+  g.addColorStop(.72, 'rgba(255,255,255,.28)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  c2.fillStyle = g; c2.fillRect(0, 0, 64, 64);
+  var t = new THREE.CanvasTexture(c);
+  if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+function ligaControles(caixa) {
+  caixa.addEventListener('pointerdown', function (ev) {
+    ponteiros.push({ id: ev.pointerId, x: ev.clientX, y: ev.clientY });
+    try { caixa.setPointerCapture(ev.pointerId); } catch (e) { }
+    arrastando = true; movi = 0; pincaAnt = 0;
+  });
+  caixa.addEventListener('pointermove', function (ev) {
+    var p = acha(ev.pointerId); if (!p) return;
+    var dx = ev.clientX - p.x, dy = ev.clientY - p.y;
+    p.x = ev.clientX; p.y = ev.clientY;
+    if (ponteiros.length >= 2) {
+      var d = Math.hypot(ponteiros[0].x - ponteiros[1].x, ponteiros[0].y - ponteiros[1].y);
+      if (pincaAnt > 8) dist = aperta(dist * (pincaAnt / d));
+      pincaAnt = d; movi += 99; return;
+    }
+    if (!arrastando) return;
+    movi += Math.abs(dx) + Math.abs(dy);
+    theta -= dx * 0.006; fi = Math.max(0.14, Math.min(Math.PI - 0.14, fi - dy * 0.006));
+    if (Math.abs(dx) + Math.abs(dy) > 2) { girando = false; $id('lyr-girar').checked = false; }
+  });
+  function solta(ev) {
+    ponteiros = ponteiros.filter(function (x) { return x.id !== ev.pointerId });
+    if (!ponteiros.length) { arrastando = false; pincaAnt = 0; }
+  }
+  caixa.addEventListener('pointerup', function (ev) {
+    var foiClique = movi <= 6 && ev.target === render.domElement;
+    solta(ev);
+    if (foiClique) escolhe(ev.clientX, ev.clientY);
+  });
+  caixa.addEventListener('pointercancel', solta);
+  caixa.addEventListener('wheel', function (ev) {
+    ev.preventDefault(); dist = aperta(dist * (ev.deltaY > 0 ? 1.12 : 0.89));
+  }, { passive: false });
+}
+function acha(id) { for (var i = 0; i < ponteiros.length; i++) if (ponteiros[i].id === id) return ponteiros[i]; return null; }
+function aperta(d) { return Math.max(1.3, Math.min(14, d)); }
+
+function escolhe(x, y) {
+  var c = $id('globo').getBoundingClientRect();
+  _tela.set(((x - c.left) / c.width) * 2 - 1, -((y - c.top) / c.height) * 2 + 1);
+  _rd.setFromCamera(_tela, camera);
+  var acerto = _rd.intersectObject(pontos, false);
+  var s = acerto.length ? visiveis[acerto[0].index] : null;
+  seguindo = s || null;
+  mostraFicha();
+  if (s) { girando = false; $id('lyr-girar').checked = false; desenhaLinhas(); }
+}
+
+function mostraFicha() {
+  var s = seguindo;
+  if (!s) { $id('ficha').style.display = 'none'; marcador.visible = false; limpaLinhas(); return; }
+  $id('ficha').style.display = 'block';
+  $id('ficha-nome').textContent = s.nome || '(sem nome)';
+  $id('ficha-pais').textContent = (s.pais || 'país não informado') + ' · ' + (s.rot || 'finalidade não informada');
+  var l = [];
+  if (s.alt !== null) l.push(['Altitude', br(Math.round(s.alt)) + ' km']);
+  if (s.lat !== null) l.push(['Sobre o mapa', s.lat.toFixed(2) + '°, ' + s.lon.toFixed(2) + '°']);
+  if (s.periodo) l.push(['Volta completa', s.periodo.toFixed(1) + ' min']);
+  if (s.incl !== null) l.push(['Inclinação', s.incl.toFixed(1) + '°']);
+  if (s.vel) l.push(['Velocidade', s.vel.toFixed(2) + ' km/s']);
+  if (s.id) l.push(['Nº Norad', String(s.id)]);
+  $id('ficha-dados').innerHTML = l.map(function (k) {
+    return '<dt>' + esc(k[0]) + '</dt><dd>' + esc(k[1]) + '</dd>';
+  }).join('');
+}
+
+function camposTLE(l1, l2) {
+  var o = { incl: null };
+  try {
+    var n = parseFloat(l2.substr(52, 12));       // voltas por dia
+    o.incl = parseFloat(l2.substr(8, 8));
+    if (n > 0) {
+      o.periodo = 1440 / n;
+      var w = n * 2 * Math.PI / 86400;           // rad/s
+      var a = Math.pow(MU / (w * w), 1 / 3);     // semieixo maior, km
+      o.vel = Math.sqrt(MU / a);
+    }
+  } catch (e) { }
+  return o;
+}
+
+function carrega() {
+  if (lendo) return;
+  lendo = true;
+  fetch('/api/mapas/orbita').then(function (r) { return r.json(); }).then(function (d) {
+    lendo = false; DADOS = d;
+    $id('stat-elementos').textContent = horaBR(d.atualizadoEm);
+    if (!SAT) { $id('status').textContent = 'Elementos na mão (' + br(d.total) + ' objetos). Falta o motor orbital carregar…'; return; }
+    montaSats();
+    if (d.atualizando && renovas > 0) { renovas--; setTimeout(carrega, 40000); }
+  }).catch(function (e) {
+    lendo = false;
+    $id('status').textContent = 'Falha ao ler os elementos orbitais: ' + e.message;
+  });
+}
+
+function montaSats() {
+  SATS = [];
+  (DADOS.grupos || []).forEach(function (g) {
+    (g.sats || []).forEach(function (s) {
+      var rec = null;
+      try { rec = SAT.twoline2satrec(s.l1, s.l2); } catch (e) { rec = null; }
+      if (!rec || rec.error) return;
+      var c = camposTLE(s.l1, s.l2), cor = new THREE.Color(COR_PAIS[s.pais] || '#A7A7B3');
+      SATS.push({ nome: s.nome, pais: s.pais, rot: g.rot, rec: rec, id: s.id, lat: null, lon: null, alt: null,
+                  sobreBrasil: false, visivel: false, v: new THREE.Vector3(),
+                  cr: cor.r, cg: cor.g, cb: cor.b, periodo: c.periodo, incl: c.incl, vel: c.vel });
+    });
+  });
+
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(SATS.length * 3), 3));
+  g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(SATS.length * 3), 3));
+  if (pontos.geometry) pontos.geometry.dispose();
+  pontos.geometry = g;
+
+  populaSelects();
+  listaGrupos();
+  $id('status').textContent = SATS.length + ' satélites posicionados pelo motor SGP4 no seu navegador' +
+    (DADOS.aviso ? ' — ' + DADOS.aviso : '') + (DADOS.stale ? ' — elementos de dias atrás, que ainda servem' : '');
+  atualiza();
+}
+
+function populaSelects() {
+  var paises = {}, rots = {};
+  SATS.forEach(function (s) { if (s.pais) paises[s.pais] = 1; if (s.rot) rots[s.rot] = 1; });
+  [['flt-pais', paises], ['flt-rot', rots]].forEach(function (par) {
+    var sel = $id(par[0]), escolhido = sel.value;
+    sel.length = 1;
+    Object.keys(par[1]).sort().forEach(function (k) {
+      var op = document.createElement('option'); op.value = k; op.textContent = k; sel.appendChild(op);
+    });
+    sel.value = escolhido;
+  });
+}
+
+function listaGrupos() {
+  var por = {};
+  SATS.forEach(function (s) {
+    var k = s.rot || 'Sem finalidade';
+    var p = por[k] || (por[k] = { total: 0, paises: {} });
+    p.total++; p.paises[s.pais || '—'] = (p.paises[s.pais || '—'] || 0) + 1;
+  });
+  $id('lista-grupos').innerHTML = Object.keys(por).sort().map(function (k) {
+    var partes = Object.keys(por[k].paises).map(function (q) { return q + ': ' + por[k].paises[q] });
+    return '<div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:8px">' +
+      '<b>' + esc(k) + '</b> — ' + por[k].total + ' objetos<br><span class="muted">' + esc(partes.join(' · ')) + '</span></div>';
+  }).join('') || '<span class="muted">Nada para listar.</span>';
+}
+
+function propoe(s, data) {
+  var p = SAT.propagate(s.rec, data);
+  if (!p || !p.position) return null;
+  var geo = SAT.eciToGeodetic(p.position, SAT.gstime(data));
+  var lat = SAT.degreesLat(geo.latitude), lon = SAT.degreesLong(geo.longitude);
+  if (!isFinite(lat) || !isFinite(lon)) return null;
+  return { lat: lat, lon: lon, alt: geo.height };
+}
+
+function atualiza() {
+  if (!SAT || !SATS.length || !pontos.geometry) return;
+  var agora = horaSimulada();
+  var pais = $id('flt-pais').value, rot = $id('flt-rot').value, soBr = $id('lyr-brasil').checked;
+  var pos = pontos.geometry.attributes.position, cor = pontos.geometry.attributes.color;
+  var sobre = 0, somaAlt = 0, nAlt = 0;
+  visiveis = [];
+  for (var i = 0; i < SATS.length; i++) {
+    var s = SATS[i], g = propoe(s, agora);
+    if (!g) { s.lat = s.lon = s.alt = null; s.visivel = false; continue; }
+    s.lat = g.lat; s.lon = g.lon; s.alt = g.alt; somaAlt += g.alt; nAlt++;
+    s.sobreBrasil = g.lat <= CAIXA_BR.lamax && g.lat >= CAIXA_BR.lamin && g.lon >= CAIXA_BR.lomin && g.lon <= CAIXA_BR.lomax;
+    if (s.sobreBrasil) sobre++;
+    s.visivel = (!pais || s.pais === pais) && (!rot || s.rot === rot) && (!soBr || s.sobreBrasil);
+    if (!s.visivel) continue;
+    paraVec(g.lat, g.lon, (RAIO_TERRA + g.alt) / RAIO_TERRA, s.v);
+    var j = visiveis.length;
+    pos.setXYZ(j, s.v.x, s.v.y, s.v.z); cor.setXYZ(j, s.cr, s.cg, s.cb);
+    visiveis.push(s);
+  }
+  pontos.geometry.setDrawRange(0, visiveis.length);
+  pos.needsUpdate = true; cor.needsUpdate = true;
+
+  $id('stat-total').textContent = br(visiveis.length);
+  $id('stat-brasil').textContent = br(sobre);
+  $id('stat-altura').textContent = nAlt ? br(Math.round(somaAlt / nAlt)) : '—';
+
+  var sol = pontoSolar(agora);
+  paraVec(sol.lat, sol.lon, 6, luzSol.position);
+  var luzReal = $id('lyr-sol').checked;
+  luzSol.intensity = luzReal ? 1.3 : 0.2;
+  luzFraca.intensity = luzReal ? 0.42 : 0.95;
+
+  desdeLinhas += 230;
+  if (seguindo || $id('lyr-orbitas').checked) {
+    if (desdeLinhas >= 900) { desdeLinhas = 0; desenhaLinhas(); }
+  } else if (grupoLinhas.children.length) limpaLinhas();
+  if (seguindo) marcador.visible = !!seguindo.visivel;
+}
+// onde o Sol está a pino neste instante: declinação + tempo sideral local
+function pontoSolar(data) {
+  var dias = data.getTime() / 86400000 - 10957.5;
+  var m = rad(280.46 + 0.9856474 * dias), c = rad(357.528 + 0.9856003 * dias);
+  var ecl = m + 1.915 * Math.sin(c) + 0.02 * Math.sin(2 * c);
+  var eps = rad(23.439 - 0.0000004 * dias);
+  var dec = Math.asin(Math.sin(eps) * Math.sin(ecl));
+  var ra = Math.atan2(Math.cos(eps) * Math.sin(ecl), Math.cos(ecl));
+  var lon = graus(ra - SAT.gstime(data));
+  return { lat: dec * 180 / Math.PI, lon: lon };
+}
+function rad(g) { return g * Math.PI / 180; }
+function graus(a) { return ((a + Math.PI * 3) % (Math.PI * 2)) - Math.PI; }
+
+function limpaLinhas() {
+  if (!grupoLinhas) return;
+  while (grupoLinhas.children.length) {
+    var o = grupoLinhas.children[0];
+    if (o.geometry) o.geometry.dispose();
+    grupoLinhas.remove(o);
+  }
+}
+
+function desenhaLinhas() {
+  if (!grupoLinhas) return;
+  limpaLinhas();
+  var todos = $id('lyr-orbitas').checked;
+  var agora = horaSimulada(), passo = 60000, meia = 20;
+  var lista = seguindo ? [seguindo] : (todos ? visiveis.slice(0, 40) : []);
+  lista.forEach(function (s) {
+    var noOrbital = [], noRastro = [];
+    for (var k = -meia; k <= meia; k++) {
+      var g = propoe(s, new Date(agora.getTime() + k * passo));
+      if (!g) continue;
+      noOrbital.push(paraVec(g.lat, g.lon, (RAIO_TERRA + g.alt) / RAIO_TERRA, new THREE.Vector3()).clone());
+      noRastro.push(paraVec(g.lat, g.lon, 1.005, new THREE.Vector3()).clone());
+    }
+    var corOrb = seguindo ? hexDaCor(s) : 0x9fb0c4;
+    junta(grupoLinhas, noOrbital, new THREE.LineBasicMaterial({ color: corOrb, transparent: true, opacity: seguindo ? 0.9 : 0.4 }));
+    if (seguindo) junta(grupoLinhas, noRastro, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.45 }));
+  });
+  if (seguindo && seguindo.visivel) { marcador.visible = true; marcador.position.copy(seguindo.v); }
+  else if (seguindo) marcador.visible = false;
+}
+
+function junta(pai, pts, mat) {
+  if (pts.length < 2) return;
+  var arr = new Float32Array(pts.length * 3);
+  for (var i = 0; i < pts.length; i++) { arr[i * 3] = pts[i].x; arr[i * 3 + 1] = pts[i].y; arr[i * 3 + 2] = pts[i].z; }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+  pai.add(new THREE.Line(g, mat));
+}
+function hexDaCor(s) { return parseInt((COR_PAIS[s.pais] || '#7DD3FC').replace('#', ''), 16); }
+
+function apontaPara(lat, lon) {
+  paraVec(lat, lon, 1, _alvo);
+  fi = Math.acos(Math.max(-1, Math.min(1, _alvo.y)));
+  theta = Math.atan2(_alvo.z, _alvo.x);
+}
+
+function quadro(ms) {
+  requestAnimationFrame(quadro);
+  if (document.hidden || !render) return;
+  var dt = ultimoMs ? Math.min(400, ms - ultimoMs) : 16;
+  ultimoMs = ms;
+  if (girando) theta += dt * 0.00006;
+  desdeProp += dt;
+  if (desdeProp > 220 && !lendo) { desdeProp = 0; atualiza(); }
+  if (seguindo && seguindo.lat !== null) apontaPara(seguindo.lat, seguindo.lon);
+
+  var r = Math.sin(fi);
+  camera.position.set(dist * r * Math.cos(theta), dist * Math.cos(fi), dist * r * Math.sin(theta));
+  camera.lookAt(0, 0, 0);
+  render.render(cena, camera);
+
+  var d = horaSimulada(), iso = d.toISOString();
+  $id('hora-sim').textContent = iso.slice(11, 19) + ' UTC';
+  $id('hora-real').textContent = d.toLocaleDateString('pt-BR') + ' · ' + d.toLocaleTimeString('pt-BR').slice(0, 5) + ' em Brasília';
+}
+
+Promise.all([import(CDN_TRES), import(CDN_SAT)]).then(function (mod) {
+  THREE = mod[0]; SAT = mod[1];
+  if (!montaCena()) return;
+  carrega();
+  requestAnimationFrame(quadro);
+}).catch(function (e) {
+  $id('status').textContent = 'O motor 3D não desceu da CDN agora (' + e.message +
+    '). A vista de mapa plano continua funcionando em Satélites em Órbita.';
+});
+
+['flt-pais', 'flt-rot', 'lyr-brasil', 'lyr-orbitas', 'lyr-sol'].forEach(function (i) {
+  $id(i).addEventListener('change', atualiza);
+});
+$id('flt-tempo').addEventListener('change', function () {
+  marcoSim = horaSimulada().getTime(); marcoReal = Date.now(); fator = num(this.value, 1);
+});
+$id('lyr-girar').addEventListener('change', function () { girando = this.checked; });
+$id('btn-brasil').addEventListener('click', function () {
+  girando = false; $id('lyr-girar').checked = false; seguindo = null; mostraFicha();
+  apontaPara(-14, -52);
+});
+$id('btn-parar').addEventListener('click', function () { seguindo = null; mostraFicha(); desenhaLinhas(); });
+$id('btn-fechar').addEventListener('click', function () { seguindo = null; mostraFicha(); desenhaLinhas(); });
+$id('btn-aprox').addEventListener('click', function () { dist = aperta(dist * 0.82); });
+$id('btn-afast').addEventListener('click', function () { dist = aperta(dist * 1.22); });
+</script>
+</body>
+</html>
