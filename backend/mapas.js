@@ -287,12 +287,20 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
     // Rede aberta Open Waters AIS: devolve GeoJSON de navios por caixa, sem chave e sem
     // cadastro (medido em 2026-10-30: Santos 237, Rio 355, Itajai 129, Manaus 49 navios).
     // Caixa grande demais da 400, entao o pais e coberto em varias caixas pequenas.
+    // As caixas sao leidas uma a uma e os nomes precisam bater com o que a caixa realmente
+    // alcanca: ate aqui a caixa "Itajaí e Paranaguá" ia de -26.4 para norte e deixava o canal
+    // de Itajaí/Navegantes (-26.9) inteiro de fora — por isso nao aparecia nenhuma embarcacao
+    // ali, nao por falta de trafego (medido: 79 navios nessa caixa, 104 ate São Francisco do
+    // Sul). Cada caixa abaixo foi medida no Open Waters em 2026-10-30.
     var CAIXAS_AIS = [
-      { nome: 'Santos e São Francisco do Sul', bbox: '-25.4,-47.6,-23.0,-45.2' },
+      { nome: 'Santos e São Sebastião', bbox: '-25.4,-47.6,-23.0,-45.2' },
+      { nome: 'Paranaguá, Joinville e São Francisco do Sul', bbox: '-26.45,-49.00,-25.10,-48.20' },
+      { nome: 'Itajaí, Navegantes e Florianópolis', bbox: '-28.20,-49.40,-26.45,-48.20' },
+      { nome: 'Rio Grande e Lagoa dos Patos', bbox: '-32.60,-52.70,-31.60,-51.20' },
       { nome: 'Rio de Janeiro e Espírito Santo', bbox: '-23.6,-44.2,-20.5,-40.0' },
-      { nome: 'Itajaí e Paranaguá', bbox: '-26.4,-49.2,-24.8,-47.6' },
+      { nome: 'Vitória, Açu e litoral norte do ES', bbox: '-21.40,-41.60,-19.40,-39.60' },
       { nome: 'Salvador e Aracaju', bbox: '-14.0,-39.4,-11.6,-37.4' },
-      { nome: 'Suape, Recife e Pecém', bbox: '-9.2,-38.6,-3.4,-34.6' },
+      { nome: 'Suape, Recife e Pecém', bbox: '-9.2,-39.1,-3.4,-34.6' },
       { nome: 'Itaqui, São Luís e Belém', bbox: '-3.2,-50.6,-0.8,-44.0' },
       { nome: 'Manaus e rio Negro', bbox: '-4.2,-61.0,-1.8,-58.6' },
       { nome: 'Santarém e baixo Amazonas', bbox: '-3.4,-55.6,-1.0,-54.0' }

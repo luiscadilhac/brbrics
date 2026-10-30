@@ -109,10 +109,16 @@ registo a ninguém:
   glifo girado pelo rumo e, entre duas leituras, a posição avança por *dead reckoning* (velocidade e
   rumo que o próprio transponder reportou) a cada segundo.
 - `/api/mapas/embarcacoes` lê o **Open Waters AIS** (`/v1/vessels?bbox=minLat,minLon,maxLat,maxLon`),
-  GeoJSON aberto. A caixa grande (Brasil inteiro) dá **400**, por isso são 8 bboxes de porto/hidrovia
-  varridos em sequência com 150ms de pausa. Medido: 1.230 embarcações, ~150 efetivamente navegando.
-  Cache de 120s; a lista de portos deixou de ser o conteúdo e passou a camada fixa de referência
-  (`portos` no payload). Na página, quem está acima de 0,9 km/h avança no mapa pelo rumo reportado.
+  GeoJSON aberto. A caixa grande (Brasil inteiro) truncava, por isso são 11 bboxes de porto/hidrovia
+  varridos em sequência com 150ms de pausa. Medido em 2026-10-30: 1.359 embarcações, ~168 de fato
+  navegando. Cache de 120s; a lista de portos deixou de ser o conteúdo e passou a camada fixa de
+  referência (`portos` no payload). Na página, quem está acima de 0,9 km/h avança no mapa pelo rumo
+  reportado.
+- **Cuidado com nome de caixa de bbox que não bate com a coordenada.** A antiga "Itajaí e Paranaguá"
+  ia de `-26.4` para o norte, e o canal de Itajaí/Navegantes está em `-26.9`: nenhuma embarcação
+  aparecia ali, não por falta de tráfego, mas porque a área nem era lida. Antes de confiar num mapa
+  "vazio", confira se a caixa cobre o lugar (medido: 92 navios na caixa certa, 10 navegando). As
+  coordenadas de cada caixa estão comentadas na `CAIXAS_AIS`.
 - `/api/mapas/orbita` baixa TLEs do **CelesTrak** (`gp.php?GROUP=…&FORMAT=tle`) para 9 grupos
   (estações orbitais, BeiDou/GPS/GLONASS/Galileo, Starlink/OneWeb, meteorológicos, observação da
   Terra). O CelesTrak responde **403 "GP data has not updated since your last request"** se o mesmo
