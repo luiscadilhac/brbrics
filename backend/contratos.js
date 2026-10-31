@@ -112,7 +112,8 @@ function registrarContratos(app, cacheGet, cacheSet, getJSON){
           acumulado.length + ' leituras trazidas da fonte nesta varredura.' +
           (teto ? ' A varredura parou no teto de ' + MAX_VARRIDAS + ' páginas da fonte, então pode haver mais contratos fora da amostra.' : '');
       }
-      if (atras) out.aviso = (out.aviso ? out.aviso + ' ' : '') + 'A fonte respondeu devagar no meio da varredura; a lista pode estar menor do que o dia teve.';
+      if (atras) out.aviso = (out.aviso ? out.aviso + ' ' : '') +
+        'O PNCP cortou o ritmo no meio da varredura (muitas consultas em sequência), então a amostra ficou menor do que o dia teve. Espere um pouco e consulte de novo.';
       if (out.dados.length || out.total) cacheSet(ck, out, 10 * 60000); else cacheSet(ck, out, 20000);
       res.json(out);
     }).catch(function(e){

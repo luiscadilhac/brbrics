@@ -174,7 +174,8 @@ que também é público e sem chave. Dois cuidados que custaram medição:
   correu sobre as N leituras da amostra — o `total` filtrado é o da amostra, não o do país.
 - **429 é o normal** se a varredura apressar: há 300ms entre páginas lidas, `tamanhoPagina=50`
   (acima disso a fonte devolve lista vazia) e cache de 10 minutos por consulta. Se um 429 corta a
-  varredura no meio, a resposta continua 200 com o que já veio e `aviso` de fonte lenta.
+  varredura no meio, a resposta continua 200 com o que já veio e um `aviso` dizendo que o PNCP cortou
+  o ritmo (por isso a legenda da página avisa que a busca filtrada leva alguns segundos a mais).
 
 ## Convenções e cuidados
 - **Encoding**: os ficheiros são UTF-8 e alguns `.html` têm BOM. Não corras scripts avulsos de
