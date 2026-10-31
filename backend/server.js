@@ -389,6 +389,8 @@ try {
   deputados.registrarDeputados(app, cacheGet, cacheSet, getJSON, getJSONFast);
   var orgaos = require('./orgaos');
   orgaos.registrarOrgaos(app, cacheGet, cacheSet, getJSON);
+  var contratos = require('./contratos');
+  contratos.registrarContratos(app, cacheGet, cacheSet, getJSON);
 } catch(e){ console.log('Modulo tribunais indisponivel:', e.message); }
 
 // ---- Canonical HTML pages (SEO + social cards) ----

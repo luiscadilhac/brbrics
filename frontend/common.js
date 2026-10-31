@@ -68,6 +68,7 @@ var NAV_ICONS={
   pin: NAV_SVG_A+'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
   book: NAV_SVG_A+'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
   trend: NAV_SVG_A+'<path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>',
+  pen: NAV_SVG_A+'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
   clipcheck: NAV_SVG_A+'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12l2 2 4-4"/></svg>',
   building: NAV_SVG_A+'<rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M12 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg>',
   folder: NAV_SVG_A+'<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
@@ -90,7 +91,7 @@ function navIco(key){
 var BRBRICS_NAV=[
   {t:'Início',h:'index.html',ic:'home'},
   {t:'Diário Oficial',h:'edicao.html',ic:'file',sub:[{t:'Edição da Semana',h:'edicao.html',ic:'calendar'},{t:'Manchetes do Dia',h:'manchetes.html',ic:'news'},{t:'Buscar no DOU',h:'busca.html?q=dou',ic:'search'}]},
-  {t:'Licitações',h:'licitacoes.html',ic:'clipcheck',sub:[{t:'Todas (PNCP)',h:'licitacoes.html',ic:'file'}]},
+  {t:'Licitações',h:'licitacoes.html',ic:'clipcheck',sub:[{t:'Todas (PNCP)',h:'licitacoes.html',ic:'file'},{t:'Contratos Assinados',h:'contratos.html',ic:'pen'}]},
   {t:'Órgãos',h:'orgao.html',ic:'building'},
   {t:'Congresso',h:'proposicoes.html',ic:'landmark',sub:[{t:'Proposições Recentes',h:'proposicoes.html',ic:'clock'},{t:'Busca Avançada',h:'legislacao.html',ic:'sliders'},{t:'Buscar no Congresso',h:'busca.html?q=proposicao',ic:'search'}]},
   {t:'Mapas',h:'mapa-brasil.html',ic:'globe',sub:[{t:'Mapa do Brasil (IBGE)',h:'mapa-brasil.html',ic:'pin'},{t:'Satélite e Focos (INPE)',h:'mapa-satelite.html',ic:'globe'},{t:'Aviões (ADS-B)',h:'mapa-avioes.html',ic:'landmark'},{t:'Embarcações (AIS)',h:'mapa-embarcacoes.html',ic:'trend'},{t:'Satélites em Órbita',h:'mapa-orbita.html',ic:'satelite'},{t:'Globo 3D dos Satélites',h:'globo-satelites.html',ic:'globe'},{t:'Câmeras Online',h:'mapa-cameras.html',ic:'zap'}]},

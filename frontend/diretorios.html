@@ -7,8 +7,8 @@
 <title>Diretórios — BrBRICS</title>
 <meta name="description" content="Diretórios oficiais: órgãos públicos, empresas, tribunais, reguladores. Busque CNPJ, encontre o órgão responsável.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
-<link rel="stylesheet" href="style.css?v=54">
-<link rel="stylesheet" href="pro.css?v=54">
+<link rel="stylesheet" href="style.css?v=55">
+<link rel="stylesheet" href="pro.css?v=55">
 </head>
 <body>
 <header class="topbar">
@@ -28,6 +28,7 @@
     <a class="navtop" href="licitacoes.html">Licitações</a>
     <div class="sub">
       <a href="licitacoes.html">Todas (PNCP)</a>
+      <a href="contratos.html">Contratos Assinados</a>
     </div>
   </div>
   <div class="navgrp">
@@ -137,6 +138,11 @@
       <h3 style="margin:8px 0">Licitações por órgão</h3>
       <p class="muted">Filtre licitações por órgão contratante no PNCP</p>
     </a>
+    <a class="card" href="contratos.html" style="text-decoration:none;display:block;text-align:center;padding:24px">
+      <div style="font-size:48px;margin-bottom:8px">✍️</div>
+      <h3 style="margin:8px 0">Contratos assinados</h3>
+      <p class="muted">O que o poder público já contratou, com fornecedor e valor</p>
+    </a>
     <a class="card" href="proposicoes.html" style="text-decoration:none;display:block;text-align:center;padding:24px">
       <div style="font-size:48px;margin-bottom:8px">🏛️</div>
       <h3 style="margin:8px 0">Congresso</h3>
@@ -163,7 +169,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=54"></script>
+<script src="common.js?v=55"></script>
 <script>
 document.getElementById('btn-cnpj').onclick = async function(){
   var cnpj = document.getElementById('cnpj-input').value.replace(/\D/g,'');

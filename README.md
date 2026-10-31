@@ -56,6 +56,7 @@ O backend expõe ~65 rotas sob `/api/*`, todas com cache em memória. As princip
 |---|---|
 | Diário Oficial | `/api/dou`, `/api/edicao/destaques`, `/api/resumo` |
 | Licitações | `/api/licitacoes`, `/api/licitacao/*` |
+| Contratos assinados | `/api/contratos` (`dataInicial,dataFinal,uf,esfera,q,pagina,tamanhoPagina`) |
 | Órgãos | `/api/orgao` (`cnpj,ano,fundo`), `/api/orgao/nomes` (`q`) |
 | Congresso | `/api/proposicoes`, `/api/proposicao/:id`, `/api/deputados`, `/api/deputado/:id`, `/api/legislacao/*` |
 | Tribunais | `/api/tribunais`, `/api/tribunais/{buscar,detalhe,feed,noticias,recentes,tema}` |
@@ -161,6 +162,20 @@ registo a ninguém:
   WebGL por software). Para testar clique, basta gravar uma cópia temporária da página com um bloco
   que chame `escolhe()` na posição projetada de um satélite — e apagar a cópia antes do commit.
 
+## Contratos assinados (`contratos.html` + `backend/contratos.js`)
+
+A licitação mostra a disputa; esta página mostra o termo que saiu dela — `v1/contratos` do PNCP,
+que também é público e sem chave. Dois cuidados que custaram medição:
+
+- **O PNCP ignora `ufSigla`, `esferaId` e `codigoMunicipioIbge`** na rota de contratos: ele devolve
+  linhas de outros estados mesmo com o parâmetro enviado. Por isso o módulo varre as páginas da fonte
+  e filtra UF, esfera e palavra **localmente**, e pára quando a amostra já encheu a página pedida
+  (teto de 10 páginas). Quando um filtro local roda, a resposta traz um `aviso` dizendo que a busca
+  correu sobre as N leituras da amostra — o `total` filtrado é o da amostra, não o do país.
+- **429 é o normal** se a varredura apressar: há 300ms entre páginas lidas, `tamanhoPagina=50`
+  (acima disso a fonte devolve lista vazia) e cache de 10 minutos por consulta. Se um 429 corta a
+  varredura no meio, a resposta continua 200 com o que já veio e `aviso` de fonte lenta.
+
 ## Convenções e cuidados
 - **Encoding**: os ficheiros são UTF-8 e alguns `.html` têm BOM. Não corras scripts avulsos de
   "correção de encoding" sobre o `frontend/` — foi isso que, uma vez, corrompeu o `common.js`
@@ -176,7 +191,7 @@ registo a ninguém:
 
 ## Páginas
 
-36 páginas estáticas em `frontend/`. As de entrada do menu: `index`, `edicao`, `licitacoes`, `orgao`,
+38 páginas estáticas em `frontend/`. As de entrada do menu: `index`, `edicao`, `licitacoes`, `contratos`, `orgao`,
 `proposicoes`, `legislacao`, `mapa-brasil`, `mapa-satelite`, `mapa-avioes`, `mapa-embarcacoes`,
 `mapa-orbita`, `mapa-cameras`, `mapas`, `indicadores`, `tribunais`, `manchetes`, `reguladores`,
 `diretorios`,

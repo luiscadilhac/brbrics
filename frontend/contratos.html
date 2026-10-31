@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contratos públicos — BrBRICS</title>
+<meta name="description" content="Contratos que o poder público já assinou, publicados no PNCP: objeto, órgão, fornecedor, valor e vigência. Filtre por estado, esfera (federal, estadual ou municipal), período e palavra-chave, sem cadastro e sem chave.">
+<link rel="canonical" href="https://brbrics.com.br/contratos.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BrBRICS">
+<meta property="og:title" content="Contratos públicos — BrBRICS">
+<meta property="og:description" content="O dinheiro público já contratado: objeto, órgão, fornecedor e valor de cada contrato publicado no PNCP.">
+<meta property="og:image" content="https://brbrics.com.br/logo-brics.png?v=50">
+<meta property="og:url" content="https://brbrics.com.br/contratos.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
+<link rel="stylesheet" href="style.css?v=55">
+<link rel="stylesheet" href="pro.css?v=55">
+<style>
+  .ct-stat { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .ct-stat > div { background: var(--card); padding: 13px; border-radius: 10px; text-align: center; }
+  .ct-v { font-size: 21px; font-weight: 800; color: var(--marca); }
+  .ct-l { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .esfera { display: inline-block; font-size: 10.5px; font-weight: 800; border-radius: 5px; padding: 1px 6px; margin-right: 6px; vertical-align: 1px; }
+  .es-F { background: #14324f; color: #7DD3FC; } .es-E { background: #2f1f43; color: #E18DFF; }
+  .es-M { background: #16351f; color: #86EFAC; } .es-N { background: #2a2a33; color: #A7A7B3; }
+  td.ct-obj { max-width: 420px; }
+  .ct-tipo { font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=50" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:28px 0;text-align:center">
+    <p class="kicker">PNCP · o dinheiro já contratado</p>
+    <h1>Contratos <span class="hl">públicos assinados</span></h1>
+    <p class="sub">Aqui não é a disputa: é o contrato que saiu dela. Cada linha é um termo publicado no Portal Nacional de Contratações Públicas, com objeto, órgão, fornecedor, valor e vigência. Os dados chegam direto do PNCP, sem cadastro e sem chave.</p>
+  </section>
+
+  <div class="ct-stat">
+    <div><div class="ct-v" id="st-total">—</div><div class="ct-l">Contratos no período</div></div>
+    <div><div class="ct-v" id="st-soma">—</div><div class="ct-l">Soma da amostra lida</div></div>
+    <div><div class="ct-v" id="st-lidos">—</div><div class="ct-l">Leituras trazidas da fonte</div></div>
+    <div><div class="ct-v" id="st-quando" style="font-size:15px">—</div><div class="ct-l">Consulta de</div></div>
+  </div>
+
+  <section class="card">
+    <div class="card-h"><h2>Consultar contratos</h2></div>
+    <div class="toolbar">
+      <label class="muted">De</label><input type="date" id="de" style="width:150px">
+      <label class="muted">até</label><input type="date" id="ate" style="width:150px">
+      <select id="uf"><option value="">Todas as UFs</option></select>
+      <select id="esfera">
+        <option value="">Todas as esferas</option>
+        <option value="F">Federal</option><option value="E">Estadual e distrital</option><option value="M">Municipal</option>
+      </select>
+      <input id="q" placeholder="Palavra no objeto, órgão ou fornecedor…" style="min-width:240px;flex:1">
+      <select id="tam"><option value="10">10/pág.</option><option value="20" selected>20/pág.</option><option value="50">50/pág.</option></select>
+      <button class="btn" id="btn-ir">Consultar</button>
+      <button class="btn ghost" id="btn-csv">Exportar CSV</button>
+    </div>
+    <p class="muted" id="status" style="font-size:13px;margin:6px 0 12px">Escolhendo o período dos últimos sete dias…</p>
+    <div style="overflow-x:auto"><table><thead>
+      <tr><th>Objeto</th><th>Órgão contratante</th><th>Onde</th><th>Fornecedor</th><th>Assinado</th><th>Valor</th></tr>
+    </thead><tbody id="tb"><tr><td colspan="6" class="muted">Carregando…</td></tr></tbody></table></div>
+    <div class="toolbar" id="pager" style="justify-content:center;gap:12px;margin-top:14px"></div>
+  </section>
+
+  <div class="legend" style="background:var(--card);padding:14px 16px;border-radius:12px;font-size:14px;color:var(--muted);margin-top:16px">
+    <strong style="color:var(--paper)">📋 Como ler:</strong> o valor é o total global do contrato, o que foi empenhado para o objeto inteiro — não só a parcela do mês. <em>Assinado</em> é a data do termo; a publicação no PNCP pode vir depois. Quando há emenda parlamentar ligada ao contrato, o autor aparece marcado no objeto. O PNCP não filtra por estado, esfera nem por palavra, então esses três filtros correm sobre as leituras que a varredura trouxe da fonte: se o aviso disser que o teto foi atingido, há mais contratos do que os encontrados fora da amostra. Para ver as disputas abertas, use <a href="licitacoes.html">Licitações</a>; para o histórico de um órgão, clique no nome dele.
+  </div>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Fonte dos contratos: PNCP (Portal Nacional de Contratações Públicas), Lei 14.133/2021.</div>
+    <div class="flinks"><a href="licitacoes.html">Licitações</a><a href="orgao.html">Órgãos</a><a href="contas.html">Contas públicas</a><a href="mapas.html">Mapas</a><a href="sobre.html">Fontes</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=55"></script>
+<script>
+var UFS=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+var ESFERA={F:'Federal',E:'Estadual',M:'Municipal',N:'Outra'};
+var _pg=1,_totalPg=1,_linhas=[];
+
+function $id(i){return document.getElementById(i);}
+function puxa(s){return String(s||'').replace(/-/g,'').replace(/\D/g,'');}
+function hoje(){return ddLocal(new Date());}
+function diasAtras(n){return ddLocal(new Date(Date.now()-n*86400000));}
+// toISOString() é UTC: de noite ele viraria o dia de amanhã e o formulário nasceria com uma data futura.
+function ddLocal(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function brl(v){return typeof v==='number'?('R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})):'—';}
+function br(v){return Number(v||0).toLocaleString('pt-BR');}
+
+UFS.forEach(function(u){var o=document.createElement('option');o.value=u;o.textContent=u;$id('uf').appendChild(o);});
+$id('de').value=diasAtras(7); $id('ate').value=hoje();
+
+function render(){
+  $id('tb').innerHTML=_linhas.map(function(c){
+    var esfera='<span class="esfera es-'+esc(c.esfera||'N')+'" title="'+esc(ESFERA[c.esfera]||'Esfera não informada')+'">'+esc(ESFERA[c.esfera]||'?')+'</span>';
+    var org=c.orgao||'';
+    var cnpj=String(c.cnpj||'').replace(/\D/g,'');
+    var orgLink=(cnpj.length===14)?('<a href="orgao.html?cnpj='+cnpj+'">'+esc(org)+'</a>'):esc(org);
+    var onde=esc((c.uf||'')+(c.municipio?(' · '+c.municipio):''));
+    var forn=esc(String(c.fornecedor||'não informado').slice(0,60));
+    var doc=c.docFornecedor?('<br><span class="ct-tipo">'+esc(c.tipoPessoa==='PF'?'CPF ':'CNPJ ')+esc(String(c.docFornecedor).replace(/^(\d{2})(\d)/,'$1.$2'))+'</span>'):'';
+    var emen=c.emenda?('<br><span class="ct-tipo">✎ '+esc(String(c.emenda).slice(0,60))+'</span>'):'';
+    return '<tr><td class="ct-obj">'+esfera+esc(String(c.objeto||'').slice(0,160))+
+      '<br><span class="ct-tipo">'+esc(c.tipo||'')+(c.categoria?(' · '+c.categoria):'')+
+      (c.vigendoAte?(' · vigência até '+esc(c.vigendoAte)):'')+
+      (c.controle?(' · nº '+esc(c.controle)):'')+emen+'</span></td>'+
+      '<td>'+orgLink+(c.unidade&&c.unidade!==org?('<br><span class="ct-tipo">'+esc(String(c.unidade).slice(0,54))+'</span>'):'')+'</td>'+
+      '<td>'+onde+'</td><td>'+forn+doc+'</td><td>'+esc(c.assinado||'—')+'</td>'+
+      '<td style="white-space:nowrap">'+esc(brl(c.valor))+'</td></tr>';
+  }).join('')||'<tr><td colspan="6">'+emptyHTML('Nenhum contrato na amostra com esses filtros',
+      'Amplie o período, troque a UF ou escreva menos palavra no campo de busca.')+'</td></tr>';
+}
+
+function renderPager(){
+  var el=$id('pager'); if(!el) return;
+  var d1=_pg<=1?' disabled':'', d2=_pg>=_totalPg?' disabled':'';
+  var h='<button class="btn ghost"'+d1+' onclick="irPag('+(_pg-1)+')">&laquo; Anterior</button>';
+  h+='<span class="muted" style="align-self:center">Página '+_pg+' de '+_totalPg+'</span>';
+  h+='<button class="btn ghost"'+d2+' onclick="irPag('+(_pg+1)+')">Próxima &raquo;</button>';
+  el.innerHTML=h;
+}
+function irPag(n){ if(n<1||n>_totalPg) return; _pg=n; carregar(); }
+
+function carregar(){
+  var st=$id('status');
+  st.textContent='Varrendo o PNCP (página '+_pg+')…';
+  var p='/api/contratos?dataInicial='+puxa($id('de').value)+'&dataFinal='+puxa($id('ate').value)+
+        '&uf='+encodeURIComponent($id('uf').value)+'&esfera='+encodeURIComponent($id('esfera').value)+
+        '&q='+encodeURIComponent($id('q').value.trim())+'&pagina='+_pg+'&tamanhoPagina='+$id('tam').value;
+  jget(p).then(function(d){
+    if(d.erro){ st.textContent=d.erro+(d.detalhe?(' — '+d.detalhe):''); _linhas=[]; render(); $id('pager').innerHTML=''; return; }
+    _linhas=d.dados||[]; _totalPg=d.totalPaginas||1;
+    $id('st-total').textContent=br(d.total);
+    $id('st-soma').textContent=brl(d.somaAmostra);
+    $id('st-lidos').textContent=br(d.lidosNaFonte)+' em '+br(d.paginasVarridas)+' página(s)';
+    $id('st-quando').textContent=horaBR(d.atualizadoEm);
+    st.textContent=(d.aviso?d.aviso:(_linhas.length+' contratos na página '+_pg+' de '+_totalPg+
+      ' — '+br(d.total)+' publicados no período'));
+    render(); renderPager();
+  }).catch(function(e){
+    st.textContent='Não foi possível ler o PNCP agora: '+e.message;
+    $id('tb').innerHTML='<tr><td colspan="6">Erro no caminho. <button class="btn ghost" onclick="carregar()">Tentar de novo</button></td></tr>';
+  });
+}
+
+function exportarCSV(){
+  if(!_linhas.length){ toast('Nada para exportar'); return; }
+  var hdr='Nº controle,Objeto,Órgão,Unidade,UF,Município,Fornecedor,Documento,Assinado,Vigência até,Valor\n';
+  var csv=_linhas.map(function(c){
+    return [c.controle,c.objeto,c.orgao,c.unidade,c.uf,c.municipio,c.fornecedor,c.docFornecedor,
+            c.assinado,c.vigendoAte,(typeof c.valor==='number'?c.valor.toFixed(2):'')]
+      .map(function(v){ return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'; }).join(',');
+  }).join('\n');
+  var blob=new Blob(['\ufeff'+hdr+csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download='contratos_pncp_'+hoje()+'.csv'; a.click();
+  URL.revokeObjectURL(url); toast('CSV exportado');
+}
+
+$id('btn-ir').onclick=function(){ _pg=1; carregar(); };
+$id('btn-csv').onclick=exportarCSV;
+['uf','esfera','tam'].forEach(function(i){ $id(i).addEventListener('change',function(){ _pg=1; carregar(); }); });
+$id('q').addEventListener('keydown',function(e){ if(e.key==='Enter'){ _pg=1; carregar(); } });
+carregar();
+</script>
+<script src="app.js?v=50"></script>
+</body>
+</html>
