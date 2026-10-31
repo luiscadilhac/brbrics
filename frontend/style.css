@@ -58,12 +58,12 @@ body{margin:0;background:radial-gradient(1200px 500px at 80% -10%,rgba(59,130,24
 .ticker-track{display:inline-block;white-space:nowrap;animation:tick 32s linear infinite}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .hero{display:grid;grid-template-columns:1.35fr .85fr;gap:14px;padding:24px 0 12px;align-items:start;max-width:none;width:100%}
-.hero-edicao{padding:56px 0 32px;text-align:center}
-.hero-edicao .kicker{display:inline-block;margin-bottom:12px}
-.hero-edicao h1{font-size:56px;max-width:800px;margin:0 auto 16px}
-.hero-edicao .sub{max-width:680px;margin:0 auto 24px;font-size:19px}
+.hero-edicao{padding:30px 0 20px;text-align:center}
+.hero-edicao .kicker{display:inline-block;margin-bottom:10px}
+.hero-edicao h1{font-size:34px;max-width:800px;margin:0 auto 12px}
+.hero-edicao .sub{max-width:680px;margin:0 auto 18px;font-size:15px}
 .kicker{color:var(--ico);text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:800}
-h1{font-size:36px;line-height:1.05;margin:.2em 0;font-weight:800;letter-spacing:-.02em}
+h1{font-size:26px;line-height:1.15;margin:.2em 0;font-weight:800;letter-spacing:-.02em}
 h1 .hl{color:var(--acc)}
 h2,h3{color:var(--paper)}
 .sub{font-size:14px;color:var(--muted)}
