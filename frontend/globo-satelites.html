@@ -5,9 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Globo 3D de Satélites — BrBRICS</title>
 <meta name="description" content="Terra em três dimensões com os satélites em órbita agora: gire o globo, aproxime, clique num satélite para segui-lo e veja a órbita e o rastro sobre o planeta. Dia e noite reais, calculados no seu navegador com o motor SGP4 do satellite.js.">
+<link rel="canonical" href="https://brbrics.com.br/globo-satelites.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BrBRICS">
+<meta property="og:title" content="Globo 3D dos satélites — BrBRICS">
+<meta property="og:description" content="A Terra em três dimensões com os satélites em órbita agora, a camada de nuvens e os focos de calor do INPE.">
+<meta property="og:image" content="https://brbrics.com.br/logo-brics.png?v=50">
+<meta property="og:url" content="https://brbrics.com.br/globo-satelites.html">
+<meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=56">
-<link rel="stylesheet" href="pro.css?v=56">
+<link rel="stylesheet" href="style.css?v=57">
+<link rel="stylesheet" href="pro.css?v=57">
 <style>
   #globo { position: relative; height: 76vh; min-height: 420px; width: 100%; border-radius: 14px;
            overflow: hidden; background: #05070f; box-shadow: 0 6px 26px rgba(0,0,0,.45); margin-bottom: 14px; }
@@ -68,6 +76,7 @@
     <div class="stat-card"><div class="stat-val" id="stat-brasil">—</div><div class="stat-lab">Sobre o Brasil agora</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-altura">—</div><div class="stat-lab">Altitude média (km)</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-elementos" style="font-size:15px">—</div><div class="stat-lab">Elementos orbitais de</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-fogos" style="color:#FF6B35">—</div><div class="stat-lab">Focos de calor do INPE (48h)</div></div>
   </div>
 
   <div class="layer-panel">
@@ -86,6 +95,8 @@
     </div>
     <div class="layer-row">
       <label><input type="checkbox" id="lyr-sol" checked> Dia e noite reais</label>
+      <label><input type="checkbox" id="lyr-nuvens" checked> Camada de nuvens</label>
+      <label><input type="checkbox" id="lyr-fogos" checked> Focos de calor do INPE</label>
       <label><input type="checkbox" id="lyr-orbitas"> Desenhar todas as órbitas</label>
       <label><input type="checkbox" id="lyr-girar" checked> Girar sozinho</label>
       <label><input type="checkbox" id="lyr-brasil"> Só o que está sobre o Brasil</label>
@@ -99,7 +110,10 @@
       <span><i class="pastilha" style="background:#86EFAC"></i>Europa e Reino Unido</span>
       <span><i class="pastilha" style="background:#FFD60A"></i>Brasil</span>
       <span><i class="pastilha" style="background:#A7A7B3"></i>Outro / não informado</span>
+      <span><i class="pastilha" style="background:#FF2D00"></i>foco de calor alto</span>
+      <span><i class="pastilha" style="background:#FFC14D"></i>foco de calor baixo</span>
     </div>
+    <p id="nota-fogos" class="muted" style="font-size:12.5px;margin:6px 0 0">Lendo os focos de calor do INPE…</p>
     <p id="status" class="muted" style="font-size:13px;margin:8px 0 0">Baixando os elementos orbitais e o motor 3D…</p>
   </div>
 
@@ -119,7 +133,7 @@
   </div>
 
   <div class="legend">
-    <strong style="color:var(--paper)">📋 Como ler:</strong> a esfera é a Terra, com a textura Blue Marble da NASA e a sombra do terminador dia/noite calculada para a hora que você está vendo. Cada ponto colorido é um satélite na distância orbital certa — órbita baixa fica rente ao planeta e geoestacionário fica num anel a 35.786 km. Ao clicar, a linha colorida é a órbita (20 minutos para cada lado) e a linha clara colada na superfície é o rastro que ele vai deixar no mapa. O país é <em>estimado</em> pelo nome do objeto e pela constelação; satélite militar costuma vir sem bandeira. Para a vista de mapa plano, com a caixa de contagem do Brasil, use <a href="mapa-orbita.html">Satélites em Órbita</a>.
+    <strong style="color:var(--paper)">📋 Como ler:</strong> a esfera é a Terra, com a textura Blue Marble da NASA, uma camada de nuvens por cima e a sombra do terminador dia/noite calculada para a hora que você está vendo. Atenção: a camada de nuvens é uma <em>composição fixa do MODIS</em> — ela dá o volume do planeta, mas não é a cobertura de nuvens de hoje. Os pontos laranja são reais e do dia: são os focos de calor que o BDQueimadas/INPE detectou no Brasil nas últimas 48 horas, e clicar em um deles abre a ficha do município. Cada ponto colorido é um satélite na distância orbital certa — órbita baixa fica rente ao planeta e geoestacionário fica num anel a 35.786 km. Ao clicar, a linha colorida é a órbita (20 minutos para cada lado) e a linha clara colada na superfície é o rastro que ele vai deixar no mapa. O país é <em>estimado</em> pelo nome do objeto e pela constelação; satélite militar costuma vir sem bandeira. Para a vista de mapa plano, com a caixa de contagem do Brasil, use <a href="mapa-orbita.html">Satélites em Órbita</a>.
   </div>
 
   <section class="card">
@@ -135,12 +149,13 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=56"></script>
+<script src="common.js?v=57"></script>
 <script src="app.js?v=50"></script>
 <script type="module">
 var CDN_TRES = 'https://cdn.jsdelivr.net/npm/three@0.160.0/+esm';
 var CDN_SAT  = 'https://cdn.jsdelivr.net/npm/satellite.js@7.1.0/+esm';
 var TEXTURA  = 'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg';
+var TEXTURA_NUVENS = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_clouds_1024.png';
 var RAIO_TERRA = 6371, MU = 398600.4418;
 var COR_PAIS = { 'Estados Unidos': '#7DD3FC', 'China': '#FF6B35', 'Rússia': '#E18DFF',
   'Europa e Reino Unido': '#86EFAC', 'Brasil': '#FFD60A', 'Outro ou não informado': '#A7A7B3' };
@@ -149,7 +164,8 @@ var CAIXA_BR = { lamin: -34, lamax: 6, lomin: -75, lomax: -32 };
 var THREE = null, SAT = null;
 var DADOS = null, SATS = [], visiveis = [], lendo = false, renovas = 2;
 var marcoReal = Date.now(), marcoSim = Date.now(), fator = 1;
-var cena, camera, render, terra, pontos, luzSol, luzFraca, grupoLinhas, marcador;
+var cena, camera, render, terra, nuvens, fogos, pontos, luzSol, luzFraca, grupoLinhas, marcador;
+var FOGOS = [], seguindoFogo = null;
 var theta = -1.2, fi = 1.2, dist = 3.1, girando = true, seguindo = null;
 var arrastando = false, movi = 0, ponteiros = [], pincaAnt = 0;
 var ultimoMs = 0, desdeProp = 0, desdeLinhas = 0;
@@ -195,6 +211,17 @@ function montaCena() {
     terra.material.needsUpdate = true;
   }, undefined, function () {
     $id('msg-globo').textContent = 'A textura da Terra não veio da CDN; o globo segue liso, mas os satélites continuam certos.';
+  });
+
+  // nuvens por cima da textura: é uma composição fixa do MODIS, não a cobertura de hoje
+  new THREE.TextureLoader().load(TEXTURA_NUVENS, function (tex) {
+    if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+    nuvens = new THREE.Mesh(new THREE.SphereGeometry(1.008, 72, 44),
+      new THREE.MeshLambertMaterial({ map: tex, transparent: true, opacity: 0.62, depthWrite: false }));
+    nuvens.visible = $id('lyr-nuvens').checked;
+    cena.add(nuvens);
+  }, undefined, function () {
+    $id('msg-globo').textContent = 'A camada de nuvens não desceu da CDN; o resto do globo segue normal.';
   });
 
   var n = 2200, est = new Float32Array(n * 3);
@@ -290,13 +317,18 @@ function escolhe(x, y) {
   _rd.setFromCamera(_tela, camera);
   var acerto = _rd.intersectObject(pontos, false);
   var s = acerto.length ? visiveis[acerto[0].index] : null;
-  seguindo = s || null;
+  seguindo = s || null; seguindoFogo = null;
+  if (!s && fogos && fogos.visible) {
+    var af = _rd.intersectObject(fogos, false);
+    if (af.length) seguindoFogo = FOGOS[af[0].index] || null;
+  }
   mostraFicha();
   if (s) { girando = false; $id('lyr-girar').checked = false; desenhaLinhas(); }
 }
 
 function mostraFicha() {
   var s = seguindo;
+  if (!s && seguindoFogo) { mostraFogo(); return; }
   if (!s) { $id('ficha').style.display = 'none'; marcador.visible = false; limpaLinhas(); return; }
   $id('ficha').style.display = 'block';
   $id('ficha-nome').textContent = s.nome || '(sem nome)';
@@ -313,6 +345,26 @@ function mostraFicha() {
   }).join('');
 }
 
+// ficha do ponto de fogo: o INPE diz município, bioma, satélite que viu e intensidade
+function mostraFogo() {
+  var f = seguindoFogo;
+  if (!f) { $id('ficha').style.display = 'none'; marcador.visible = false; return; }
+  limpaLinhas();
+  $id('ficha').style.display = 'block';
+  $id('ficha-nome').textContent = 'Foco de calor em ' + (f.municipio || 'município não informado');
+  $id('ficha-pais').textContent = (f.uf || f.ufNome || 'UF não informada') +
+    (f.bioma ? ' · bioma ' + f.bioma : '');
+  var l = [['Detectado em', horaBR(f.datahora)]];
+  if (f.satelite) l.push(['Satélite que viu', f.satelite]);
+  if (f.intensidade) l.push(['Intensidade', String(f.intensidade).toLowerCase()]);
+  l.push(['Coordenadas', num(f.lat, 0).toFixed(2) + '°, ' + num(f.lon, 0).toFixed(2) + '°']);
+  $id('ficha-dados').innerHTML = l.map(function (k) {
+    return '<dt>' + esc(k[0]) + '</dt><dd>' + esc(k[1]) + '</dd>';
+  }).join('');
+  marcador.visible = true;
+  paraVec(num(f.lat, 0), num(f.lon, 0), 1.012, marcador.position);
+}
+
 function camposTLE(l1, l2) {
   var o = { incl: null };
   try {
@@ -326,6 +378,42 @@ function camposTLE(l1, l2) {
     }
   } catch (e) { }
   return o;
+}
+
+function carregaFogos() {
+  fetch('/api/mapas/satelite?estado=BR').then(function (r) { return r.json(); }).then(function (d) {
+    FOGOS = (d.focos || []).filter(function (f) { return isFinite(f.lat) && isFinite(f.lon); });
+    if (!THREE || !cena) return;
+    var geo = new THREE.BufferGeometry();
+    var pos = new Float32Array(FOGOS.length * 3), cor = new Float32Array(FOGOS.length * 3);
+    FOGOS.forEach(function (f, i) {
+      paraVec(+f.lat, +f.lon, 1.006, _vec);
+      pos[i * 3] = _vec.x; pos[i * 3 + 1] = _vec.y; pos[i * 3 + 2] = _vec.z;
+      var c = corFogo(f.intensidade);
+      cor[i * 3] = c[0]; cor[i * 3 + 1] = c[1]; cor[i * 3 + 2] = c[2];
+    });
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(cor, 3));
+    if (fogos) { cena.remove(fogos); fogos.geometry.dispose(); }
+    fogos = new THREE.Points(geo, new THREE.PointsMaterial({
+      size: 5.5, sizeAttenuation: false, vertexColors: true,
+      map: brilho(), transparent: true, depthWrite: false }));
+    fogos.visible = $id('lyr-fogos').checked;
+    cena.add(fogos);
+    $id('stat-fogos').textContent = br(FOGOS.length);
+    $id('nota-fogos').textContent = 'Os ' + br(FOGOS.length) + ' focos vieram do BDQueimadas/INPE nas últimas 48 horas ' +
+      '(a consulta devolve no máximo 1.500, os mais recentes). ' + (d.aviso || '');
+  }).catch(function () {
+    $id('stat-fogos').textContent = '—';
+    $id('nota-fogos').textContent = 'O INPE não devolveu focos de calor agora.';
+  });
+}
+function corFogo(intens) {
+  var v = String(intens || '').toUpperCase();
+  if (v.indexOf('ALTO') >= 0 && v.indexOf('MODERADO') < 0) return [1, 0.16, 0];
+  if (v.indexOf('MODERADO') >= 0) return [1, 0.5, 0];
+  if (v.indexOf('BAIXO') >= 0) return [1, 0.78, 0.2];
+  return [1, 0.42, 0.1];
 }
 
 function carrega() {
@@ -531,6 +619,7 @@ Promise.all([import(CDN_TRES), import(CDN_SAT)]).then(function (mod) {
   THREE = mod[0]; SAT = mod[1];
   if (!montaCena()) return;
   carrega();
+  carregaFogos();
   requestAnimationFrame(quadro);
 }).catch(function (e) {
   $id('status').textContent = 'O motor 3D não desceu da CDN agora (' + e.message +
@@ -540,6 +629,11 @@ Promise.all([import(CDN_TRES), import(CDN_SAT)]).then(function (mod) {
 ['flt-pais', 'flt-rot', 'lyr-brasil', 'lyr-orbitas', 'lyr-sol'].forEach(function (i) {
   $id(i).addEventListener('change', atualiza);
 });
+$id('lyr-nuvens').addEventListener('change', function () { if (nuvens) nuvens.visible = this.checked; });
+$id('lyr-fogos').addEventListener('change', function () {
+  if (fogos) fogos.visible = this.checked;
+  if (!this.checked) { seguindoFogo = null; mostraFicha(); }
+});
 $id('flt-tempo').addEventListener('change', function () {
   marcoSim = horaSimulada().getTime(); marcoReal = Date.now(); fator = num(this.value, 1);
 });
@@ -548,8 +642,8 @@ $id('btn-brasil').addEventListener('click', function () {
   girando = false; $id('lyr-girar').checked = false; seguindo = null; mostraFicha();
   apontaPara(-14, -52);
 });
-$id('btn-parar').addEventListener('click', function () { seguindo = null; mostraFicha(); desenhaLinhas(); });
-$id('btn-fechar').addEventListener('click', function () { seguindo = null; mostraFicha(); desenhaLinhas(); });
+$id('btn-parar').addEventListener('click', function () { seguindo = null; seguindoFogo = null; mostraFicha(); desenhaLinhas(); });
+$id('btn-fechar').addEventListener('click', function () { seguindo = null; seguindoFogo = null; mostraFicha(); desenhaLinhas(); });
 $id('btn-aprox').addEventListener('click', function () { dist = aperta(dist * 0.82); });
 $id('btn-afast').addEventListener('click', function () { dist = aperta(dist * 1.22); });
 </script>

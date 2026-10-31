@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Globo 3D das rotas aéreas do mundo — BrBRICS</title>
+<meta name="description" content="A malha de rotas comerciais do mundo sobre um globo 3D, com o tráfego correndo em tracejado animado: as ligações mais atendidas do planeta e todas as rotas com origem ou destino no Brasil. Dados abertos do OpenFlights.">
+<link rel="canonical" href="https://brbrics.com.br/globo-rotas.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BrBRICS">
+<meta property="og:title" content="Globo 3D das rotas aéreas — BrBRICS">
+<meta property="og:description" content="As rotas aéreas do mundo inteiro sobre o planeta em três dimensões, com as brasileiras em destaque.">
+<meta property="og:image" content="https://brbrics.com.br/logo-brics.png?v=50">
+<meta property="og:url" content="https://brbrics.com.br/globo-rotas.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
+<link rel="stylesheet" href="style.css?v=57">
+<link rel="stylesheet" href="pro.css?v=57">
+<style>
+  .ct-globo { position: relative; height: min(76vh, 720px); border-radius: 12px; overflow: hidden; background: #05050a; }
+  .ct-globo .aviso { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--muted); }
+  .ct-lado { display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: start; }
+  @media(max-width:900px){ .ct-lado { grid-template-columns: 1fr; } }
+  .ct-painel { background: var(--card); border-radius: 12px; padding: 14px; position: sticky; top: 12px; }
+  .ct-painel h3 { margin: 0 0 8px; }
+  .ct-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+  .ct-linha b { color: var(--marca); text-align: right; }
+  .ct-leg { font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+  .ct-leg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 10px; vertical-align: -1px; }
+  .globo-tip { background: rgba(8,8,12,.94); border: 1px solid var(--pos-deep); border-radius: 8px; padding: 7px 10px; font-size: 12.5px; color: var(--paper); max-width: 260px; }
+  .globo-tip b { color: var(--marca); }
+  .ct-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .ct-stats > div { background: var(--card); padding: 11px; border-radius: 10px; text-align: center; }
+  .ct-v { font-size: 18px; font-weight: 800; color: var(--marca); }
+  .ct-l { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .ct-lista { max-height: 300px; overflow: auto; margin-top: 8px; }
+  .ct-lista a { display: block; font-size: 12.5px; padding: 5px 0; border-bottom: 1px solid var(--line); color: var(--texto); text-decoration: none; }
+  .ct-lista a:hover { color: var(--marca); }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=50" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:22px 0 8px;text-align:center">
+    <p class="kicker">OpenFlights · malha de aviação comercial</p>
+    <h1>As rotas aéreas <span class="hl">do mundo inteiro</span></h1>
+    <p class="sub">Cada arco liga dois aeroportos e o tracejado que corre por ele é o fluxo de voos: quanto mais linhas áreas atendem o par, mais espesso e brilhante o arco. Os dourados têm origem ou destino no Brasil. Gire o planeta, clique num arco para ler a ficha do par.</p>
+  </section>
+
+  <div class="ct-stats">
+    <div><div class="ct-v" id="st-n">—</div><div class="ct-l">rotas desenhadas</div></div>
+    <div><div class="ct-v" id="st-a">—</div><div class="ct-l">aeroportos servidos</div></div>
+    <div><div class="ct-v" id="st-br">—</div><div class="ct-l">rotas com o Brasil</div></div>
+    <div><div class="ct-v" id="st-top" style="font-size:14px">—</div><div class="ct-l">par mais atendido</div></div>
+  </div>
+
+  <div class="ct-lado">
+    <section class="card" style="margin:0">
+      <div class="toolbar" style="margin-top:0">
+        <input id="filtro" type="search" placeholder="aeroporto (GRU, Congonhas...)" style="min-width:180px">
+        <select id="qtd">
+          <option value="250">250 rotas do mundo (+ todas as do Brasil)</option>
+          <option value="600" selected>600 rotas do mundo (+ todas as do Brasil)</option>
+          <option value="1200">1.200 rotas do mundo (+ todas as do Brasil)</option>
+          <option value="9999">tudo o que a fonte traz</option>
+        </select>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="so-brasil"> só as do Brasil</label>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="lyr-aeroportos"> marcar aeroportos</label>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="lyr-fluxo" checked> fluxo animado</label>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="lyr-girar" checked> girar</label>
+        <button class="btn ghost" id="btn-brasil">Ver o Brasil</button>
+        <button class="btn ghost" id="btn-mundo">Ver o mundo</button>
+        <span class="muted" id="status" style="font-size:12.5px">Lendo o OpenFlights…</span>
+      </div>
+      <div class="ct-globo"><div id="globo" style="width:100%;height:100%"></div><div class="aviso" id="aviso">Preparando o planeta…</div></div>
+      <p class="ct-leg" id="legenda"></p>
+      <p class="ct-leg">O OpenFlights é uma coleta aberta de rotas (airports.dat e routes.dat), republicada pelo projeto a cada poucos anos: mostra a malha estrutural, não os voos de hoje. A contagem de cada arco é o número de registros de linha área que atendem aquele par.</p>
+    </section>
+
+    <aside class="ct-painel">
+      <h3 id="p-titulo">Escolha uma rota no globo</h3>
+      <div id="p-corpo" class="muted" style="font-size:13px">Clique num arco para ver os dois aeroportos, quantas linhas áreas atendem a ligação e o peso de cada um na malha.</div>
+      <div class="ct-lista" id="p-lista"></div>
+    </aside>
+  </div>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Rotas: OpenFlights (base aberta), lida pelo nosso servidor porque são 3,5 MB de texto cru.</div>
+    <div class="flinks"><a href="mapas.html">Todos os mapas</a><a href="mapa-avioes.html">Aviões ao vivo</a><a href="globo-cabos.html">Globo de cabos submarinos</a><a href="globo-lancamentos.html">Globo de lançamentos</a><a href="sobre.html">Fontes</a><a href="privacidade.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=57"></script>
+<script src="app.js?v=50"></script>
+<script type="module">
+import Globe from 'https://cdn.jsdelivr.net/npm/globe.gl@2.34.5/+esm';
+
+var $ = function (i) { return document.getElementById(i); };
+var COR_MUNDO = '#4FA3FF', COR_BR = '#FFC14D';
+var g = null, ARCOS = [], AEROS = {}, TUDO_AEROS = [], ESCOLHIDO = null;
+
+function corArco(a) { return a.pais === 'BR' ? COR_BR : COR_MUNDO; }
+function nomeAero(code) {
+  var a = AEROS[code];
+  return a ? a.nome + ' (' + (a.cidade || '?') + ', ' + a.pais + ')' : code;
+}
+
+function montaCena() {
+  var el = $('globo');
+  g = Globe()(el)
+    .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg')
+    .bumpImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
+    .backgroundImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png')
+    .showAtmosphere(true).atmosphereAltitude(0.14)
+    .arcStartLat('d').arcStartLng('q').arcEndLat('p').arcEndLng('o')
+    .arcColor(function (a) { return corArco(a); })
+    .arcAltitude(function (a) { return 0.02 + Math.min(a.voos, 40) / 40 * 0.04; })
+    // espessura em graus angulares do raio da Terra: acima de 0,5 os mil arcos viram uma mancha
+    .arcStroke(function (a) { return 0.12 + Math.min(a.voos, 40) / 40 * 0.3; })
+    // zero: a geometria do arco grosso só nasce dentro do tween da transição,
+    // e com transição ligada o primeiro quadro é um traço sem posição nenhuma
+    .arcsTransitionDuration(0)
+    // o autoescala multiplica pelo comprimento do arco: 0,35 jogava um voo longo a um raio de distância
+    .arcAltitudeAutoScale(0.06)
+    // geometria enxuta: sao quase dois mil arcos e cada segmento vira uma draw call
+    .arcCurveResolution(16)
+    .arcCircularResolution(4)
+    // o tracejado ANDA só com a caixa ligada: desligada, o arco vira linha contínua
+    .arcDashLength(function () { return $('lyr-fluxo').checked ? 0.35 : 1; })
+    .arcDashGap(function () { return $('lyr-fluxo').checked ? 0.25 : 0; })
+    .arcDashAnimateTime(function (a) { return $('lyr-fluxo').checked ? 4200 - Math.min(a.voos, 40) * 55 : 1000; })
+    .arcLabel(function (a) {
+      return '<div class="globo-tip"><b>' + a.de + ' → ' + a.para + '</b><br>' +
+        (a.voos) + ' registros de linha área · ' + a.cias + ' companhias<br>' +
+        '<span class="muted">' + nomeAero(a.de) + '<br>' + nomeAero(a.para) + '</span></div>';
+    })
+    .onArcClick(abreFicha)
+    .pointLat('lat').pointLng('lng').pointColor('#8FE3F0').pointAltitude(0.005)
+    .pointRadius(function (p) { return 0.08 + Math.min(p.grau, 30) * 0.02; })
+    .pointLabel(function (p) {
+      return '<div class="globo-tip"><b>' + p.iata + '</b> ' + p.nome + '<br>' + p.cidade + ' · ' + p.pais +
+        '<br><span class="muted">' + p.grau + ' rotas no desenho</span></div>';
+    })
+    .atmosphereColor('#4fa3ff');
+  g.controls().autoRotate = true;
+  g.controls().autoRotateSpeed = 0.25;
+  g.pointOfView({ lat: 20, lng: -60, altitude: 2.4 }, 0);
+  redimensiona();
+  window.addEventListener('resize', redimensiona);
+  $('aviso').style.display = 'none';
+}
+
+function redimensiona() {
+  if (!g) return;
+  var el = $('globo');
+  g.width(el.clientWidth).height(el.clientHeight);
+}
+
+function pinta() {
+  var texto = $('filtro').value.trim().toLowerCase();
+  var soBr = $('so-brasil').checked;
+  var teto = Number($('qtd').value);
+  var filtrados = ARCOS.filter(function (a) {
+    if (soBr && a.pais !== 'BR') return false;
+    if (texto && (a.de + ' ' + a.para + ' ' + nomeAero(a.de) + ' ' + nomeAero(a.para)).toLowerCase().indexOf(texto) < 0) return false;
+    return true;
+  });
+  // o corte sozinha deixaria o Brasil de fora: as brasileiras vem no fim da lista,
+  // porque no mundo inteiro ha mais rotas densas que as nossas
+  var brasileiras = filtrados.filter(function (a) { return a.pais === 'BR'; });
+  var mundo = filtrados.filter(function (a) { return a.pais !== 'BR'; }).slice(0, teto);
+  var lista = soBr ? brasileiras : mundo.concat(brasileiras);
+  if (ESCOLHIDO) {
+    var escolhidos = ARCOS.filter(function (a) { return a.id === ESCOLHIDO; });
+    lista = escolhidos.concat(lista.filter(function (a) { return a.id !== ESCOLHIDO; }));
+  }
+  g.arcsData(lista);
+  var usados = {};
+  lista.forEach(function (a) { usados[a.de] = 1; usados[a.para] = 1; });
+  var marcados = $('lyr-aeroportos').checked
+    ? TUDO_AEROS.filter(function (p) { return usados[p.iata]; }) : [];
+  g.pointsData(marcados);
+  var brs = lista.filter(function (a) { return a.pais === 'BR'; }).length;
+  var topo = lista.filter(function (a) { return a.pais !== 'BR'; })
+    .reduce(function (a, b) { return (!a || b.voos > a.voos) ? b : a; }, null) || lista[0];
+  $('st-n').textContent = lista.length.toLocaleString('pt-BR');
+  $('st-a').textContent = Object.keys(usados).length.toLocaleString('pt-BR');
+  $('st-br').textContent = brs.toLocaleString('pt-BR');
+  $('st-top').textContent = topo ? topo.de + '–' + topo.para + ' (' + topo.voos + ')' : '—';
+  $('status').textContent = lista.length.toLocaleString('pt-BR') + ' rotas desenhadas' +
+    (soBr ? ' · só Brasil' : ' · ' + teto + ' do mundo + ' + brs + ' do Brasil') +
+    (texto ? ' · “' + texto + '”' : '');
+  // atalhos no painel para as maiores ligações brasileiras
+  var melhores = ARCOS.filter(function (a) { return a.pais === 'BR'; })
+    .sort(function (a, b) { return b.voos - a.voos; }).slice(0, 10);
+  $('p-lista').innerHTML = '<p class="muted" style="font-size:11.5px;margin:8px 0 2px">As dez ligações brasileiras mais atendidas — clique para voar até elas:</p>' +
+    melhores.map(function (a) {
+      return '<a href="#" data-rota="' + a.id + '">' + a.de + ' ⇄ ' + a.para +
+        ' <span class="muted">· ' + a.cias + ' cia.</span></a>';
+    }).join('');
+}
+
+function abreFicha(a) {
+  ESCOLHIDO = a.id;
+  pinta();
+  var de = AEROS[a.de], para = AEROS[a.para];
+  $('p-titulo').textContent = a.de + ' ⇄ ' + a.para;
+  $('p-corpo').innerHTML =
+    '<div class="ct-linha"><span>Origem</span><b>' + (de ? de.nome : a.de) + '</b></div>' +
+    '<div class="ct-linha"><span>Cidade</span><b>' + (de ? de.cidade + ' · ' + de.pais : '—') + '</b></div>' +
+    '<div class="ct-linha"><span>Destino</span><b>' + (para ? para.nome : a.para) + '</b></div>' +
+    '<div class="ct-linha"><span>Cidade</span><b>' + (para ? para.cidade + ' · ' + para.pais : '—') + '</b></div>' +
+    '<div class="ct-linha"><span>Registros de rota</span><b>' + a.voos + '</b></div>' +
+    '<div class="ct-linha"><span>Companhias distintas</span><b>' + a.cias + '</b></div>' +
+    '<div class="ct-linha"><span>Rota brasileira</span><b>' + (a.pais === 'BR' ? 'sim' : 'não') + '</b></div>' +
+    '<p class="muted" style="font-size:12px;margin:10px 0 0">“Registros de rota” conta as linhas do routes.dat que ligam o par — uma mesma companhia pode aparecer mais de uma vez por equipamento ou código compartilhado. Não é número de voos por dia.</p>';
+  g.pointOfView({ lat: (a.d + a.p) / 2, lng: (a.q + a.o) / 2, altitude: 1.5 }, 1200);
+}
+
+function carregar() {
+  fetch('/api/mapas/rotas', { signal: AbortSignal.timeout(60000) }).then(function (r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function (j) {
+    TUDO_AEROS = (j.aeroportos || []).slice();
+    AEROS = {};
+    TUDO_AEROS.forEach(function (a) { if (a.iata && !AEROS[a.iata]) AEROS[a.iata] = a; });
+    ARCOS = (j.arcos || []).map(function (a, i) { a.id = i; return a; });
+    $('aviso').style.display = ARCOS.length ? 'none' : 'flex';
+    if (!ARCOS.length) { $('aviso').textContent = 'Nenhuma rota veio da fonte agora.'; return; }
+    $('legenda').innerHTML = 'Cores: <i style="background:' + COR_MUNDO + '"></i>rota internacional ' +
+      '<i style="background:' + COR_BR + '"></i>com origem ou destino no Brasil. ' + (j.aviso || '');
+    pinta();
+  }).catch(function (e) {
+    $('status').textContent = 'Não consegui ler o OpenFlights agora: ' + e.message;
+    $('aviso').style.display = 'flex';
+    $('aviso').innerHTML = 'As listas de rotas não responderam. <button class="btn ghost" style="margin-left:8px" onclick="location.reload()">Tentar de novo</button>';
+  });
+}
+
+montaCena();
+$('filtro').addEventListener('input', pinta);
+$('qtd').addEventListener('change', pinta);
+['so-brasil', 'lyr-aeroportos', 'lyr-fluxo'].forEach(function (i) { $(i).addEventListener('change', pinta); });
+$('lyr-girar').addEventListener('change', function () { g.controls().autoRotate = this.checked; });
+$('btn-brasil').onclick = function () { g.pointOfView({ lat: -14, lng: -52, altitude: 1.3 }, 1400); };
+$('btn-mundo').onclick = function () { g.pointOfView({ lat: 25, lng: -40, altitude: 2.4 }, 1400); };
+$('p-lista').addEventListener('click', function (ev) {
+  var alvo = ev.target.closest('a[data-rota]');
+  if (!alvo) return;
+  ev.preventDefault();
+  var a = ARCOS[Number(alvo.dataset.rota)];
+  if (a) abreFicha(a);
+});
+carregar();
+</script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Globo 3D dos próximos lançamentos espaciais — BrBRICS</title>
+<meta name="description" content="Os próximos lançamentos de foguete agendados no mundo, sobre um globo 3D: base de lançamento, empresa, foguete, órbita prevista e a contagem regressiva. Agenda pública da The Space Devs, sem chave e sem cadastro.">
+<link rel="canonical" href="https://brbrics.com.br/globo-lancamentos.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BrBRICS">
+<meta property="og:title" content="Globo 3D dos próximos lançamentos — BrBRICS">
+<meta property="og:description" content="De onde o mundo vai lançar foguetes nos próximos dias: base, empresa, foguete e órbita previstos.">
+<meta property="og:image" content="https://brbrics.com.br/logo-brics.png?v=50">
+<meta property="og:url" content="https://brbrics.com.br/globo-lancamentos.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
+<link rel="stylesheet" href="style.css?v=57">
+<link rel="stylesheet" href="pro.css?v=57">
+<style>
+  .ct-globo { position: relative; height: min(76vh, 720px); border-radius: 12px; overflow: hidden; background: #05050a; }
+  .ct-globo .aviso { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--muted); }
+  .ct-lado { display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: start; }
+  @media(max-width:900px){ .ct-lado { grid-template-columns: 1fr; } }
+  .ct-painel { background: var(--card); border-radius: 12px; padding: 14px; position: sticky; top: 12px; }
+  .ct-painel h3 { margin: 0 0 8px; }
+  .ct-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+  .ct-linha b { color: var(--marca); text-align: right; }
+  .ct-leg { font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+  .ct-leg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 10px; vertical-align: -1px; }
+  .globo-tip { background: rgba(8,8,12,.94); border: 1px solid var(--pos-deep); border-radius: 8px; padding: 7px 10px; font-size: 12.5px; color: var(--paper); max-width: 260px; }
+  .globo-tip b { color: var(--marca); }
+  .ct-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .ct-stats > div { background: var(--card); padding: 11px; border-radius: 10px; text-align: center; }
+  .ct-v { font-size: 18px; font-weight: 800; color: var(--marca); }
+  .ct-l { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .ct-lista { max-height: 320px; overflow: auto; margin-top: 8px; }
+  .ct-lista a { display: block; font-size: 12.5px; padding: 6px 0; border-bottom: 1px solid var(--line); color: var(--texto); text-decoration: none; }
+  .ct-lista a:hover { color: var(--marca); }
+  .ct-lista small { display: block; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=50" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:22px 0 8px;text-align:center">
+    <p class="kicker">The Space Devs · agenda orbital aberta</p>
+    <h1>Os foguetes <span class="hl">que vão subir</span></h1>
+    <p class="sub">Cada ponto é uma base de lançamento com voo previsto; o tamanho conta quantos lançamentos ela tem na janela e o anel que pulsa marca quem decola nos próximos sete dias. Clique para ler a ficha da missão e ver a data prevista.</p>
+  </section>
+
+  <div class="ct-stats">
+    <div><div class="ct-v" id="st-n">—</div><div class="ct-l">lançamentos na janela</div></div>
+    <div><div class="ct-v" id="st-b">—</div><div class="ct-l">bases envolvidas</div></div>
+    <div><div class="ct-v" id="st-7">—</div><div class="ct-l">nos próximos 7 dias</div></div>
+    <div><div class="ct-v" id="st-prox" style="font-size:14px">—</div><div class="ct-l">próximo da lista</div></div>
+  </div>
+
+  <div class="ct-lado">
+    <section class="card" style="margin:0">
+      <div class="toolbar" style="margin-top:0">
+        <input id="filtro" type="search" placeholder="missão, foguete, empresa" style="min-width:180px">
+        <select id="janela">
+          <option value="7">Próximos 7 dias</option>
+          <option value="14">Próximos 14 dias</option>
+          <option value="30" selected>Próximos 30 dias</option>
+          <option value="9999">Toda a agenda lida</option>
+        </select>
+        <select id="pais"><option value="">Todos os países</option></select>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="lyr-cartelas" checked> etiquetas dos mais próximos</label>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="lyr-argolas" checked> pulsar os de 7 dias</label>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="lyr-girar" checked> girar</label>
+        <button class="btn ghost" id="btn-brasil">Ver as Américas</button>
+        <button class="btn ghost" id="btn-mundo">Ver o mundo</button>
+        <span class="muted" id="status" style="font-size:12.5px">Lendo a agenda de lançamentos…</span>
+      </div>
+      <div class="ct-globo"><div id="globo" style="width:100%;height:100%"></div><div class="aviso" id="aviso">Preparando o planeta…</div></div>
+      <p class="ct-leg" id="legenda"></p>
+      <p class="ct-leg" id="fonte-leg"></p>
+    </section>
+
+    <aside class="ct-painel">
+      <h3 id="p-titulo">Escolha uma base no globo</h3>
+      <div id="p-corpo" class="muted" style="font-size:13px">Clique num ponto para ver os voos previstos ali. A lista ao lado traz a agenda por ordem de data.</div>
+      <div class="ct-lista" id="p-lista"></div>
+    </aside>
+  </div>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Agenda de lançamentos: The Space Devs (API pública), lida pelo nosso servidor porque a fonte não libera acesso do navegador.</div>
+    <div class="flinks"><a href="mapas.html">Todos os mapas</a><a href="globo-satelites.html">Globo de satélites</a><a href="globo-rotas.html">Globo de rotas aéreas</a><a href="mapa-orbita.html">Órbitas dos satélites</a><a href="sobre.html">Fontes</a><a href="privacidade.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=57"></script>
+<script src="app.js?v=50"></script>
+<script type="module">
+import Globe from 'https://cdn.jsdelivr.net/npm/globe.gl@2.34.5/+esm';
+
+var $ = function (i) { return document.getElementById(i); };
+var COR_PAIS = {
+  USA: '#4FA3FF', RUS: '#FF5A5A', CHN: '#FFC14D', IND: '#B45AFF', NZL: '#2FB8C9',
+  FRA: '#7DD3FC', JPN: '#FF8AC2', KOR: '#9BE564', IRN: '#F97316', GUF: '#7DD3FC',
+  CAN: '#60A5FA', GBR: '#38BDF8', ARE: '#FBBF24', PRK: '#EF4444', MNG: '#A3E635'
+};
+var g = null, LANC = [], BASES = [], ESCOLHIDA = null;
+var dias = function (x) { return x.dias == null ? 9999 : x.dias; };
+function corPais(p) { return COR_PAIS[p] || '#9AA7B8'; }
+function dataHora(iso) {
+  try {
+    var d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR').slice(0, 5) + ' (UTC)';
+  } catch (e) { return '—'; }
+}
+function contaReg(d) {
+  if (d <= 0) return 'hoje';
+  if (d === 1) return 'amanhã';
+  return 'em ' + d + ' dias';
+}
+
+function montaCena() {
+  var el = $('globo');
+  g = Globe()(el)
+    .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg')
+    .bumpImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
+    .backgroundImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png')
+    .showAtmosphere(true).atmosphereAltitude(0.16)
+    .pointLat('lat').pointLng('lng')
+    .pointColor(function (b) { return corPais(b.pais); })
+    // raio e tamanho de rótulo são em graus angulares do raio da Terra: com 0,2 a cartela sumia na vista do planeta
+    .pointAltitude(0.02).pointRadius(function (b) { return 0.55 + Math.min(b.qtd, 20) * 0.13; })
+    .pointsMerge(false)
+    .pointLabel(function (b) {
+      return '<div class="globo-tip"><b>' + b.base + '</b><br>' + b.qtd + ' lançamentos na janela' +
+        '<br><span class="muted">próximo: ' + b.prox + ' · ' + contaReg(b.proxDias) + '</span></div>';
+    })
+    .onPointClick(abreBase)
+    .ringColor(function (b) { return function (t) { return 'rgba(255,193,77,' + (1 - t) + ')'; }; })
+    .ringMaxRadius(function (b) { return 3 + Math.min(b.qtd, 20) * 0.35; })
+    .ringPropagationSpeed(1.4).ringRepeatPeriod(1200)
+    .labelLat('lat').labelLng('lng')
+    .labelText(function (l) { return l.foguete.split(' | ')[0] + ' · ' + contaReg(l.dias); })
+    .labelSize(2.6).labelDotRadius(0.5).labelAltitude(0.04)
+    .labelColor(function (l) { return corPais(l.pais); })
+    .labelResolution(3)
+    .atmosphereColor('#4fa3ff');
+  g.controls().autoRotate = true;
+  g.controls().autoRotateSpeed = 0.22;
+  g.pointOfView({ lat: 20, lng: -50, altitude: 2.4 }, 0);
+  redimensiona();
+  window.addEventListener('resize', redimensiona);
+  $('aviso').style.display = 'none';
+}
+
+function redimensiona() {
+  if (!g) return;
+  var el = $('globo');
+  g.width(el.clientWidth).height(el.clientHeight);
+}
+
+function naJanela() {
+  var janela = Number($('janela').value);
+  var texto = $('filtro').value.trim().toLowerCase();
+  var pais = $('pais').value;
+  return LANC.filter(function (x) {
+    if (dias(x) > janela) return false;
+    if (pais && x.pais !== pais) return false;
+    if (texto && (x.nome + ' ' + x.foguete + ' ' + x.lsp + ' ' + x.base + ' ' + x.orbita)
+      .toLowerCase().indexOf(texto) < 0) return false;
+    return true;
+  });
+}
+
+function pinta() {
+  var lista = naJanela();
+  var porBase = {};
+  lista.forEach(function (x) {
+    var k = x.base;
+    var b = porBase[k] || (porBase[k] = { base: k, pais: x.pais, lat: x.lat, lng: x.lng, qtd: 0, prox: '', proxDias: 9999 });
+    b.qtd++;
+    if (dias(x) < b.proxDias) { b.proxDias = dias(x); b.prox = x.nome; b.id = x.id; }
+  });
+  BASES = Object.keys(porBase).map(function (k) { return porBase[k]; });
+  if (ESCOLHIDA) {
+    var marcada = BASES.filter(function (b) { return b.base === ESCOLHIDA; });
+    marcada.forEach(function (b) { b.escolhida = true; });
+  }
+  g.pointsData(BASES);
+  g.ringsData(($('lyr-argolas').checked ? BASES : []).filter(function (b) { return b.proxDias <= 7; }));
+  g.labelsData(($('lyr-cartelas').checked ? lista : []).slice().sort(function (a, b) { return dias(a) - dias(b); }).slice(0, 6));
+
+  var sete = lista.filter(function (x) { return dias(x) <= 7; }).length;
+  var prox = lista.slice().sort(function (a, b) { return dias(a) - dias(b); })[0];
+  $('st-n').textContent = lista.length.toLocaleString('pt-BR');
+  $('st-b').textContent = BASES.length.toLocaleString('pt-BR');
+  $('st-7').textContent = sete.toLocaleString('pt-BR');
+  $('st-prox').textContent = prox ? prox.foguete.split(' | ')[0] + ' ' + contaReg(prox.dias) : '—';
+  $('status').textContent = lista.length.toLocaleString('pt-BR') + ' lançamentos na janela · ' +
+    BASES.length + ' bases' + ($('filtro').value.trim() ? ' · “' + $('filtro').value.trim() + '”' : '');
+
+  var ordenados = lista.slice().sort(function (a, b) { return dias(a) - dias(b); }).slice(0, 14);
+  $('p-lista').innerHTML = (ordenados.length ? '<p class="muted" style="font-size:11.5px;margin:8px 0 2px">Agenda por data — clique para voar até a base:</p>' : '') +
+    ordenados.map(function (x) {
+      return '<a href="#" data-lanc="' + x.id + '"><b style="color:' + corPais(x.pais) + '">' +
+        x.nome + '</b> · ' + contaReg(x.dias) +
+        '<small>' + x.base + ' — ' + x.nome + '</small></a>';
+    }).join('');
+  $('legenda').innerHTML = 'Cor da base = país do lançamento: ' +
+    BASES.map(function (b) { return b.pais; }).filter(function (v, i, a) { return a.indexOf(v) === i; })
+      .sort(function (a, b) { return nomePais(a).localeCompare(nomePais(b)); })
+      .map(function (p) { return '<i style="background:' + corPais(p) + '"></i>' + nomePais(p); }).join('  ·  ') +
+    '  ·  <i style="background:#FFC14D"></i>anel pulsando = decola em até 7 dias.';
+}
+
+var NOME_PAIS = {
+  USA: 'Estados Unidos', RUS: 'Rússia', CHN: 'China', IND: 'Índia', NZL: 'Nova Zelândia',
+  FRA: 'França', GUF: 'Guiana Francesa', JPN: 'Japão', KOR: 'Coreia do Sul', IRN: 'Irã',
+  CAN: 'Canadá', GBR: 'Reino Unido', ARE: 'Emirados Árabes', PRK: 'Coreia do Norte',
+  MNG: 'Mongólia', KAZ: 'Cazaquistão', NOR: 'Noruega', SWE: 'Suécia', UKR: 'Ucrânia',
+  ESP: 'Espanha', ITA: 'Itália', BLR: 'Belarus'
+};
+function nomePais(p) { return NOME_PAIS[p] || (p ? p : 'país não informado'); }
+
+function abreBase(b) {
+  ESCOLHIDA = b.base;
+  pinta();
+  var voos = naJanela().filter(function (x) { return x.base === b.base; })
+    .sort(function (a, x) { return dias(a) - dias(x); });
+  $('p-titulo').textContent = b.base;
+  $('p-corpo').innerHTML =
+    '<div class="ct-linha"><span>País</span><b>' + nomePais(b.pais) + '</b></div>' +
+    '<div class="ct-linha"><span>Coordenadas</span><b>' + b.lat.toFixed(2) + ', ' + b.lng.toFixed(2) + '</b></div>' +
+    '<div class="ct-linha"><span>Voos na janela</span><b>' + voos.length + '</b></div>' +
+    voos.slice(0, 6).map(function (x) {
+      return '<div class="ct-linha"><span>' + x.nome + '</span><b>' + contaReg(x.dias) + '</b></div>';
+    }).join('') +
+    '<p class="muted" style="font-size:12px;margin:10px 0 0">' +
+    (voos[0] && voos[0].descricao ? voos[0].descricao : 'Sem descrição da missão.') + '</p>' +
+    (voos[0] && voos[0].url ? '<p style="margin:8px 0 0"><a class="btn ghost" href="' + voos[0].url + '" target="_blank" rel="noopener">Registro na The Space Devs</a></p>' : '');
+  g.pointOfView({ lat: b.lat, lng: b.lng, altitude: 1.5 }, 1200);
+}
+
+function carregar() {
+  fetch('/api/mapas/lancamentos', { signal: AbortSignal.timeout(40000) }).then(function (r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function (j) {
+    LANC = (j.lancamentos || []).map(function (x, i) { x.id = i; return x; });
+    $('aviso').style.display = LANC.length ? 'none' : 'flex';
+    if (!LANC.length) { $('aviso').textContent = 'A agenda não devolveu lançamentos agora.'; return; }
+    var paises = {};
+    LANC.forEach(function (x) { if (x.pais) paises[x.pais] = (paises[x.pais] || 0) + 1; });
+    $('pais').innerHTML = '<option value="">Todos os países</option>' +
+      Object.keys(paises).sort(function (a, b) { return paises[b] - paises[a]; }).map(function (p) {
+        return '<option value="' + p + '">' + nomePais(p) + ' (' + paises[p] + ')</option>';
+      }).join('');
+    $('fonte-leg').textContent = (j.aviso || '') + ' Última leitura: ' + dataHora(j.atualizadoEm) + '.';
+    pinta();
+  }).catch(function (e) {
+    $('status').textContent = 'Não consegui ler a agenda agora: ' + e.message;
+    $('aviso').style.display = 'flex';
+    $('aviso').innerHTML = 'A The Space Devs não respondeu. <button class="btn ghost" style="margin-left:8px" onclick="location.reload()">Tentar de novo</button>';
+  });
+}
+
+montaCena();
+$('filtro').addEventListener('input', pinta);
+$('janela').addEventListener('change', pinta);
+$('pais').addEventListener('change', pinta);
+['lyr-cartelas', 'lyr-argolas'].forEach(function (i) { $(i).addEventListener('change', pinta); });
+$('lyr-girar').addEventListener('change', function () { g.controls().autoRotate = this.checked; });
+$('btn-brasil').onclick = function () { g.pointOfView({ lat: 25, lng: -80, altitude: 1.6 }, 1400); };
+$('btn-mundo').onclick = function () { g.pointOfView({ lat: 15, lng: 40, altitude: 2.3 }, 1400); };
+$('p-lista').addEventListener('click', function (ev) {
+  var alvo = ev.target.closest('a[data-lanc]');
+  if (!alvo) return;
+  ev.preventDefault();
+  var x = LANC[Number(alvo.dataset.lanc)];
+  if (!x) return;
+  var b = null;
+  for (var i = 0; i < BASES.length; i++) if (BASES[i].base === x.base) { b = BASES[i]; break; }
+  if (b) abreBase(b);
+});
+carregar();
+</script>
+</body>
+</html>

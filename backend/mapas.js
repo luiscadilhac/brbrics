@@ -1,5 +1,7 @@
 // BrBRICS - Rotas de mapas geoespaciais (focos INPE/BDQueimadas, avioes ADS-B, embarcacoes AIS,
-// satelites em orbita por TLE, cameras publicas). Nenhuma fonte pede chave ou cadastro.
+// satelites em orbita por TLE, cameras publicas, cabos submarinos, malha aerea e lancamentos).
+// Cabos, OpenFlights e The Space Devs nao liberam leitura pelo navegador: passam por aqui.
+// Nenhuma fonte pede chave ou cadastro.
 module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
 
   // Ultima resposta boa por rota: se a fonte falhar, entrega o ultimo dado com aviso
@@ -647,6 +649,333 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
     };
     cacheSet(ck, out, 3600000);
     res.json(out);
+  });
+
+  // ================= globos 3D: cabos, rotas aereas, lancamentos =================
+
+  var MAX_CABOS = 320;
+  var MAX_PONTOS_LINHA = 40;
+  var MAX_ARCOS = 1400;
+
+  function soNumeros(v) { return v !== null && v !== undefined && isFinite(v); }
+
+  // A fonte traz 60 mil pontos por traco; o globo nao precisa de nada alem de 40 para
+  // desenhar a curva, e sem afinar a pagina baixaria mais de um megabyte.
+  function afinaLinha(pts, teto) {
+    if (pts.length <= teto) return pts;
+    var passo = pts.length / teto, saída = [];
+    for (var i = 0; i < teto; i++) saída.push(pts[Math.floor(i * passo)]);
+    var ultimo = pts[pts.length - 1];
+    if (saída[saída.length - 1] !== ultimo) saída.push(ultimo);
+    return saída;
+  }
+
+  // Duas varreduras a partir de qualquer ponta: e a aproximacao barata do diametro do traco.
+  function pontaMaisLonga(pontas) {
+    if (pontas.length < 2) return [];
+    function quadrado(p, q) {
+      var dx = p[0] - q[0], dy = p[1] - q[1];
+      return dx * dx + dy * dy;
+    }
+    function maisDistante(de) {
+      var melhor = de;
+      pontas.forEach(function(p) { if (quadrado(p, de) > quadrado(melhor, de)) melhor = p; });
+      return melhor;
+    }
+    var a = maisDistante(pontas[0]);
+    var b = maisDistante(a);
+    return a === b ? [] : [a, b];
+  }
+
+  // ---- Cabos submarinos (Submarine Cable Map) ----
+  // A fonte nao envia CORS, entao o navegador nao consegue ler: passa pelo servidor.
+  app.get('/api/mapas/cabos', function(req, res) {
+    var ck = 'mapa_cabos';
+    var hit = cacheGet(ck);
+    if (hit) return res.json(hit);
+
+    getJSON('https://www.submarinecablemap.com/api/v3/cable/cable-geo.json', {}, 40000)
+      .then(function(r) {
+        if (r.status !== 200 || !r.data || !r.data.features) throw new Error('HTTP ' + r.status);
+        var porCabo = {}, ordem = [];
+        r.data.features.forEach(function(f) {
+          var p = f.properties || {}, g = f.geometry;
+          if (!p.id || !g || !g.coordinates) return;
+          var cabo = porCabo[p.id];
+          if (!cabo) {
+            cabo = porCabo[p.id] = { id: p.id, nome: p.name || p.id, cor: p.color || null,
+              linhas: [], pontos: 0, pontas: [] };
+            ordem.push(p.id);
+          }
+          g.coordinates.forEach(function(traaco) {
+            var pts = (traaco || []).filter(function(xy) {
+              return xy && soNumeros(xy[0]) && soNumeros(xy[1]);
+            }).map(function(xy) {
+              return [ +xy[0].toFixed(3), +xy[1].toFixed(3) ];
+            });
+            if (pts.length < 2) return;
+            cabo.pontos += pts.length;
+            cabo.linhas.push(afinaLinha(pts, MAX_PONTOS_LINHA));
+            cabo.pontas.push(pts[0], pts[pts.length - 1]);
+          });
+        });
+        var todos = ordem.map(function(k) { return porCabo[k]; })
+          .filter(function(c) { return c.linhas.length; });
+        // as duas pontas mais afastadas do traco: o globo marca como chegada de terra
+        todos.forEach(function(c) {
+          c.chegadas = pontaMaisLonga(c.pontas);
+          delete c.pontas;
+        });
+        var mostrados = todos.slice().sort(function(a, b) { return b.pontos - a.pontos; })
+          .slice(0, MAX_CABOS);
+        var out = {
+          fonte: 'Submarine Cable Map (TeleGeography)',
+          total: mostrados.length,
+          catalogados: todos.length,
+          cabos: mostrados,
+          aviso: todos.length > mostrados.length
+            ? 'Há ' + todos.length + ' cabos catalogados; o globo desenha os ' + mostrados.length +
+              ' traçados mais longos, que são os que sustentam o tráfego entre continentes.'
+            : null,
+          atualizadoEm: new Date().toISOString()
+        };
+        cacheSet(ck, out, 24 * 3600000);
+        guardarBoa(ck, out);
+        res.json(out);
+      })
+      .catch(function(e) {
+        var boa = UltimaBOA(ck);
+        if (boa) {
+          var velho = JSON.parse(JSON.stringify(boa.v));
+          velho.stale = true;
+          velho.aviso = 'A fonte de cabos não respondeu agora (' + String(e.message || e) +
+                        '); mostrando o mapa lido em ' + horaLegivel(new Date(boa.t)) + '.';
+          return res.json(velho);
+        }
+        res.json({ fonte: 'Submarine Cable Map (TeleGeography)', total: 0, cabos: [],
+          erro: 'Cabos indisponíveis agora',
+          aviso: 'A fonte não respondeu. Recarregue em instantes.',
+          atualizadoEm: new Date().toISOString() });
+      });
+  });
+
+  // ---- Rotas aereas (OpenFlights) ----
+  // CSV com aspas: os nomes de aeroporto tem virgula dentro do campo entre aspas.
+  function separaCsv(linha) {
+    var campos = [], atual = '', dentro = false;
+    for (var i = 0; i < linha.length; i++) {
+      var ch = linha[i];
+      if (dentro) {
+        if (ch === '"') {
+          if (linha[i + 1] === '"') { atual += '"'; i++; }
+          else dentro = false;
+        } else atual += ch;
+      } else if (ch === '"') dentro = true;
+      else if (ch === ',') { campos.push(atual); atual = ''; }
+      else atual += ch;
+    }
+    campos.push(atual);
+    return campos;
+  }
+
+  function leAeroportos(texto) {
+    var porId = {}, porIata = {};
+    texto.split('\n').forEach(function(l) {
+      if (!l || l.charAt(0) === '#') return;
+      var c = separaCsv(l);
+      if (c.length < 8) return;
+      if (c[12] && c[12] !== 'airport' && c[12] !== 'heliport') return;
+      var lat = parseFloat(c[6]), lng = parseFloat(c[7]);
+      if (!soNumeros(lat) || !soNumeros(lng) || (lat === 0 && lng === 0)) return;
+      var a = { id: c[0], nome: c[1], cidade: c[2], pais: c[3],
+                iata: c[4] === '-' ? '' : c[4], lat: lat, lng: lng, grau: 0 };
+      porId[a.id] = a;
+      if (a.iata && !porIata[a.iata]) porIata[a.iata] = a;
+    });
+    return { porId: porId, porIata: porIata };
+  }
+
+  app.get('/api/mapas/rotas', function(req, res) {
+    var ck = 'mapa_rotas';
+    var hit = cacheGet(ck);
+    if (hit) return res.json(hit);
+
+    var base = 'https://raw.githubusercontent.com/jpatokal/openflights/master/data/';
+    var aero = null;
+    Promise.all([
+      getJSON(base + 'airports.dat', {}, 40000),
+      getJSON(base + 'routes.dat', {}, 60000)
+    ]).then(function(rs) {
+      if (rs[0].status !== 200 || typeof rs[0].data !== 'string') throw new Error('aeroportos HTTP ' + rs[0].status);
+      if (rs[1].status !== 200 || typeof rs[1].data !== 'string') throw new Error('rotas HTTP ' + rs[1].status);
+      aero = leAeroportos(rs[0].data);
+      var pares = {}, chaves = [];
+      rs[1].data.split('\n').forEach(function(l) {
+        if (!l || l.charAt(0) === '#') return;
+        var c = separaCsv(l);
+        if (c.length < 6) return;
+        var de = aero.porId[c[3]] || aero.porIata[c[2]];
+        var para = aero.porId[c[5]] || aero.porIata[c[4]];
+        if (!de || !para || de.id === para.id) return;
+        var k = de.id < para.id ? de.id + '|' + para.id : para.id + '|' + de.id;
+        var par = pares[k];
+        if (!par) {
+          par = pares[k] = { de: de, para: para, voos: 0, cias: {} };
+          chaves.push(k);
+          de.grau++; para.grau++;
+        }
+        par.voos++;
+        if (c[0]) par.cias[c[0]] = 1;
+      });
+      var lista = chaves.map(function(k) { return pares[k]; });
+      function doBrasil(p) { return p.de.pais === 'Brazil' || p.para.pais === 'Brazil'; }
+      // Do mundo entra o topo por frequencia; as brasileiras entram todas, porque o
+      // publico do site quer ver a propria malha e ela nunca apareceria no corte global.
+      var brasileiras = lista.filter(doBrasil);
+      var selecionados = lista.filter(function(p) { return !doBrasil(p); })
+        .sort(function(a, b) { return b.voos - a.voos; })
+        .slice(0, MAX_ARCOS).concat(brasileiras);
+      var usados = {}, arcos = [];
+      selecionados.forEach(function(p) {
+        [p.de, p.para].forEach(function(a) {
+          if (!usados[a.id]) {
+            usados[a.id] = { nome: a.nome, cidade: a.cidade, pais: a.pais,
+              iata: a.iata, lat: a.lat, lng: a.lng, grau: 0 };
+          }
+          usados[a.id].grau++;
+        });
+        arcos.push({ d: p.de.lat, q: p.de.lng, p: p.para.lat, o: p.para.lng,
+          de: p.de.iata || p.de.nome, para: p.para.iata || p.para.nome,
+          pais: p.de.pais === 'Brazil' || p.para.pais === 'Brazil' ? 'BR' : '',
+          voos: p.voos, cias: Object.keys(p.cias).length });
+      });
+      var out = {
+        fonte: 'OpenFlights (airports.dat + routes.dat)',
+        total: arcos.length,
+        arcos: arcos,
+        aeroportos: Object.keys(usados).map(function(k) { return usados[k]; }),
+        aviso: 'São ' + chaves.length + ' pares de aeroportos no catálogo; o globo desenha as ' +
+               arcos.length + ' ligações mais atendidas do mundo e todas as ' + brasileiras.length +
+               ' com origem ou destino no Brasil. É a malha de rotas publicada pelo OpenFlights, ' +
+               'não os voos de hoje: a espessura do arco conta quantas linhas áreas atendem o par.',
+        atualizadoEm: new Date().toISOString()
+      };
+      // base estatica: um mes de cache evita baixar 3,5 MB de cada vez que alguem abre a pagina
+      cacheSet(ck, out, 30 * 24 * 3600000);
+      guardarBoa(ck, out);
+      res.json(out);
+    }).catch(function(e) {
+      var boa = UltimaBOA(ck);
+      if (boa) {
+        var velho = JSON.parse(JSON.stringify(boa.v));
+        velho.stale = true;
+        velho.aviso = 'As listas do OpenFlights não responderam agora; mostrando a malha lida em ' +
+                      horaLegivel(new Date(boa.t)) + '.';
+        return res.json(velho);
+      }
+      res.json({ fonte: 'OpenFlights (airports.dat + routes.dat)', total: 0, arcos: [],
+        aeroportos: [], erro: 'Rotas indisponíveis agora',
+        aviso: 'A fonte não respondeu. Recarregue em instantes.',
+        atualizadoEm: new Date().toISOString() });
+    });
+  });
+
+  // ---- Proximos lancamentos espaciais (The Space Devs) ----
+  app.get('/api/mapas/lancamentos', function(req, res) {
+    var ck = 'mapa_lancamentos';
+    var hit = cacheGet(ck);
+    if (hit) return res.json(hit);
+
+    var base = 'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?format=json&limit=50&offset=';
+    var pagina = 0, colhidos = [], esgotou = false, anunciados = 0;
+
+    function passo() {
+      if (pagina >= 2) return Promise.resolve();
+      return getJSON(base + (pagina * 50), {}, 20000).then(function(r) {
+        var lista = (r.data && r.data.results) || [];
+        if (r.status !== 200 || !lista.length) { esgotou = true; return; }
+        if (r.data.count) anunciados = r.data.count;
+        colhidos = colhidos.concat(lista);
+        pagina++;
+        return espera(400).then(passo);
+      }).catch(function() { esgotou = true; });
+    }
+
+    passo().then(function() {
+      var agora = Date.now();
+      var atrasados = 0;
+      var lancamentos = colhidos.map(function(L) {
+        var pad = L.pad || {}, loc = pad.location || {};
+        var lat = parseFloat(pad.latitude), lng = parseFloat(pad.longitude);
+        var quando = L.net ? new Date(L.net).getTime() : 0;
+        var mis = L.mission || {};
+        return {
+          nome: L.name || '—',
+          foguete: (L.rocket && L.rocket.configuration && L.rocket.configuration.name) || '—',
+          lsp: (L.launch_service_provider && L.launch_service_provider.name) || '—',
+          local: pad.name || loc.name || '—',
+          base: loc.name || '—',
+          pais: loc.country_code || pad.country_code || '',
+          lat: soNumeros(lat) ? lat : null,
+          lng: soNumeros(lng) ? lng : null,
+          quando: L.net || '',
+          dias: quando ? Math.round((quando - agora) / 86400000) : null,
+          status: (L.status && L.status.name) || '—',
+          orbita: (mis.orbit && mis.orbit.name) || mis.mission_type || '',
+          descricao: (mis.description || '').slice(0, 300),
+          url: L.url || ''
+        };
+      }).filter(function(x) {
+        if (x.lat === null || x.lng === null) return false;
+        // a lista "upcoming" ainda traz o que acabou de voar: sem cortar, o globo mente
+        var t = new Date(x.quando).getTime();
+        if (t && t < agora - 3600000) { atrasados++; return false; }
+        return true;
+      })
+        .sort(function(a, b) { return new Date(a.quando) - new Date(b.quando); });
+
+      if (!lancamentos.length) {
+        var boa = UltimaBOA(ck);
+        if (boa) {
+          var velho = JSON.parse(JSON.stringify(boa.v));
+          velho.stale = true;
+          velho.aviso = 'A The Space Devs não devolveu lançamentos agora; mostrando a lista lida em ' +
+                        horaLegivel(new Date(boa.t)) + '. Recarregue em instantes.';
+          return res.json(velho);
+        }
+        return res.json({ fonte: 'The Space Devs (API pública)', total: 0, lancamentos: [], bases: [],
+          erro: 'Lançamentos indisponíveis agora',
+          aviso: 'A The Space Devs não respondeu ou cortou o ritmo. Recarregue em instantes.',
+          atualizadoEm: new Date().toISOString() });
+      }
+
+      var porBase = {};
+      lancamentos.forEach(function(x) {
+        var k = x.base || x.local;
+        if (!porBase[k]) porBase[k] = { base: k, pais: x.pais, lat: x.lat, lng: x.lng, qtd: 0 };
+        porBase[k].qtd++;
+      });
+
+      var out = {
+        fonte: 'The Space Devs (API pública)',
+        total: lancamentos.length,
+        anunciados: anunciados,
+        lancamentos: lancamentos,
+        bases: Object.keys(porBase).map(function(k) { return porBase[k]; })
+          .sort(function(a, b) { return b.qtd - a.qtd; }),
+        aviso: 'A agenda da The Space Devs traz ' + (anunciados || colhidos.length) +
+               ' lançamentos anunciados; o globo recebe as próximas duas páginas e mostra os ' +
+               lancamentos.length + ' com data ainda à frente' +
+               (atrasados ? ' (' + atrasados + ' já tinham voado)' : '') +
+               '. ' + (esgotou ? 'A leitura veio parcial. ' : '') +
+               'Ela fica guardada por uma hora: a API libera poucas consultas por dia sem chave. ' +
+               'Data prevista muda com o tempo.',
+        atualizadoEm: new Date().toISOString()
+      };
+      cacheSet(ck, out, 3600000);
+      guardarBoa(ck, out);
+      res.json(out);
+    });
   });
 
 };

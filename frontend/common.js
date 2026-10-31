@@ -81,7 +81,11 @@ var NAV_ICONS={
   globe: NAV_SVG_A+'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
   car: NAV_SVG_A+'<path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="1"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></svg>',
   leaf: NAV_SVG_A+'<path d="M11 20A7 7 0 0 1 4 13c0-4 3-8 9-9 4-.8 7-1 7-1s-.3 4-1.5 7.5C17 15 14 18.5 11 20z"/><path d="M4 21c4-6 8-9 12-11"/></svg>',
-  banknote: NAV_SVG_A+'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>'
+  banknote: NAV_SVG_A+'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>',
+  sismo: NAV_SVG_A+'<path d="M2 12h3.5L8 5l4 14 2.5-7H22"/></svg>',
+  cabo: NAV_SVG_A+'<path d="M9 2v5"/><path d="M15 2v5"/><path d="M6 7h12v3a6 6 0 0 1-12 0z"/><path d="M12 16v6"/></svg>',
+  aviao: NAV_SVG_A+'<path d="M17.8 19.2 16 11l3.5-3.5a2.1 2.1 0 0 0-3-3L13 8 4.8 6.2a1 1 0 0 0-.9 1.7L9 11l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.1 5.1a1 1 0 0 0 1.7-.9z"/></svg>',
+  foguete: NAV_SVG_A+'<path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2"/></svg>'
 };
 function navIco(key){
   if(!key||!NAV_ICONS[key])return null;
@@ -94,7 +98,7 @@ var BRBRICS_NAV=[
   {t:'Licitações',h:'licitacoes.html',ic:'clipcheck',sub:[{t:'Todas (PNCP)',h:'licitacoes.html',ic:'file'},{t:'Contratos Assinados',h:'contratos.html',ic:'pen'}]},
   {t:'Órgãos',h:'orgao.html',ic:'building'},
   {t:'Congresso',h:'proposicoes.html',ic:'landmark',sub:[{t:'Proposições Recentes',h:'proposicoes.html',ic:'clock'},{t:'Busca Avançada',h:'legislacao.html',ic:'sliders'},{t:'Buscar no Congresso',h:'busca.html?q=proposicao',ic:'search'}]},
-  {t:'Mapas',h:'mapa-brasil.html',ic:'globe',sub:[{t:'Mapa do Brasil (IBGE)',h:'mapa-brasil.html',ic:'pin'},{t:'Satélite e Focos (INPE)',h:'mapa-satelite.html',ic:'globe'},{t:'Aviões (ADS-B)',h:'mapa-avioes.html',ic:'landmark'},{t:'Embarcações (AIS)',h:'mapa-embarcacoes.html',ic:'trend'},{t:'Satélites em Órbita',h:'mapa-orbita.html',ic:'satelite'},{t:'Globo 3D dos Satélites',h:'globo-satelites.html',ic:'globe'},{t:'Câmeras Online',h:'mapa-cameras.html',ic:'zap'}]},
+  {t:'Mapas',h:'mapa-brasil.html',ic:'globe',sub:[{t:'Mapa do Brasil (IBGE)',h:'mapa-brasil.html',ic:'pin'},{t:'Satélite e Focos (INPE)',h:'mapa-satelite.html',ic:'globe'},{t:'Aviões (ADS-B)',h:'mapa-avioes.html',ic:'landmark'},{t:'Embarcações (AIS)',h:'mapa-embarcacoes.html',ic:'trend'},{t:'Satélites em Órbita',h:'mapa-orbita.html',ic:'satelite'},{t:'Globo 3D dos Satélites',h:'globo-satelites.html',ic:'globe'},{t:'Globo 3D dos Terremotos',h:'globo-terremotos.html',ic:'sismo'},{t:'Globo 3D dos Cabos Submarinos',h:'globo-cabos.html',ic:'cabo'},{t:'Globo 3D das Rotas Aéreas',h:'globo-rotas.html',ic:'aviao'},{t:'Globo 3D dos Lançamentos',h:'globo-lancamentos.html',ic:'foguete'},{t:'Câmeras Online',h:'mapa-cameras.html',ic:'zap'}]},
   {t:'Indicadores',h:'indicadores.html',ic:'chart',sub:[{t:'Séries BCB (IPCA, Selic, Câmbio)',h:'indicadores.html',ic:'chart'},{t:'Boletim Focus 2026',h:'indicadores.html#focus',ic:'trend'},{t:'Bolsa e cripto',h:'index.html#mercado'},{t:'IPCA 12m & Desemprego',h:'indicadores.html#extras',ic:'users'}]},
   {t:'Tribunais',h:'tribunais.html',ic:'scale',sub:[{t:'Consulta Processual (DataJud)',h:'tribunais.html',ic:'search'},{t:'Jurisprudência por Tema',h:'tribunais.html#jurisprudencia',ic:'book'},{t:'Notícias dos Tribunais',h:'tribunais.html#feed',ic:'news'}]},
   {t:'Notícias',h:'manchetes.html',ic:'news',sub:[{t:'Manchetes (Reguladores + Tribunais)',h:'manchetes.html',ic:'news'},{t:'Agências & Ministérios',h:'reguladores.html',ic:'building'},{t:'Diretórios Oficiais',h:'diretorios.html',ic:'folder'},{t:'Por Órgão/UF',h:'diretorios.html',ic:'pin'}]},

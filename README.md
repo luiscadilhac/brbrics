@@ -162,6 +162,54 @@ registo a ninguém:
   WebGL por software). Para testar clique, basta gravar uma cópia temporária da página com um bloco
   que chame `escolhe()` na posição projetada de um satélite — e apagar a cópia antes do commit.
 
+## Globos 3D novos (terremotos, cabos, rotas aéreas, lançamentos)
+
+Quatro páginas novas em `frontend/`, todas com **globe.gl 2.34.5**
+(`cdn.jsdelivr.net/npm/globe.gl@2.34.5/+esm`) sobre a mesma textura Blue Marble. Três delas precisam
+de proxy no `backend/mapas.js` porque a fonte não libera leitura pelo navegador; o terremoto lê o
+USGS direto da aba (CORS `*`).
+
+- `globo-terremotos.html` — **USGS** (`earthquake.usgs.gov/earthquakes/feed/v1.0/summary/<feed>.geojson`),
+  sem rota nova e sem chave. Pilares com altura e grossura pela magnitude, cor pela profundidade
+  (raso / 70–300 / mais de 300 km) e anel pulsando nos M5,5+. Os feeds são `all_day`, `all_week`,
+  `all_month`, `4.5_day` e `significant`.
+- `globo-cabos.html` + `/api/mapas/cabos` — **Submarine Cable Map** (TeleGeography,
+  `https://www.submarinecablemap.com/sites/default/files/files/data/cable-geo.json`). O arquivo tem
+  733 feições e **não** manda `Access-Control-Allow-Origin`, por isso passa pelo backend; cache de 24h.
+  As feições vêm agrupadas por `properties.id` (um cabo tem vários trechos), e o `getJSON` já traz
+  o GeoJSON parseado. São enviados os 320 cabos com mais vértices (`MAX_CABOS`), cada linha afinada
+  para no máximo 40 pontos (`afinaLinha`) — com a geometria inteira o navegador caía. Medido:
+  1.126 trechos desenhados, 11 cabos tocando a caixa do litoral brasileiro.
+  `pontaMaisLonga()` resolve as duas pontas mais afastadas do traço (varredura dupla, sem centroide)
+  para marcar a chegada em terra; as `ext` da fonte são só a primeira linha e mentiam.
+- `globo-rotas.html` + `/api/mapas/rotas` — **OpenFlights** (`airports.dat` + `routes.dat`, CORS `*`
+  mas 1,1MB + 2,4MB: baixados e afinados no servidor, cache de 30 dias). Os `.dat` chegam como texto
+  (`getJSON` não parseia), lidos por `separaCsv()` que respeita as aspas. Medido: 18.972 pares de
+  aeroportos com companhia aérea; o payload traz as 1.891 ligações mais frequentes **mais** todas as
+  491 com origem ou destino no Brasil, que nunca entrariam no corte global.
+- `globo-lancamentos.html` + `/api/mapas/lancamentos` — **The Space Devs**
+  (`api.the-space-dev.com/launch/upcoming/?format=json&limit=50&offset=`), sem CORS, cache de 1h
+  porque a API libera poucas consultas por dia sem chave. Só o modo detalhe traz coordenadas
+  (`pad.latitude`/`pad.longitude`); `mode=list` não traz nenhuma. Medido: 480 lançamentos anunciados,
+  duas páginas lidas, 98 com data ainda à frente — o filtro que descarta o que já voou é obrigatório,
+  senão o globo mostra decolagens passadas como se fossem de amanhã.
+
+Armadilhas do globe.gl que custaram tempo (medidas na 2.34.5):
+
+- **`arcPointsCount` não existe.** Chamar um método inexistente na cadeia faz o módulo inteiro morrer
+  antes do `carregar()`, e o sintoma é silencioso: a API responde 200, a página fica com o aviso de
+  "preparando o planeta" e os números em travessão, sem erro visível no console. Para afinar a
+  geometria use `arcCurveResolution` (padrão 64) e `arcCircularResolution` (padrão 6); nos ~1.900 arcos
+  das rotas aéreas, 16/4 foi o que manteve a cena fluida.
+- `arcStroke`, `labelSize` e `labelDotRadius` são **graus angulares**, não pixels: `labelSize(42)`
+  escreve um rótulo do tamanho de um continente. `pathStroke(null)` desenha uma `THREE.Line` de 1px
+  (barata); qualquer valor não nulo liga o FatLine.
+- A globe.gl **apaga o `innerHTML` do contêiner** onde monta: o `<div id="aviso">` tem de ser irmão
+  do `#globo`, nunca filho. E ela mede o contêiner só na criação — sem `g.width().height()` num
+  listener de `resize`, o canvas estoura a janela e aparece barra de rolagem.
+- Camada de rótulos e anéis é `labelsData`/`ringsData`; a camada livre é `customLayerData`
+  (não `customLayer`).
+
 ## Contratos assinados (`contratos.html` + `backend/contratos.js`)
 
 A licitação mostra a disputa; esta página mostra o termo que saiu dela — `v1/contratos` do PNCP,
@@ -192,9 +240,11 @@ que também é público e sem chave. Dois cuidados que custaram medição:
 
 ## Páginas
 
-38 páginas estáticas em `frontend/`. As de entrada do menu: `index`, `edicao`, `licitacoes`, `contratos`, `orgao`,
+42 páginas estáticas em `frontend/`. As de entrada do menu: `index`, `edicao`, `licitacoes`, `contratos`, `orgao`,
 `proposicoes`, `legislacao`, `mapa-brasil`, `mapa-satelite`, `mapa-avioes`, `mapa-embarcacoes`,
-`mapa-orbita`, `mapa-cameras`, `mapas`, `indicadores`, `tribunais`, `manchetes`, `reguladores`,
+`mapa-orbita`, `mapa-cameras`, `mapas`,
+`globo-satelites`, `globo-terremotos`, `globo-cabos`, `globo-rotas`, `globo-lancamentos`,
+`indicadores`, `tribunais`, `manchetes`, `reguladores`,
 `diretorios`,
 `territorio`, `clima`, `contas`, `energia`, `comex`, `fipe`, `agro`, `rss`, `calendario`,
 `areas`, `busca`, `sobre`, `contato`, `privacidade`, `painel`. Detalhe: `licitacao-detalhe`,

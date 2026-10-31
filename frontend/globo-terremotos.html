@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Globo 3D dos terremotos do mundo — BrBRICS</title>
+<meta name="description" content="Os terremotos dos últimos dia, semana ou mês sobre um globo 3D: o pilar cresce com a magnitude e muda de cor com a profundidade. Dados do USGS, atualizados a cada minuto, sem cadastro e sem chave.">
+<link rel="canonical" href="https://brbrics.com.br/globo-terremotos.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BrBRICS">
+<meta property="og:title" content="Globo 3D dos terremotos — BrBRICS">
+<meta property="og:description" content="Sismos das últimas 24 horas, 7 dias ou 30 dias sobre o planeta em três dimensões.">
+<meta property="og:image" content="https://brbrics.com.br/logo-brics.png?v=50">
+<meta property="og:url" content="https://brbrics.com.br/globo-terremotos.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
+<link rel="stylesheet" href="style.css?v=57">
+<link rel="stylesheet" href="pro.css?v=57">
+<style>
+  .ct-globo { position: relative; height: min(76vh, 720px); border-radius: 12px; overflow: hidden; background: #05050a; }
+  .ct-globo .aviso { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--muted); }
+  .ct-lado { display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: start; }
+  @media(max-width:900px){ .ct-lado { grid-template-columns: 1fr; } }
+  .ct-painel { background: var(--card); border-radius: 12px; padding: 14px; position: sticky; top: 12px; }
+  .ct-painel h3 { margin: 0 0 8px; }
+  .ct-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+  .ct-linha b { color: var(--marca); }
+  .ct-leg { font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+  .ct-leg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 10px; vertical-align: -1px; }
+  .globo-tip { background: rgba(8,8,12,.94); border: 1px solid var(--pos-deep); border-radius: 8px; padding: 7px 10px; font-size: 12.5px; color: var(--paper); max-width: 260px; }
+  .globo-tip b { color: var(--marca); }
+  .ct-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .ct-stats > div { background: var(--card); padding: 11px; border-radius: 10px; text-align: center; }
+  .ct-v { font-size: 18px; font-weight: 800; color: var(--marca); }
+  .ct-l { font-size: 11px; color: var(--muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=50" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:22px 0 8px;text-align:center">
+    <p class="kicker">USGS · sismicidade global ao vivo</p>
+    <h1>Terremotos <span class="hl">no planeta inteiro</span></h1>
+    <p class="sub">Cada pilar é um sismo registrado. A altura e a grossura crescem com a magnitude; a cor conta o quão fundo ele aconteceu. Gire com o mouse, aproxime com a roda e clique num pilar para ler a ficha.</p>
+  </section>
+
+  <div class="ct-stats">
+    <div><div class="ct-v" id="st-n">—</div><div class="ct-l">sismos no período</div></div>
+    <div><div class="ct-v" id="st-max">—</div><div class="ct-l">maior magnitude</div></div>
+    <div><div class="ct-v" id="st-forte">—</div><div class="ct-l">de M 5,0 para cima</div></div>
+    <div><div class="ct-v" id="st-quando" style="font-size:14px">—</div><div class="ct-l">atualizado em</div></div>
+  </div>
+
+  <div class="ct-lado">
+    <section class="card" style="margin:0">
+      <div class="toolbar" style="margin-top:0">
+        <select id="periodo">
+          <option value="all_day" selected>Últimas 24 horas</option>
+          <option value="all_week">Últimos 7 dias</option>
+          <option value="all_month">Últimos 30 dias</option>
+          <option value="4.5_day">Só M4,5+ (24h)</option>
+          <option value="significant">Significativos (todos)</option>
+        </select>
+        <select id="mag"><option value="0">Todas as magnitudes</option><option value="2.5">M 2,5+</option><option value="4.5" selected>M 4,5+</option><option value="6">M 6,0+</option></select>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="lyr-girar" checked> girar</label>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="lyr-argolas" checked> pulsar os fortes</label>
+        <button class="btn ghost" id="btn-brasil">Ver o Brasil</button>
+        <button class="btn ghost" id="btn-mundo">Ver o mundo</button>
+        <span class="muted" id="status" style="font-size:12.5px">Lendo o USGS…</span>
+      </div>
+      <div class="ct-globo"><div id="globo" style="width:100%;height:100%"></div><div class="aviso" id="aviso">Preparando o planeta…</div></div>
+      <p class="ct-leg">Cor pela profundidade: <i style="background:#FF5A5A"></i>raso (até 70 km, onde o estrago acontece) <i style="background:#FFB454"></i>70 a 300 km <i style="background:#5AA9FF"></i>mais de 300 km, em zona de subducção profunda. Fonte: <a href="https://earthquake.usgs.gov/earthquakes/feed/" target="_blank" rel="noopener">USGS Earthquake Hazards Program</a>, que atualiza a cada minuto.</p>
+    </section>
+
+    <aside class="ct-painel">
+      <h3 id="p-titulo">Escolha um sismo no globo</h3>
+      <div id="p-corpo" class="muted" style="font-size:13px">Clique em qualquer pilar para ver magnitude, profundidade, lugar, hora de Brasília e o link da ficha oficial.</div>
+    </aside>
+  </div>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Sismos: USGS (agência dos EUA), lidos direto do navegador.</div>
+    <div class="flinks"><a href="mapas.html">Todos os mapas</a><a href="globo-satelites.html">Globo de satélites</a><a href="clima.html">Clima nas capitais</a><a href="sobre.html">Fontes</a><a href="privacidade.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=57"></script>
+<script src="app.js?v=50"></script>
+<script type="module">
+import Globe from 'https://cdn.jsdelivr.net/npm/globe.gl@2.34.5/+esm';
+
+var $ = function (i) { return document.getElementById(i); };
+var URL_BASE = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/';
+var g = null, TUDO = [], LIDOS = null;
+
+function corProfundidade(km) {
+  if (km == null) return '#9AA7B8';
+  if (km < 70) return '#FF5A5A';
+  if (km <= 300) return '#FFB454';
+  return '#5AA9FF';
+}
+function brlMag(m) { return (m == null ? '—' : Number(m).toFixed(1).replace('.', ',')); }
+function horaBR(iso) {
+  try { var d = new Date(iso); return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR').slice(0, 5); }
+  catch (e) { return '—'; }
+}
+
+function montaCena() {
+  var el = $('globo');
+  g = Globe()(el)
+    .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg')
+    .bumpImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
+    .backgroundImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png')
+    .showAtmosphere(true).atmosphereAltitude(0.16)
+    .pointLat('lat').pointLng('lng')
+    .pointAltitude(function (d) { return 0.012 + (d.mag || 1) * 0.028; })
+    .pointRadius(function (d) { return 0.12 + (d.mag || 1) * 0.16; })
+    .pointColor(function (d) { return corProfundidade(d.prof); })
+    .pointsMerge(false)
+    .pointLabel(function (d) {
+      return '<div class="globo-tip"><b>M ' + brlMag(d.mag) + '</b> · ' + (d.prof == null ? '—' : brlMag(d.prof) + ' km') +
+        '<br>' + d.lugar + '<br><span class="muted">' + horaBR(d.quando) + ' (Brasília)</span></div>';
+    })
+    .ringColor(function (d) { return function (t) { return 'rgba(255,190,90,' + (1 - t) + ')'; }; })
+    .ringMaxRadius(function (d) { return 3 + (d.mag || 5); })
+    .ringPropagationSpeed(1.6)
+    .ringRepeatPeriod(1100)
+    .onPointClick(mostraFicha);
+  g.controls().autoRotate = true;
+  g.controls().autoRotateSpeed = 0.35;
+  g.pointOfView({ lat: -12, lng: -60, altitude: 2.6 }, 0);
+  redimensiona();
+  window.addEventListener('resize', redimensiona);
+  $('aviso').style.display = 'none';
+}
+
+// A globe.gl mede o contêiner só na criação; sem isso o canvas fica do tamanho da janela e aparece barra de rolagem.
+function redimensiona() {
+  if (!g) return;
+  var el = $('globo');
+  g.width(el.clientWidth).height(el.clientHeight);
+}
+
+function mostraFicha(d) {
+  $('p-titulo').textContent = d.lugar || 'Sismo';
+  $('p-corpo').innerHTML =
+    '<div class="ct-linha"><span>Magnitude</span><b>M ' + brlMag(d.mag) + '</b></div>' +
+    '<div class="ct-linha"><span>Profundidade</span><b>' + (d.prof == null ? '—' : brlMag(d.prof) + ' km') + '</b></div>' +
+    '<div class="ct-linha"><span>Onde</span><b>' + (d.pais || '—') + '</b></div>' +
+    '<div class="ct-linha"><span>Coordenadas</span><b>' + brlMag(d.lat) + ', ' + brlMag(d.lng) + '</b></div>' +
+    '<div class="ct-linha"><span>Hora de Brasília</span><b>' + horaBR(d.quando) + '</b></div>' +
+    (d.url ? '<p style="margin:10px 0 0"><a class="btn ghost" href="' + d.url + '" target="_blank" rel="noopener">Ficha no USGS</a></p>' : '') +
+    '<p class="muted" style="font-size:12px;margin:10px 0 0">O USGS é o serviço geológico dos Estados Unidos e é quem melhor cobre o mundo inteiro de graça. No Brasil, o serviço oficial é o CSM/USP, que só registra tremores a partir de magnitude bem menor — por isso o mapa quase não mostra o nosso país.</p>';
+  if (g) g.pointOfView({ lat: d.lat, lng: d.lng, altitude: 1.5 }, 900);
+}
+
+function pinta() {
+  var corte = Number($('mag').value || 0);
+  var lista = TUDO.filter(function (s) { return (s.mag || 0) >= corte; });
+  g.pointsData(lista);
+  g.ringsData(($('lyr-argolas').checked ? lista : []).filter(function (s) { return (s.mag || 0) >= 5.5; }).slice(0, 40));
+  var forte = lista.filter(function (s) { return (s.mag || 0) >= 5; }).length;
+  var max = lista.reduce(function (a, s) { return (s.mag || 0) > (a ? a.mag || 0 : -1) ? s : a; }, null);
+  $('st-n').textContent = lista.length.toLocaleString('pt-BR');
+  $('st-max').textContent = max ? 'M ' + brlMag(max.mag) : '—';
+  $('st-forte').textContent = forte.toLocaleString('pt-BR');
+  $('status').textContent = lista.length.toLocaleString('pt-BR') + ' sismos de M' + brlMag(corte) + '+ no período';
+}
+
+function carregar() {
+  var feed = $('periodo').value;
+  $('status').textContent = 'Lendo o USGS…';
+  fetch(URL_BASE + feed + '.geojson', { signal: AbortSignal.timeout(25000) }).then(function (r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function (j) {
+    TUDO = (j.features || []).map(function (f) {
+      var c = f.geometry.coordinates, p = f.properties || {};
+      var lugar = String(p.place || p.title || 'sem local');
+      return {
+        lng: c[0], lat: c[1], prof: c[2], mag: p.mag, lugar: lugar.replace(/^.*?—\s*/, ''),
+        pais: (lugar.match(/\(([^)]{2,3})\)$/) || [])[1] || '',
+        quando: p.time ? new Date(p.time).toISOString() : '', url: p.url || ''
+      };
+    });
+    LIDOS = new Date();
+    $('st-quando').textContent = horaBR(LIDOS.toISOString());
+    pinta();
+  }).catch(function (e) {
+    $('status').textContent = 'O USGS não respondeu agora: ' + e.message;
+    $('aviso').style.display = 'flex';
+    $('aviso').innerHTML = 'O USGS não respondeu agora. <button class="btn ghost" style="margin-left:8px" onclick="location.reload()">Tentar de novo</button>';
+  });
+}
+
+montaCena();
+$('periodo').addEventListener('change', carregar);
+['mag'].forEach(function (i) { $(i).addEventListener('change', pinta); });
+$('lyr-argolas').addEventListener('change', pinta);
+$('lyr-girar').addEventListener('change', function () { g.controls().autoRotate = this.checked; });
+$('btn-brasil').onclick = function () { g.pointOfView({ lat: -12, lng: -52, altitude: 1.25 }, 1200); };
+$('btn-mundo').onclick = function () { g.pointOfView({ lat: 0, lng: -150, altitude: 2.3 }, 1200); };
+carregar();
+</script>
+</body>
+</html>

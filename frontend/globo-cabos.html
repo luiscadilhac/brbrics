@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Globo 3D dos cabos submarinos da internet — BrBRICS</title>
+<meta name="description" content="Os cabos de fibra óptica que carregam a internet entre os continentes, desenhados sobre um globo 3D: nome, trechos, pontos de chegada e os cabos que servem o litoral do Brasil. Catálogo público do Submarine Cable Map (TeleGeography).">
+<link rel="canonical" href="https://brbrics.com.br/globo-cabos.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BrBRICS">
+<meta property="og:title" content="Globo 3D dos cabos submarinos — BrBRICS">
+<meta property="og:description" content="A internet física: os cabos de fibra óptica que ligam os continentes, sobre o planeta em três dimensões.">
+<meta property="og:image" content="https://brbrics.com.br/logo-brics.png?v=50">
+<meta property="og:url" content="https://brbrics.com.br/globo-cabos.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
+<link rel="stylesheet" href="style.css?v=57">
+<link rel="stylesheet" href="pro.css?v=57">
+<style>
+  .ct-globo { position: relative; height: min(76vh, 720px); border-radius: 12px; overflow: hidden; background: #05050a; }
+  .ct-globo .aviso { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--muted); }
+  .ct-lado { display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: start; }
+  @media(max-width:900px){ .ct-lado { grid-template-columns: 1fr; } }
+  .ct-painel { background: var(--card); border-radius: 12px; padding: 14px; position: sticky; top: 12px; }
+  .ct-painel h3 { margin: 0 0 8px; }
+  .ct-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+  .ct-linha b { color: var(--marca); text-align: right; }
+  .ct-leg { font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+  .ct-leg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 10px; vertical-align: -1px; }
+  .globo-tip { background: rgba(8,8,12,.94); border: 1px solid var(--pos-deep); border-radius: 8px; padding: 7px 10px; font-size: 12.5px; color: var(--paper); max-width: 260px; }
+  .globo-tip b { color: var(--marca); }
+  .ct-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .ct-stats > div { background: var(--card); padding: 11px; border-radius: 10px; text-align: center; }
+  .ct-v { font-size: 18px; font-weight: 800; color: var(--marca); }
+  .ct-l { font-size: 11px; color: var(--muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="logo-brics.png?v=50" alt="BrBRICS" style="width:34px;height:34px;vertical-align:-6px;border-radius:10px"><span class="brand-tx">Br<b>BRICS</b></span></a>
+    <nav class="nav"></nav>
+    <div class="actions"><input id="busca" type="search" placeholder="Buscar no portal..."></div>
+  </div>
+  <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
+  <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
+</header>
+<main class="wrap">
+  <section class="hero" style="padding:22px 0 8px;text-align:center">
+    <p class="kicker">Submarine Cable Map · TeleGeography</p>
+    <h1>A internet <span class="hl">por baixo do mar</span></h1>
+    <p class="sub">Quase todo o tráfego internacional de dados — videochamadas, pagamentos, sites — corre por cabos de fibra óptica no fundo do oceano. Cada linha no globo é o traçado de um cabo. Passe o mouse para ler o nome, clique para abrir a ficha e ligue o filtro dourado para ver os que passam pela costa do Brasil.</p>
+  </section>
+
+  <div class="ct-stats">
+    <div><div class="ct-v" id="st-n">—</div><div class="ct-l">cabos desenhados</div></div>
+    <div><div class="ct-v" id="st-t">—</div><div class="ct-l">trechos de fibra</div></div>
+    <div><div class="ct-v" id="st-br">—</div><div class="ct-l">tocam a caixa do litoral BR</div></div>
+    <div><div class="ct-v" id="st-quando" style="font-size:14px">—</div><div class="ct-l">catálogo lido em</div></div>
+  </div>
+
+  <div class="ct-lado">
+    <section class="card" style="margin:0">
+      <div class="toolbar" style="margin-top:0">
+        <input id="filtro" type="search" placeholder="nome do cabo (ex.: 2Africa, Monet)" style="min-width:190px">
+        <select id="qtd">
+          <option value="80">Os 80 maiores traçados</option>
+          <option value="160" selected>Os 160 maiores traçados</option>
+          <option value="320">Todos os 320 do corte</option>
+        </select>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="lyr-chegadas" checked> marcar as pontas</label>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="so-brasil"> só cabos do Brasil</label>
+        <label class="muted" style="font-size:12.5px"><input type="checkbox" id="lyr-girar" checked> girar</label>
+        <button class="btn ghost" id="btn-brasil">Ver o Atlântico Sul</button>
+        <button class="btn ghost" id="btn-mundo">Ver o mundo</button>
+        <span class="muted" id="status" style="font-size:12.5px">Lendo o catálogo de cabos…</span>
+      </div>
+      <div class="ct-globo"><div id="globo" style="width:100%;height:100%"></div><div class="aviso" id="aviso">Preparando o planeta…</div></div>
+      <p class="ct-leg" id="legenda"></p>
+      <p class="ct-leg">O catálogo da TeleGeography não lista país por país, então o filtro do Brasil entra com todo cabo que tenha um vértice dentro da caixa do litoral brasileiro (5° N a 34° S, 74° O a 35° O) — aproximação, não lista oficial de chegadas. Fonte: <a href="https://www.submarinecablemap.com/" target="_blank" rel="noopener">Submarine Cable Map</a>.</p>
+    </section>
+
+    <aside class="ct-painel">
+      <h3 id="p-titulo">Escolha um cabo no globo</h3>
+      <div id="p-corpo" class="muted" style="font-size:13px">Clique em qualquer linha para ver o nome, quantos trechos o compõem e onde ele começa e termina.</div>
+    </aside>
+  </div>
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>BrBRICS</b> — transparência de dados do setor público. Cabos: catálogo público do Submarine Cable Map (TeleGeography), lido pelo nosso servidor porque a fonte não libera acesso do navegador.</div>
+    <div class="flinks"><a href="mapas.html">Todos os mapas</a><a href="globo-terremotos.html">Globo de terremotos</a><a href="globo-rotas.html">Globo de rotas aéreas</a><a href="mapa-avioes.html">Aviões ao vivo</a><a href="sobre.html">Fontes</a><a href="privacidade.html">Privacidade (LGPD)</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+<button class="backtop" id="backtop" title="Voltar ao topo">up</button>
+<script src="common.js?v=57"></script>
+<script src="app.js?v=50"></script>
+<script type="module">
+import Globe from 'https://cdn.jsdelivr.net/npm/globe.gl@2.34.5/+esm';
+
+var $ = function (i) { return document.getElementById(i); };
+var COR_NORMAL = '#2FB8C9', COR_BR = '#FFC14D', COR_ESCOLH = '#FFFFFF';
+var g = null, CABOS = [], VISIVEIS = [], ESCOLHIDO = null;
+
+// caixa do litoral brasileiro: latitude -34..5, longitude -74..-35
+function tocaBrasil(c) {
+  return c.linhas.some(function (l) {
+    return l.some(function (p) { return p[1] > -34 && p[1] < 5 && p[0] > -74 && p[0] < -35; });
+  });
+}
+
+function montaCena() {
+  var el = $('globo');
+  g = Globe()(el)
+    .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg')
+    .bumpImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
+    .backgroundImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png')
+    .showAtmosphere(true).atmosphereAltitude(0.14)
+    .pathPoints(function (d) { return d.pontos; })
+    .pathPointLat(function (p) { return p[1]; })
+    .pathPointLng(function (p) { return p[0]; })
+    .pathPointAlt(0.004)
+    .pathColor(function (d) { return d.cor; })
+    // todas com traço grosso: a 1 pixel a vista inteira do planeta ficava vazia
+    .pathStroke(function (d) { return d.grosso ? 1.4 : (d.brasil ? 0.75 : 0.4); })
+    // zero: com transição, o traçado só ganha geometria no meio do tween e some em cargas rápidas
+    .pathTransitionDuration(0)
+    .pathLabel(function (d) {
+      return '<div class="globo-tip"><b>' + d.nome + '</b><br>' + d.trechos + ' trechos no mar · este trecho com ' +
+        d.vertices + ' vértices' + (d.brasil ? '<br><span style="color:#FFC14D">passa pela caixa do litoral do Brasil</span>' : '') + '</div>';
+    })
+    .onPathClick(abreFicha)
+    .pointLat('lat').pointLng('lng').pointColor('#8FE3F0').pointAltitude(0.01)
+    .pointRadius(0.22).pointLabel(function (d) { return '<div class="globo-tip">' + d.texto + '</div>'; })
+    .atmosphereColor('#2fb8c9');
+  g.controls().autoRotate = true;
+  g.controls().autoRotateSpeed = 0.28;
+  g.pointOfView({ lat: 10, lng: -30, altitude: 2.1 }, 0);
+  redimensiona();
+  window.addEventListener('resize', redimensiona);
+  $('aviso').style.display = 'none';
+}
+
+function redimensiona() {
+  if (!g) return;
+  var el = $('globo');
+  g.width(el.clientWidth).height(el.clientHeight);
+}
+
+function pinta() {
+  var texto = $('filtro').value.trim().toLowerCase();
+  var soBr = $('so-brasil').checked;
+  var teto = Number($('qtd').value);
+  VISIVEIS = [];
+  var contagem = 0, brs = 0;
+  CABOS.forEach(function (c) {
+    if (contagem >= teto) return;
+    if (c.brasil) brs++;
+    if (soBr && !c.brasil) return;
+    if (texto && c.nome.toLowerCase().indexOf(texto) < 0) return;
+    contagem++;
+    c.linhas.forEach(function (l) {
+      VISIVEIS.push({
+        nome: c.nome, id: c.id, cor: c.cor,
+        grosso: ESCOLHIDO === c.id, brasil: c.brasil,
+        pontos: l, trechos: c.linhas.length, vertices: l.length
+      });
+    });
+  });
+  // o cabo escolhido sobe para cima dos outros e fica mais grosso
+  VISIVEIS.sort(function (a, b) { return (b.grosso ? 1 : 0) - (a.grosso ? 1 : 0); });
+  g.pathsData(VISIVEIS);
+  var pontas = [];
+  if ($('lyr-chegadas').checked) {
+    var vistos = {};
+    CABOS.slice(0, teto).forEach(function (c) {
+      if (soBr && !c.brasil) return;
+      (c.chegadas || []).forEach(function (p) {
+        var k = p[1].toFixed(1) + '_' + p[0].toFixed(1);
+        if (vistos[k]) return;
+        vistos[k] = 1;
+        pontas.push({ lat: p[1], lng: p[0], texto: 'ponta de ' + c.nome });
+      });
+    });
+  }
+  g.pointsData(pontas);
+  $('st-n').textContent = contagem.toLocaleString('pt-BR');
+  $('st-t').textContent = VISIVEIS.length.toLocaleString('pt-BR');
+  $('st-br').textContent = brs.toLocaleString('pt-BR');
+  $('status').textContent = VISIVEIS.length.toLocaleString('pt-BR') + ' trechos desenhados' +
+    (soBr ? ' (só Brasil)' : '') + (texto ? ' com “' + texto + '”' : '');
+}
+
+function abreFicha(d) {
+  var c = null;
+  for (var i = 0; i < CABOS.length; i++) if (CABOS[i].id === d.id) { c = CABOS[i]; break; }
+  ESCOLHIDO = d.id;
+  pinta();
+  if (!c) return;
+  var ponta = function (p) { return p[1].toFixed(2).replace('.', ',') + '°, ' + p[0].toFixed(2).replace('.', ',') + '°'; };
+  $('p-titulo').textContent = c.nome;
+  $('p-corpo').innerHTML =
+    '<div class="ct-linha"><span>Identificador</span><b>' + c.id + '</b></div>' +
+    '<div class="ct-linha"><span>Trechos no mar</span><b>' + c.linhas.length + '</b></div>' +
+    '<div class="ct-linha"><span>Vértices do traçado</span><b>' + c.pontos.toLocaleString('pt-BR') + '</b></div>' +
+    '<div class="ct-linha"><span>Ponta A</span><b>' + (c.chegadas && c.chegadas.length ? ponta(c.chegadas[0]) : '—') + '</b></div>' +
+    '<div class="ct-linha"><span>Ponta B</span><b>' + (c.chegadas && c.chegadas.length ? ponta(c.chegadas[1]) : '—') + '</b></div>' +
+    (c.brasil ? '<p style="margin:10px 0 0;font-size:12.5px;color:#FFC14D">Tem vértices dentro da caixa do litoral brasileiro.</p>' : '') +
+    '<p class="muted" style="font-size:12px;margin:10px 0 0">As duas pontas são calculadas como os dois vértices mais afastados do traçado — não é a lista oficial de estações de chegada, que a fonte só publica cabo a cabo.</p>';
+  var meio = c.chegadas && c.chegadas.length ? c.chegadas[0] : c.linhas[0][0];
+  g.pointOfView({ lat: meio[1], lng: meio[0], altitude: 1.4 }, 1200);
+}
+
+function carregar() {
+  fetch('/api/mapas/cabos', { signal: AbortSignal.timeout(40000) }).then(function (r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function (j) {
+    CABOS = (j.cabos || []).map(function (c) {
+      return {
+        id: c.id, nome: c.nome, linhas: c.linhas, pontos: c.pontos, chegadas: c.chegadas || [],
+        cor: tocaBrasil(c) ? COR_BR : COR_NORMAL, brasil: tocaBrasil(c)
+      };
+    });
+    $('aviso').style.display = CABOS.length ? 'none' : 'flex';
+    if (!CABOS.length) { $('aviso').textContent = 'Nenhum cabo veio da fonte agora.'; return; }
+    $('st-quando').textContent = new Date(j.atualizadoEm).toLocaleDateString('pt-BR');
+    $('legenda').innerHTML = 'Cores: <i style="background:' + COR_NORMAL + '"></i>cabo no oceano ' +
+      '<i style="background:' + COR_BR + '"></i>com vértice na caixa do litoral do Brasil ' +
+      '<i style="background:' + COR_ESCOLH + '"></i>o cabo aberto na ficha. ' + (j.aviso || '');
+    pinta();
+  }).catch(function (e) {
+    $('status').textContent = 'Não consegui ler o catálogo agora: ' + e.message;
+    $('aviso').style.display = 'flex';
+    $('aviso').innerHTML = 'O catálogo de cabos não respondeu. <button class="btn ghost" style="margin-left:8px" onclick="location.reload()">Tentar de novo</button>';
+  });
+}
+
+montaCena();
+$('filtro').addEventListener('input', pinta);
+$('qtd').addEventListener('change', pinta);
+['lyr-chegadas', 'so-brasil'].forEach(function (i) { $(i).addEventListener('change', pinta); });
+$('lyr-girar').addEventListener('change', function () { g.controls().autoRotate = this.checked; });
+$('btn-brasil').onclick = function () { g.pointOfView({ lat: -16, lng: -30, altitude: 1.5 }, 1400); };
+$('btn-mundo').onclick = function () { g.pointOfView({ lat: 12, lng: -20, altitude: 2.3 }, 1400); };
+carregar();
+</script>
+</body>
+</html>
