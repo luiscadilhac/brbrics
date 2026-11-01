@@ -14,8 +14,8 @@
 <meta property="og:url" content="https://brbrics.com.br/globo-lancamentos.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 <style>
   .ct-globo { position: relative; height: min(76vh, 720px); border-radius: 12px; overflow: hidden; background: #05050a; }
   .ct-globo .aviso { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--muted); }
@@ -23,7 +23,7 @@
   @media(max-width:900px){ .ct-lado { grid-template-columns: 1fr; } }
   .ct-painel { background: var(--card); border-radius: 12px; padding: 14px; position: sticky; top: 12px; }
   .ct-painel h3 { margin: 0 0 8px; }
-  .ct-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+  .ct-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; padding: 5px 0; border-bottom: 1px solid var(--line); }
   .ct-linha b { color: var(--marca); text-align: right; }
   .ct-leg { font-size: 12.5px; color: var(--muted); margin-top: 10px; }
   .ct-leg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 10px; vertical-align: -1px; }
@@ -31,7 +31,7 @@
   .globo-tip b { color: var(--marca); }
   .ct-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
   .ct-stats > div { background: var(--card); padding: 11px; border-radius: 10px; text-align: center; }
-  .ct-v { font-size: 18px; font-weight: 800; color: var(--marca); }
+  .ct-v { font-size: 14px; font-weight: 800; color: var(--marca); }
   .ct-l { font-size: 11px; color: var(--muted); margin-top: 2px; }
   .ct-lista { max-height: 320px; overflow: auto; margin-top: 8px; }
   .ct-lista a { display: block; font-size: 12.5px; padding: 6px 0; border-bottom: 1px solid var(--line); color: var(--texto); text-decoration: none; }
@@ -50,7 +50,7 @@
   <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:22px 0 8px;text-align:center">
+  <section class="hero hero-centro" style="padding:22px 0 8px;text-align:center">
     <p class="kicker">The Space Devs · agenda orbital aberta</p>
     <h1>Os foguetes <span class="hl">que vão subir</span></h1>
     <p class="sub">Cada ponto é uma base de lançamento com voo previsto; o tamanho conta quantos lançamentos ela tem na janela e o anel que pulsa marca quem decola nos próximos sete dias. Clique para ler a ficha da missão e ver a data prevista.</p>
@@ -60,7 +60,7 @@
     <div><div class="ct-v" id="st-n">—</div><div class="ct-l">lançamentos na janela</div></div>
     <div><div class="ct-v" id="st-b">—</div><div class="ct-l">bases envolvidas</div></div>
     <div><div class="ct-v" id="st-7">—</div><div class="ct-l">nos próximos 7 dias</div></div>
-    <div><div class="ct-v" id="st-prox" style="font-size:14px">—</div><div class="ct-l">próximo da lista</div></div>
+    <div><div class="ct-v" id="st-prox" style="font-size:12px">—</div><div class="ct-l">próximo da lista</div></div>
   </div>
 
   <div class="ct-lado">
@@ -88,7 +88,7 @@
 
     <aside class="ct-painel">
       <h3 id="p-titulo">Escolha uma base no globo</h3>
-      <div id="p-corpo" class="muted" style="font-size:13px">Clique num ponto para ver os voos previstos ali. A lista ao lado traz a agenda por ordem de data.</div>
+      <div id="p-corpo" class="muted" style="font-size:12px">Clique num ponto para ver os voos previstos ali. A lista ao lado traz a agenda por ordem de data.</div>
       <div class="ct-lista" id="p-lista"></div>
     </aside>
   </div>

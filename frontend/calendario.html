@@ -6,17 +6,17 @@
 <title>Calendário Oficial — BrBRICS</title>
 <meta name="description" content="Feriados nacionais, sessões do Congresso e prazos do calendário oficial público brasileiro.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 <style>
   .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
   .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
-  .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
+  .stat-val { font-size: 17px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .cal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
   .cal-card { background: var(--card2); border-radius: 10px; padding: 16px; border:1px solid var(--marco-dentro); }
-  .cal-card h4 { margin: 0 0 10px; color: var(--marca); font-size: 15px; }
-  .cal-item { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; display: flex; justify-content: space-between; }
+  .cal-card h4 { margin: 0 0 10px; color: var(--marca); font-size: 13px; }
+  .cal-item { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 12px; display: flex; justify-content: space-between; }
   .cal-item:last-child { border-bottom: none; }
   .cal-item b { color: var(--paper); }
   .cal-item .muted { color: var(--muted); font-size: 11px; }
@@ -24,8 +24,8 @@
   .tipo-sessao { color: #3b82f6; font-weight: 800; font-size: 11px; text-transform: uppercase; }
   .tipo-recesso { color: #a78bfa; font-weight: 800; font-size: 11px; text-transform: uppercase; }
   .ano-select { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
-  .ano-select select { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg2); color: var(--paper); font-size: 13px; }
-  .btn-ano { background: var(--grad); color: #141414; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  .ano-select select { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg2); color: var(--paper); font-size: 12px; }
+  .btn-ano { background: var(--grad); color: #141414; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; }
   .btn-ano:hover { transform: translateY(-1px); }
 </style>
 </head>
@@ -40,7 +40,7 @@
   <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:28px 0;text-align:center">
+  <section class="hero hero-centro" style="padding:28px 0;text-align:center">
     <p class="kicker">📅 Calendário Oficial</p>
     <h1>Feriados e Sessões Públicas</h1>
     <p class="sub">Feriados nacionais, sessões legislativas e recessos — calendário oficial do Brasil.</p>
@@ -52,7 +52,7 @@
   </div>
 
   <div class="ano-select">
-    <label style="font-size:13px;color:var(--muted)">Ano:</label>
+    <label style="font-size:12px;color:var(--muted)">Ano:</label>
     <select id="sel-ano"></select>
     <button class="btn-ano" id="btn-carregar">Carregar →</button>
   </div>

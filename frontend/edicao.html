@@ -14,8 +14,8 @@
 <meta property="og:image" content="https://brbrics.com.br/logo-brics.png?v=50">
 <meta property="og:url" content="https://brbrics.com.br/edicao.html">
 <meta name="twitter:card" content="summary">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 </head>
 <body>
 <header class="topbar">
@@ -173,7 +173,7 @@ jget('/api/edicao/destaques').then(function(r){
     var html = '';
     (arr||[]).forEach(function(a){
       html += '<article><div class="tag-row"><span class="tag">'+esc(a.artType||a.secao||'DOU')+'</span>'+favBtnHTML(a.link,a.titulo)+'</div><h4><a href="'+esc(a.link)+'" target="_blank" rel="noopener">'+esc(a.titulo)+'</a></h4>';
-      if(a.resumo) html += '<p class="muted" style="font-size:13px;margin:4px 0">'+esc(String(a.resumo).slice(0,180))+(String(a.resumo).length>180?'…':'')+'</p>';
+      if(a.resumo) html += '<p class="muted" style="font-size:12px;margin:4px 0">'+esc(String(a.resumo).slice(0,180))+(String(a.resumo).length>180?'…':'')+'</p>';
       var rod = [];
       if(a.orgao) rod.push(a.orgao);
       rod.push(a.secao||'DOU');

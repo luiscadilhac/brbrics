@@ -14,8 +14,8 @@
 <meta property="og:url" content="https://brbrics.com.br/globo-satelites.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 <style>
   #globo { position: relative; height: 76vh; min-height: 420px; width: 100%; border-radius: 14px;
            overflow: hidden; background: #05070f; box-shadow: 0 6px 26px rgba(0,0,0,.45); margin-bottom: 14px; }
@@ -25,30 +25,30 @@
   .gl-relogio { position: absolute; top: 12px; left: 14px; font-size: 12.5px; color: #e8eef6;
                 background: rgba(5,7,15,.55); border: 1px solid rgba(255,255,255,.14); border-radius: 10px;
                 padding: 6px 10px; font-variant-numeric: tabular-nums; pointer-events: none; }
-  .gl-relogio b { font-size: 15px; }
+  .gl-relogio b { font-size: 13px; }
   .gl-ficha { position: absolute; top: 12px; right: 12px; width: min(300px, 52%); background: rgba(8,11,20,.92);
               border: 1px solid rgba(255,255,255,.16); border-radius: 12px; padding: 12px 13px; color: #e8eef6;
-              font-size: 13px; display: none; }
-  .gl-ficha h3 { margin: 0 0 4px; font-size: 15px; color: #fff; padding-right: 18px; }
+              font-size: 12px; display: none; }
+  .gl-ficha h3 { margin: 0 0 4px; font-size: 13px; color: #fff; padding-right: 18px; }
   .gl-ficha dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 8px 0 0; font-size: 12.5px; }
   .gl-ficha dt { color: #9fb0c4; } .gl-ficha dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
-  .gl-ficha .fechar { position: absolute; top: 4px; right: 8px; cursor: pointer; color: #9fb0c4; font-size: 18px; background: none; border: 0; line-height: 1; }
+  .gl-ficha .fechar { position: absolute; top: 4px; right: 8px; cursor: pointer; color: #9fb0c4; font-size: 14px; background: none; border: 0; line-height: 1; }
   .gl-botao { position: absolute; background: rgba(8,11,20,.82); color: #e8eef6; border: 1px solid rgba(255,255,255,.18);
               border-radius: 9px; padding: 6px 11px; font-size: 12.5px; cursor: pointer; }
   .gl-botao:hover { border-color: #fff; }
   .gl-pilha { position: absolute; bottom: 44px; left: 14px; display: flex; flex-direction: column; gap: 6px; }
   .layer-panel { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
   .layer-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
-  .layer-row label { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .layer-row label { font-size: 12px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
   .layer-row input { accent-color: var(--marca); }
-  .layer-row select { background: var(--card2); color: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 13px; }
-  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  .layer-row select { background: var(--card2); color: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 12px; }
+  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; }
   .btn-sm:hover { transform: translateY(-1px); }
   .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
   .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
-  .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
+  .stat-val { font-size: 17px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .legend { background: var(--card); padding: 14px 16px; border-radius: 12px; font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .legend { background: var(--card); padding: 14px 16px; border-radius: 12px; font-size: 12px; color: var(--muted); margin-bottom: 16px; }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
   .chips span { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; background: var(--card2); }
   .pastilha { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
@@ -65,7 +65,7 @@
   <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:28px 0;text-align:center">
+  <section class="hero hero-centro" style="padding:28px 0;text-align:center">
     <p class="kicker">🌍 A Terra em três dimensões — com o tráfego orbital em volta</p>
     <h1>Globo 3D dos satélites que estão no céu neste instante</h1>
     <p class="sub">Arraste para girar o planeta, use a roda do mouse (ou dois dedos) para chegar mais perto e clique em qualquer ponto para seguir aquele satélite. O dia e a noite são os de verdade: a luz vem da posição real do Sol agora. Cada ponto é a conta da órbita feita no seu navegador, a partir dos elementos orbitais abertos — não é imagem de satélite.</p>
@@ -75,17 +75,17 @@
     <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Satélites no globo</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-brasil">—</div><div class="stat-lab">Sobre o Brasil agora</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-altura">—</div><div class="stat-lab">Altitude média (km)</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-elementos" style="font-size:15px">—</div><div class="stat-lab">Elementos orbitais de</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-elementos" style="font-size:13px">—</div><div class="stat-lab">Elementos orbitais de</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-fogos" style="color:#FF6B35">—</div><div class="stat-lab">Focos de calor do INPE (48h)</div></div>
   </div>
 
   <div class="layer-panel">
     <div class="layer-row">
-      <span class="muted" style="font-size:13px">País:</span>
+      <span class="muted" style="font-size:12px">País:</span>
       <select id="flt-pais"><option value="">Todos</option></select>
-      <span class="muted" style="font-size:13px">Finalidade:</span>
+      <span class="muted" style="font-size:12px">Finalidade:</span>
       <select id="flt-rot"><option value="">Todas</option></select>
-      <span class="muted" style="font-size:13px">Ritmo:</span>
+      <span class="muted" style="font-size:12px">Ritmo:</span>
       <select id="flt-tempo">
         <option value="1">Tempo real</option>
         <option value="10">10× mais rápido</option>
@@ -114,7 +114,7 @@
       <span><i class="pastilha" style="background:#FFC14D"></i>foco de calor baixo</span>
     </div>
     <p id="nota-fogos" class="muted" style="font-size:12.5px;margin:6px 0 0">Lendo os focos de calor do INPE…</p>
-    <p id="status" class="muted" style="font-size:13px;margin:8px 0 0">Baixando os elementos orbitais e o motor 3D…</p>
+    <p id="status" class="muted" style="font-size:12px;margin:8px 0 0">Baixando os elementos orbitais e o motor 3D…</p>
   </div>
 
   <div id="globo">
@@ -138,7 +138,7 @@
 
   <section class="card">
     <div class="card-h"><h2>🛰️ O que está em órbita nesta leitura</h2></div>
-    <div id="lista-grupos" class="muted" style="font-size:14px">Aguarde a leitura dos elementos orbitais…</div>
+    <div id="lista-grupos" class="muted" style="font-size:12px">Aguarde a leitura dos elementos orbitais…</div>
   </section>
 </main>
 <footer>

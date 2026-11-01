@@ -14,12 +14,12 @@
 <meta property="og:url" content="https://brbrics.com.br/contratos.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 <style>
   .ct-stat { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 16px; }
   .ct-stat > div { background: var(--card); padding: 13px; border-radius: 10px; text-align: center; }
-  .ct-v { font-size: 21px; font-weight: 800; color: var(--marca); }
+  .ct-v { font-size: 16px; font-weight: 800; color: var(--marca); }
   .ct-l { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
   .esfera { display: inline-block; font-size: 10.5px; font-weight: 800; border-radius: 5px; padding: 1px 6px; margin-right: 6px; vertical-align: 1px; }
   .es-F { background: #14324f; color: #7DD3FC; } .es-E { background: #2f1f43; color: #E18DFF; }
@@ -39,7 +39,7 @@
   <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:28px 0;text-align:center">
+  <section class="hero hero-centro" style="padding:28px 0;text-align:center">
     <p class="kicker">PNCP · o dinheiro já contratado</p>
     <h1>Contratos <span class="hl">públicos assinados</span></h1>
     <p class="sub">Aqui não é a disputa: é o contrato que saiu dela. Cada linha é um termo publicado no Portal Nacional de Contratações Públicas, com objeto, órgão, fornecedor, valor e vigência. Os dados chegam direto do PNCP, sem cadastro e sem chave.</p>
@@ -49,7 +49,7 @@
     <div><div class="ct-v" id="st-total">—</div><div class="ct-l">Contratos no período</div></div>
     <div><div class="ct-v" id="st-soma">—</div><div class="ct-l">Soma da amostra lida</div></div>
     <div><div class="ct-v" id="st-lidos">—</div><div class="ct-l">Leituras trazidas da fonte</div></div>
-    <div><div class="ct-v" id="st-quando" style="font-size:15px">—</div><div class="ct-l">Consulta de</div></div>
+    <div><div class="ct-v" id="st-quando" style="font-size:13px">—</div><div class="ct-l">Consulta de</div></div>
   </div>
 
   <section class="card">
@@ -67,14 +67,14 @@
       <button class="btn" id="btn-ir">Consultar</button>
       <button class="btn ghost" id="btn-csv">Exportar CSV</button>
     </div>
-    <p class="muted" id="status" style="font-size:13px;margin:6px 0 12px">Escolhendo o período dos últimos sete dias…</p>
+    <p class="muted" id="status" style="font-size:12px;margin:6px 0 12px">Escolhendo o período dos últimos sete dias…</p>
     <div style="overflow-x:auto"><table><thead>
       <tr><th>Objeto</th><th>Órgão contratante</th><th>Onde</th><th>Fornecedor</th><th>Assinado</th><th>Valor</th></tr>
     </thead><tbody id="tb"><tr><td colspan="6" class="muted">Carregando…</td></tr></tbody></table></div>
     <div class="toolbar" id="pager" style="justify-content:center;gap:12px;margin-top:14px"></div>
   </section>
 
-  <div class="legend" style="background:var(--card);padding:14px 16px;border-radius:12px;font-size:14px;color:var(--muted);margin-top:16px">
+  <div class="legend" style="background:var(--card);padding:14px 16px;border-radius:12px;font-size:12px;color:var(--muted);margin-top:16px">
     <strong style="color:var(--paper)">📋 Como ler:</strong> o valor é o total global do contrato, o que foi empenhado para o objeto inteiro — não só a parcela do mês. <em>Assinado</em> é a data do termo; a publicação no PNCP pode vir depois. Quando há emenda parlamentar ligada ao contrato, o autor aparece marcado no objeto. O PNCP não filtra por estado, esfera nem por palavra, então esses três filtros correm sobre as leituras que a varredura trouxe da fonte — e por isso uma busca filtrada leva alguns segundos a mais. Se o aviso disser que a varredura parou antes do fim, há mais contratos do que os encontrados na amostra: espere um pouco e consulte de novo. Para ver as disputas abertas, use <a href="licitacoes.html">Licitações</a>; para o histórico de um órgão, clique no nome dele.
   </div>
 </main>

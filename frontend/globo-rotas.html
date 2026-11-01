@@ -14,8 +14,8 @@
 <meta property="og:url" content="https://brbrics.com.br/globo-rotas.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 <style>
   .ct-globo { position: relative; height: min(76vh, 720px); border-radius: 12px; overflow: hidden; background: #05050a; }
   .ct-globo .aviso { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--muted); }
@@ -23,7 +23,7 @@
   @media(max-width:900px){ .ct-lado { grid-template-columns: 1fr; } }
   .ct-painel { background: var(--card); border-radius: 12px; padding: 14px; position: sticky; top: 12px; }
   .ct-painel h3 { margin: 0 0 8px; }
-  .ct-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+  .ct-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; padding: 5px 0; border-bottom: 1px solid var(--line); }
   .ct-linha b { color: var(--marca); text-align: right; }
   .ct-leg { font-size: 12.5px; color: var(--muted); margin-top: 10px; }
   .ct-leg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 10px; vertical-align: -1px; }
@@ -31,7 +31,7 @@
   .globo-tip b { color: var(--marca); }
   .ct-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
   .ct-stats > div { background: var(--card); padding: 11px; border-radius: 10px; text-align: center; }
-  .ct-v { font-size: 18px; font-weight: 800; color: var(--marca); }
+  .ct-v { font-size: 14px; font-weight: 800; color: var(--marca); }
   .ct-l { font-size: 11px; color: var(--muted); margin-top: 2px; }
   .ct-lista { max-height: 300px; overflow: auto; margin-top: 8px; }
   .ct-lista a { display: block; font-size: 12.5px; padding: 5px 0; border-bottom: 1px solid var(--line); color: var(--texto); text-decoration: none; }
@@ -49,7 +49,7 @@
   <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:22px 0 8px;text-align:center">
+  <section class="hero hero-centro" style="padding:22px 0 8px;text-align:center">
     <p class="kicker">OpenFlights · malha de aviação comercial</p>
     <h1>As rotas aéreas <span class="hl">do mundo inteiro</span></h1>
     <p class="sub">Cada arco liga dois aeroportos e o tracejado que corre por ele é o fluxo de voos: quanto mais linhas áreas atendem o par, mais espesso e brilhante o arco. Os dourados têm origem ou destino no Brasil. Gire o planeta, clique num arco para ler a ficha do par.</p>
@@ -59,7 +59,7 @@
     <div><div class="ct-v" id="st-n">—</div><div class="ct-l">rotas desenhadas</div></div>
     <div><div class="ct-v" id="st-a">—</div><div class="ct-l">aeroportos servidos</div></div>
     <div><div class="ct-v" id="st-br">—</div><div class="ct-l">rotas com o Brasil</div></div>
-    <div><div class="ct-v" id="st-top" style="font-size:14px">—</div><div class="ct-l">par mais atendido</div></div>
+    <div><div class="ct-v" id="st-top" style="font-size:12px">—</div><div class="ct-l">par mais atendido</div></div>
   </div>
 
   <div class="ct-lado">
@@ -87,7 +87,7 @@
 
     <aside class="ct-painel">
       <h3 id="p-titulo">Escolha uma rota no globo</h3>
-      <div id="p-corpo" class="muted" style="font-size:13px">Clique num arco para ver os dois aeroportos, quantas linhas áreas atendem a ligação e o peso de cada um na malha.</div>
+      <div id="p-corpo" class="muted" style="font-size:12px">Clique num arco para ver os dois aeroportos, quantas linhas áreas atendem a ligação e o peso de cada um na malha.</div>
       <div class="ct-lista" id="p-lista"></div>
     </aside>
   </div>

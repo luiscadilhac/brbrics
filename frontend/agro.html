@@ -7,8 +7,8 @@
 <title>Agro — BrBRICS</title>
 <meta name="description" content="Safra por produto e UF (IBGE PAM), notícias do agro e Ministério da Agricultura.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 </head>
 <body>
 <header class="topbar">
@@ -22,7 +22,7 @@
   <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:28px 0;text-align:center">
+  <section class="hero hero-centro" style="padding:28px 0;text-align:center">
     <p class="kicker">IBGE PAM · MAPA · Conab</p>
     <h1>Safra <span class="hl">brasileira</span></h1>
     <p class="sub">Quantidade produzida e valor por produto e UF (Produção Agrícola Municipal) + notícias do agro.</p>
@@ -83,7 +83,7 @@ document.getElementById('btn-pam').onclick=function(){
       var linhas=rows.map(function(d){
         var w=Math.max(2,Math.round((d.valor||0)/max*100));
         var nome=prod==='all'?(d.produto+' · '+d.localidade):d.localidade;
-        return '<div style="display:flex;align-items:center;gap:8px;margin:7px 0"><span style="min-width:170px;font-size:13px">'+esc(nome)+'</span>'
+        return '<div style="display:flex;align-items:center;gap:8px;margin:7px 0"><span style="min-width:170px;font-size:12px">'+esc(nome)+'</span>'
         +'<span style="flex:1;background:#101014;border:1px solid var(--line);border-radius:99px;height:12px;overflow:hidden"><span style="display:block;height:100%;width:'+w+'%;background:var(--grad)"></span></span>'
         +'<small class="muted" style="min-width:150px;text-align:right">'+(d.valor!=null?Number(d.valor).toLocaleString('pt-BR'):'—')+' '+esc(s.unidade||'')+'</small></div>';
       }).join('');

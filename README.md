@@ -48,6 +48,35 @@ ficheiro, e o ticker de manchetes/mercado também.
 Ícones do menu: apenas as chaves definidas em `NAV_ICONS` em `common.js` produzem ícone; chave
 desconhecida significa item sem ícone, sem erro.
 
+## Tipografia: a régua é o menu
+
+A âncora do portal é o **menu principal, 11,5px** (`.nav a{font-size:.82rem}` com `html{font-size:14px}`).
+Nenhum texto escrito fica acima disso sem necessidade, e nenhum título de abertura passa de **16px**.
+Medida no navegador (`getComputedStyle`), página a página — não pelo número escrito no CSS.
+
+| Nível | Tamanho | Onde |
+|---|---|---|
+| menu principal | 11,5px | âncora, não se mexe |
+| submenus | 10,9px | sempre ≤ menu |
+| corpo / texto de leitura | 12,3px | `body{.88rem}` |
+| rótulo miúdo (etiqueta, cabeçalho de tabela, kicker) | 10,1px | piso: abaixo de 10px vira poeira |
+| título de cartão (h4) | 12px | manchetes e listas |
+| título de seção (h3 / h2) | 12,3px / 13,3px | |
+| número de KPI | 17px | `.stat-val` |
+| **título de abertura (h1)** | **16px** | o maior do site |
+
+Camadas: `style.css` é a base e `pro.css` é a que vence (carrega depois e usa `!important` nos
+títulos) — para mudar um título, muda-se no `pro.css`. Cada página também traz números próprios no
+seu `<style>` e em `style=""`; ao ajustar a escala, varre-se os 42 ficheiros (valores em px, não há
+`rem` inline). Depois de mexer em qualquer CSS, sobe-se o `?v=` em todas as páginas **e** no `CORE`
+do `sw.js`, e incrementa-se o `CACHE_NAME`.
+
+A abertura das 35 páginas de texto usa `.hero-centro` (coluna centrada). O `.hero` de duas colunas
+ficou só para a página inicial, que tem os cartões de KPI ao lado.
+
+O widget A-/A+ do menu (`aplicarFonte()` em `common.js`) mexe só no `font-size` da raiz, portanto
+afeta o que está em `rem`; os valores em px das páginas não escalam com ele.
+
 ## APIs
 
 O backend expõe ~65 rotas sob `/api/*`, todas com cache em memória. As principais por família:

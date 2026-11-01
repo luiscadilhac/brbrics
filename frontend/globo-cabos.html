@@ -14,8 +14,8 @@
 <meta property="og:url" content="https://brbrics.com.br/globo-cabos.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 <style>
   .ct-globo { position: relative; height: min(76vh, 720px); border-radius: 12px; overflow: hidden; background: #05050a; }
   .ct-globo .aviso { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--muted); }
@@ -23,7 +23,7 @@
   @media(max-width:900px){ .ct-lado { grid-template-columns: 1fr; } }
   .ct-painel { background: var(--card); border-radius: 12px; padding: 14px; position: sticky; top: 12px; }
   .ct-painel h3 { margin: 0 0 8px; }
-  .ct-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+  .ct-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; padding: 5px 0; border-bottom: 1px solid var(--line); }
   .ct-linha b { color: var(--marca); text-align: right; }
   .ct-leg { font-size: 12.5px; color: var(--muted); margin-top: 10px; }
   .ct-leg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 10px; vertical-align: -1px; }
@@ -31,7 +31,7 @@
   .globo-tip b { color: var(--marca); }
   .ct-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
   .ct-stats > div { background: var(--card); padding: 11px; border-radius: 10px; text-align: center; }
-  .ct-v { font-size: 18px; font-weight: 800; color: var(--marca); }
+  .ct-v { font-size: 14px; font-weight: 800; color: var(--marca); }
   .ct-l { font-size: 11px; color: var(--muted); margin-top: 2px; }
 </style>
 </head>
@@ -46,7 +46,7 @@
   <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:22px 0 8px;text-align:center">
+  <section class="hero hero-centro" style="padding:22px 0 8px;text-align:center">
     <p class="kicker">Submarine Cable Map · TeleGeography</p>
     <h1>A internet <span class="hl">por baixo do mar</span></h1>
     <p class="sub">Quase todo o tráfego internacional de dados — videochamadas, pagamentos, sites — corre por cabos de fibra óptica no fundo do oceano. Cada linha no globo é o traçado de um cabo. Passe o mouse para ler o nome, clique para abrir a ficha e ligue o filtro dourado para ver os que passam pela costa do Brasil.</p>
@@ -56,7 +56,7 @@
     <div><div class="ct-v" id="st-n">—</div><div class="ct-l">cabos desenhados</div></div>
     <div><div class="ct-v" id="st-t">—</div><div class="ct-l">trechos de fibra</div></div>
     <div><div class="ct-v" id="st-br">—</div><div class="ct-l">tocam a caixa do litoral BR</div></div>
-    <div><div class="ct-v" id="st-quando" style="font-size:14px">—</div><div class="ct-l">catálogo lido em</div></div>
+    <div><div class="ct-v" id="st-quando" style="font-size:12px">—</div><div class="ct-l">catálogo lido em</div></div>
   </div>
 
   <div class="ct-lado">
@@ -82,7 +82,7 @@
 
     <aside class="ct-painel">
       <h3 id="p-titulo">Escolha um cabo no globo</h3>
-      <div id="p-corpo" class="muted" style="font-size:13px">Clique em qualquer linha para ver o nome, quantos trechos o compõem e onde ele começa e termina.</div>
+      <div id="p-corpo" class="muted" style="font-size:12px">Clique em qualquer linha para ver o nome, quantos trechos o compõem e onde ele começa e termina.</div>
     </aside>
   </div>
 </main>

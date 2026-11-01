@@ -6,28 +6,28 @@
 <title>Satélites em Órbita — BrBRICS</title>
 <meta name="description" content="Satélites em órbita da Terra agora — brasileiros, chineses, americanos, russos e europeus — calculados a partir dos elementos orbitais abertos (CelesTrak, SATNOGS) com o motor SGP4 do satellite.js.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   #map { height: 72vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
   .layer-panel { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
   .layer-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
-  .layer-row label { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .layer-row label { font-size: 12px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
   .layer-row input { accent-color: var(--marca); }
-  .layer-row select { background: var(--card2); color: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 13px; }
-  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  .layer-row select { background: var(--card2); color: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 12px; }
+  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; }
   .btn-sm:hover { transform: translateY(-1px); }
   .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
   .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
-  .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
+  .stat-val { font-size: 17px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .legend { background: var(--card); padding: 14px 16px; border-radius: 12px; font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .legend { background: var(--card); padding: 14px 16px; border-radius: 12px; font-size: 12px; color: var(--muted); margin-bottom: 16px; }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
   .chips span { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; background: var(--card2); }
   .relogio { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--paper); }
   #lista-sats { max-height: 340px; overflow-y: auto; }
-  .sat-card { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; font-size: 13px; }
+  .sat-card { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; font-size: 12px; }
   .sat-card b { color: var(--paper); }
   .pastilha { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
 </style>
@@ -43,7 +43,7 @@
   <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:28px 0;text-align:center">
+  <section class="hero hero-centro" style="padding:28px 0;text-align:center">
     <p class="kicker">🛰️ Órbita baixa e geoestacionária — neste instante</p>
     <h1>Satélites brasileiros, chineses, americanos, russos e europeus no céu</h1>
     <p class="sub">O portal baixa os elementos orbitais abertos — os conjuntos do CelesTrak e, quando ele não responde, a base da SATNOGS — e calcula a posição de cada satélite no seu navegador, com o motor SGP4 da biblioteca aberta satellite.js. Não é foto de satélite: é a conta de onde ele está neste segundo.</p>
@@ -53,17 +53,17 @@
     <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Satélites rastreados</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-brasil">—</div><div class="stat-lab">Sobre o Brasil agora</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-altura">—</div><div class="stat-lab">Altitude média (km)</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-elementos" style="font-size:15px">—</div><div class="stat-lab">Elementos orbitais de</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-elementos" style="font-size:13px">—</div><div class="stat-lab">Elementos orbitais de</div></div>
   </div>
 
   <div class="layer-panel">
     <div class="layer-row"><strong style="color:var(--paper)">Ver a órbita:</strong></div>
     <div class="layer-row">
-      <span class="muted" style="font-size:13px">País:</span>
+      <span class="muted" style="font-size:12px">País:</span>
       <select id="flt-pais"><option value="">Todos</option></select>
-      <span class="muted" style="font-size:13px">Finalidade:</span>
+      <span class="muted" style="font-size:12px">Finalidade:</span>
       <select id="flt-rot"><option value="">Todas</option></select>
-      <span class="muted" style="font-size:13px">Ritmo:</span>
+      <span class="muted" style="font-size:12px">Ritmo:</span>
       <select id="flt-tempo">
         <option value="1">Tempo real</option>
         <option value="10">10× mais rápido</option>
@@ -87,9 +87,9 @@
       <span><i class="pastilha" style="background:#A7A7B3"></i>Outro / não informado</span>
     </div>
     <div class="layer-row" style="margin-top:6px">
-      <span class="muted" style="font-size:13px">Hora simulada (UTC): <span class="relogio" id="hora-sim">—</span></span>
+      <span class="muted" style="font-size:12px">Hora simulada (UTC): <span class="relogio" id="hora-sim">—</span></span>
     </div>
-    <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Baixando os elementos orbitais…</p>
+    <p id="status-dados" class="muted" style="font-size:12px;margin:8px 0 0">Baixando os elementos orbitais…</p>
   </div>
 
   <div id="map"></div>
@@ -100,7 +100,7 @@
 
   <section class="card">
     <div class="card-h"><h2>🛰️ O que está sendo rastreado</h2></div>
-    <div id="lista-sats" class="muted" style="font-size:14px">Aguarde a leitura dos elementos orbitais…</div>
+    <div id="lista-sats" class="muted" style="font-size:12px">Aguarde a leitura dos elementos orbitais…</div>
   </section>
 </main>
 <footer>

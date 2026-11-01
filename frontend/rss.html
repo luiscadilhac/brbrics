@@ -6,17 +6,17 @@
 <title>RSS — Feeds Oficiais — BrBRICS</title>
 <meta name="description" content="Notícias e publicações oficiais via RSS: Diário Oficial da União, Agência Brasil, IBGE e ANEEL.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 <style>
   .fontes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 24px; }
   .fonte-card { background: var(--card); border-radius: 10px; padding: 16px; border:1px solid var(--marco-dentro); }
-  .fonte-card h4 { margin: 0 0 8px; color: var(--marca); font-size: 15px; }
+  .fonte-card h4 { margin: 0 0 8px; color: var(--marca); font-size: 13px; }
   .fonte-card p { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
-  .btn-rss { background: var(--grad); color: #141414; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; width: 100%; }
+  .btn-rss { background: var(--grad); color: #141414; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; width: 100%; }
   .btn-rss:hover { transform: translateY(-1px); }
   .itens-lista { background: var(--card2); border-radius: 10px; padding: 0; border:1px solid var(--marco-dentro); max-height: 600px; overflow-y: auto; }
-  .item-rss { padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .item-rss { padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 12px; }
   .item-rss:last-child { border-bottom: none; }
   .item-rss b { color: var(--paper); display: block; margin-bottom: 4px; }
   .item-rss .muted { font-size: 11px; color: var(--muted); }
@@ -24,7 +24,7 @@
   .item-rss a:hover { text-decoration: underline; }
   .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
   .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
-  .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
+  .stat-val { font-size: 17px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
 </style>
 </head>
@@ -39,7 +39,7 @@
   <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:28px 0;text-align:center">
+  <section class="hero hero-centro" style="padding:28px 0;text-align:center">
     <p class="kicker">📰 RSS — Feeds Oficiais</p>
     <h1>Notícias e Publicações do Governo</h1>
     <p class="sub">Diário Oficial da União, Agência Brasil, IBGE e ANEEL — atualização automática via RSS.</p>
@@ -150,7 +150,7 @@ function preencheFeedBrbrics(){
   if (campo) campo.value = endereco;
   if (gnews) gnews.href = 'https://news.google.com/addfeed?feed=' + encodeURIComponent(endereco);
   if (lista) lista.innerHTML =
-      '<article><h3 style="margin:0 0 4px;font-size:17px">O que sai no feed do portal</h3>'
+      '<article><h3 style="margin:0 0 4px;font-size:13px">O que sai no feed do portal</h3>'
     + '<p style="margin:6px 0 0">Manchetes e publicações reunidas pelo BrBRICS: Diário Oficial da União, '
     + 'licitações do PNCP, proposições do Congresso e atualizações de agências reguladoras.</p>'
     + '<p style="margin:8px 0 0" class="muted">Endereço único: <b>' + esc(endereco) + '</b> '

@@ -7,8 +7,8 @@
 <title>Comércio Exterior — BrBRICS</title>
 <meta name="description" content="Balança comercial por UF e principais parceiros do Brasil (MDIC ComexStat, API oficial).">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 </head>
 <body>
 <header class="topbar">
@@ -22,7 +22,7 @@
   <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:28px 0;text-align:center">
+  <section class="hero hero-centro" style="padding:28px 0;text-align:center">
     <p class="kicker">MDIC — ComexStat (API oficial)</p>
     <h1>Balança <span class="hl">comercial</span></h1>
     <p class="sub">Exportações, importações e saldo por UF, além dos principais parceiros do Brasil — em US$ FOB.</p>
@@ -68,7 +68,7 @@ function barras(items, fmt){
   return items.map(function(x){
     var v=x.valor!=null?x.valor:(x.mov||0);
     var w=Math.max(2,Math.round(v/max*100));
-    return '<div style="display:flex;align-items:center;gap:8px;margin:7px 0"><span style="min-width:150px;font-size:13px">'+esc(x.rotulo||x.uf||'')+'</span>'
+    return '<div style="display:flex;align-items:center;gap:8px;margin:7px 0"><span style="min-width:150px;font-size:12px">'+esc(x.rotulo||x.uf||'')+'</span>'
     +'<span style="flex:1;background:#101014;border:1px solid var(--line);border-radius:99px;height:12px;overflow:hidden"><span style="display:block;height:100%;width:'+w+'%;background:var(--grad)"></span></span>'
     +'<small class="muted" style="min-width:130px;text-align:right">'+esc(fmt?fmt(v):bi(v))+'</small></div>';
   }).join('');

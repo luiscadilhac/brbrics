@@ -7,8 +7,8 @@
 <title>Clima — BrBRICS</title>
 <meta name="description" content="Previsão do tempo nas 27 capitais: máxima, mínima, chuva e vento. Fonte numérica aberta + INMET oficial.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon"><link rel="icon" href="favicon.png?v=50" type="image/png" sizes="64x64">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 </head>
 <body>
 <header class="topbar">
@@ -22,7 +22,7 @@
   <div class="ticker"><div class="ticker-track" id="ticker-in">Carregando notícias...</div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:28px 0;text-align:center">
+  <section class="hero hero-centro" style="padding:28px 0;text-align:center">
     <p class="kicker">Previsão 5 dias · 27 capitais</p>
     <h1>Tempo <span class="hl">no Brasil</span></h1>
     <p class="sub">Máxima, mínima, chuva e vento por capital. Modelo numérico aberto + <a href="https://portal.inmet.gov.br/" target="_blank" rel="noopener" style="color:var(--marca)">INMET oficial</a> para alertas.</p>
@@ -71,7 +71,7 @@ jget('/api/clima/capitais').then(function(r){
     var h=(c.dias||[])[0]||{};
     return '<article class="news-card"><div class="news-body" style="text-align:center;cursor:pointer" onclick="document.getElementById(\'sel-cap\').value=\''+i+'\';verCap()">'
     +'<h4>'+esc(c.cidade)+'/'+esc(c.uf)+'</h4>'+icoClima(h.icone)
-    +'<p style="font-size:20px;margin:6px 0"><b style="color:var(--marca)">'+esc(h.max!=null?Math.round(h.max)+'°':'—')+'</b> <span class="muted">'+esc(h.min!=null?Math.round(h.min)+'°':'')+'</span></p>'
+    +'<p style="font-size:17px;margin:6px 0"><b style="color:var(--marca)">'+esc(h.max!=null?Math.round(h.max)+'°':'—')+'</b> <span class="muted">'+esc(h.min!=null?Math.round(h.min)+'°':'')+'</span></p>'
     +'<small class="muted">'+esc(h.condicao||'')+(h.chuva?' · '+esc(h.chuva)+' mm':'')+'</small></div></article>';
   }).join('')||emptyHTML('Sem dados de clima','Tente mais tarde.');
 }).catch(function(){document.getElementById('grid-caps').innerHTML='<p class="muted">Clima indisponível.</p>';});

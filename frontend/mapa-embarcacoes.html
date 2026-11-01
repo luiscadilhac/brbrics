@@ -6,27 +6,27 @@
 <title>Mapa de Embarcações — BrBRICS</title>
 <meta name="description" content="Navios navegando na costa e nos rios do Brasil em tempo real pelo AIS (Automatic Identification System) da rede aberta Open Waters, sem cadastro e sem chave de API.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   #map { height: 70vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
   .layer-panel { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
   .layer-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
-  .layer-row label { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .layer-row label { font-size: 12px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
   .layer-row input { accent-color: var(--marca); }
-  .layer-row select { background: var(--card2); color: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 13px; }
-  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  .layer-row select { background: var(--card2); color: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 12px; }
+  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; }
   .btn-sm:hover { transform: translateY(-1px); }
   .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
   .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
-  .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
+  .stat-val { font-size: 17px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .legend { background: var(--card); padding: 14px 16px; border-radius: 12px; font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .legend { background: var(--card); padding: 14px 16px; border-radius: 12px; font-size: 12px; color: var(--muted); margin-bottom: 16px; }
   .navio-icone { background: none; border: none; }
   .navio-giro { width: 22px; height: 22px; transform-origin: 50% 50%; transition: transform .9s linear; }
   .navio-giro svg { display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.7)); }
-  .navio-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; cursor: pointer; font-size: 13px; }
+  .navio-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; cursor: pointer; font-size: 12px; }
   .navio-card:hover { border-color: var(--acc); }
   .navio-card b { color: var(--paper); }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
@@ -44,7 +44,7 @@
   <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:28px 0;text-align:center">
+  <section class="hero hero-centro" style="padding:28px 0;text-align:center">
     <p class="kicker">🚢 Embarcações ao vivo — AIS</p>
     <h1>Navios navegando pelo litoral e pelos rios do Brasil</h1>
     <p class="sub">Cada posição vem do transponder AIS da própria embarcação, coletado pela rede aberta de receptores Open Waters. Estão no mapa tanto os navios em movimento quanto os fundeados e atracados — que são a maioria. Quem está em movimento avança no mapa entre uma leitura e outra. Sem cadastro e sem chave de API.</p>
@@ -54,7 +54,7 @@
     <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Embarcações captadas</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-navegando">—</div><div class="stat-lab">Efetivamente navegando</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última leitura</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-fonte" style="font-size:15px">—</div><div class="stat-lab">Fonte de dados</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-fonte" style="font-size:13px">—</div><div class="stat-lab">Fonte de dados</div></div>
   </div>
 
   <div class="layer-panel">
@@ -68,9 +68,9 @@
       <label><input type="checkbox" id="flt-navegando"> Só quem está em movimento</label>
     </div>
     <div class="layer-row">
-      <span class="muted" style="font-size:13px">Tipo:</span>
+      <span class="muted" style="font-size:12px">Tipo:</span>
       <select id="flt-tipo"><option value="">Todos</option></select>
-      <span class="muted" style="font-size:13px">Região:</span>
+      <span class="muted" style="font-size:12px">Região:</span>
       <select id="flt-caixa"><option value="">Todas</option></select>
     </div>
     <div class="layer-row" style="margin-top:8px">
@@ -83,7 +83,7 @@
       <span style="color:#8b8b96">● atracado, sem transmissão recente</span>
       <span style="color:var(--ico-vivo)">⚓ porto organizador</span>
     </div>
-    <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Consultando os receptores AIS…</p>
+    <p id="status-dados" class="muted" style="font-size:12px;margin:8px 0 0">Consultando os receptores AIS…</p>
   </div>
 
   <div id="map"></div>
@@ -99,17 +99,17 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
         <h4 style="margin:0 0 8px;color:var(--marca)">Open Waters AIS</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Rede aberta de receptores AIS com end-point público em GeoJSON. É a fonte das posições deste mapa.</p>
+        <p style="font-size:12px;color:var(--muted);margin:0 0 8px">Rede aberta de receptores AIS com end-point público em GeoJSON. É a fonte das posições deste mapa.</p>
         <a href="https://openwaters.io/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">openwaters.io →</a>
       </div>
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
         <h4 style="margin:0 0 8px;color:var(--marca)">Sistema AIS</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Todo navio acima de 300 toneladas é obrigado a emitir posição, rumo e velocidade por AIS. É um sinal de rádio aberto, recebido por antenas costeiras.</p>
+        <p style="font-size:12px;color:var(--muted);margin:0 0 8px">Todo navio acima de 300 toneladas é obrigado a emitir posição, rumo e velocidade por AIS. É um sinal de rádio aberto, recebido por antenas costeiras.</p>
         <a href="https://www.imo.org/en/MediaCentre/HotTopics/Pages/AIS.aspx" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">O que a OMI diz →</a>
       </div>
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--line)">
         <h4 style="margin:0 0 8px;color:var(--marca)">Portos organizadores</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">A camada fixa de portos é compilação própria do BrBRICS, com coordenadas aproximadas das bocas de portos brasileiros.</p>
+        <p style="font-size:12px;color:var(--muted);margin:0 0 8px">A camada fixa de portos é compilação própria do BrBRICS, com coordenadas aproximadas das bocas de portos brasileiros.</p>
         <a href="diretorios.html" style="color:var(--marca);font-size:12px">Diretórios do portal →</a>
       </div>
     </div>

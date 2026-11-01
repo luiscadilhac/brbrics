@@ -6,8 +6,8 @@
 <title>Câmeras ao Vivo — BrBRICS</title>
 <meta name="description" content="Câmeras ao vivo dentro do portal: trânsito de Santo André (SP) em vídeo contínuo, praias, cidades, portos e mirantes do Brasil e do mundo pela transmissão aberta de cada câmera.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=59">
-<link rel="stylesheet" href="pro.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="pro.css?v=60">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   #map { height: 52vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin: 0; }
@@ -23,34 +23,34 @@
   .visor-tela { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; }
   .visor-tela iframe, .visor-tela img { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: contain; }
   .visor-tela .vazio { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    color: var(--muted); font-size: 14px; text-align: center; padding: 20px; }
+    color: var(--muted); font-size: 12px; text-align: center; padding: 20px; }
   .visor-rodape { display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; padding: 9px 12px;
-    background: var(--card); border-top: 1px solid var(--marco-dentro); font-size: 13px; }
+    background: var(--card); border-top: 1px solid var(--marco-dentro); font-size: 12px; }
   .visor-rodape b { color: var(--paper); }
   .visor-rodape .muted { color: var(--muted); font-size: 12px; }
   .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
   .stat-card { background: var(--card); border: 1px solid var(--marco-dentro); padding: 14px; border-radius: 10px; text-align: center; }
-  .stat-val { font-size: 24px; font-weight: 800; color: var(--marca); }
+  .stat-val { font-size: 17px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .filtro { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 14px; }
-  .filtro button { background: transparent; color: var(--marca); border: 1px solid #4a4a55; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  .filtro button { background: transparent; color: var(--marca); border: 1px solid #4a4a55; padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; }
   .filtro button.ativo { background: var(--marca); color: #141414; font-weight: 800; }
   .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 14px; margin: 0; overflow-y: auto; overscroll-behavior: contain; }
-  .cam-card { background: var(--card2); border: 1px solid var(--marco-dentro); border-radius: 12px; overflow: hidden; cursor: pointer; font-size: 13px; }
+  .cam-card { background: var(--card2); border: 1px solid var(--marco-dentro); border-radius: 12px; overflow: hidden; cursor: pointer; font-size: 12px; }
   .cam-card:hover { transform: translateY(-2px); }
   .cam-card.escolhida { outline: 2px solid var(--marca); }
   .cam-foto { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; }
   .cam-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .cam-foto .play { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
     width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,.55); color: var(--marca);
-    display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid var(--marca); }
+    display: flex; align-items: center; justify-content: center; font-size: 14px; border: 2px solid var(--marca); }
   .cam-foto .ao-vivo { position: absolute; left: 8px; top: 8px; background: rgba(0,0,0,.6); color: #FF6B6B;
     font-size: 10px; font-weight: 800; letter-spacing: .6px; padding: 3px 7px; border-radius: 6px; }
   .cam-txt { padding: 9px 11px 11px; }
-  .cam-txt b { color: var(--paper); display: block; margin-bottom: 3px; font-size: 13px; }
+  .cam-txt b { color: var(--paper); display: block; margin-bottom: 3px; font-size: 12px; }
   .cam-txt .muted { color: var(--muted); font-size: 11px; }
   .selo { display: inline-block; font-size: 10px; border: 1px solid var(--marco-dentro); border-radius: 999px; padding: 1px 8px; margin-top: 6px; color: var(--muted); }
-  .aviso { background: var(--card2); border: 1px solid var(--marco-dentro); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .aviso { background: var(--card2); border: 1px solid var(--marco-dentro); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--muted); margin-bottom: 14px; }
 </style>
 </head>
 <body>
@@ -64,7 +64,7 @@
   <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:24px 0;text-align:center">
+  <section class="hero hero-centro" style="padding:24px 0;text-align:center">
     <p class="kicker">📹 Câmeras ao vivo</p>
     <h1>O vídeo da câmera dentro do portal</h1>
     <p class="sub">Trânsito de Santo André (SP) em vídeo contínuo, praias, cidades, portos e mirantes de vários estados e mais 62 câmeras públicas do mundo — portos, praias, cidades, mirantes, natureza e aeroportos — pela transmissão aberta de cada câmera. Nada de link para página de órgão público.</p>
@@ -114,22 +114,22 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--marco-dentro)">
         <h4 style="margin:0 0 8px;color:var(--marca)">Trânsito — Santo André (SP)</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Vídeo MJPEG do centro de monitoramento da prefeitura. As 16 câmeras vivas foram conferidas uma a uma: só entrou quem entrega quadro novo.</p>
+        <p style="font-size:12px;color:var(--muted);margin:0 0 8px">Vídeo MJPEG do centro de monitoramento da prefeitura. As 16 câmeras vivas foram conferidas uma a uma: só entrou quem entrega quadro novo.</p>
         <a href="https://www.santoandre.sp.gov.br/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">Prefeitura de Santo André →</a>
       </div>
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--marco-dentro)">
         <h4 style="margin:0 0 8px;color:var(--marca)">Praias e cidades — SkylineWebcams</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Câmeras abertas de vários estados. O vídeo vivo delas é uma transmissão contínua no YouTube, e é ela que abre aqui no portal.</p>
+        <p style="font-size:12px;color:var(--muted);margin:0 0 8px">Câmeras abertas de vários estados. O vídeo vivo delas é uma transmissão contínua no YouTube, e é ela que abre aqui no portal.</p>
         <a href="https://www.skylinewebcams.com/pt/webcam/brasil.html" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">SkylineWebcams →</a>
       </div>
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--marco-dentro)">
         <h4 style="margin:0 0 8px;color:var(--marca)">No mundo — autoridade do porto, prefeitura, reserva</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">62 câmeras em 23 países: portos de Roterdã, Hamburgo, Helsinki, Dublin, Sydney; praias e praças de cidades; mirantes; aeroportos de Praga, Lisboa e Heathrow; poços de água de reservas na África e geleiras no norte. Todas são transmissões 24 horas que o próprio dono da câmera abre no YouTube — nada de TV paga e nada de câmera de segurança de terceiros exposta por engano. Cada uma foi conferida em 1º de novembro de 2026: quadro novo e vídeo que abre aqui dentro.</p>
+        <p style="font-size:12px;color:var(--muted);margin:0 0 8px">62 câmeras em 23 países: portos de Roterdã, Hamburgo, Helsinki, Dublin, Sydney; praias e praças de cidades; mirantes; aeroportos de Praga, Lisboa e Heathrow; poços de água de reservas na África e geleiras no norte. Todas são transmissões 24 horas que o próprio dono da câmera abre no YouTube — nada de TV paga e nada de câmera de segurança de terceiros exposta por engano. Cada uma foi conferida em 1º de novembro de 2026: quadro novo e vídeo que abre aqui dentro.</p>
         <a href="https://www.earthcam.net/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">EarthCam (uma das redes) →</a>
       </div>
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--marco-dentro)">
         <h4 style="margin:0 0 8px;color:var(--marca)">Por que não CET-SP e DNIT</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">As câmeras de trânsito desses órgãos foram testadas uma a uma: mudaram de endereço, exigem chave ou devolvem fotografia parada de anos atrás. Nenhuma entrega imagem viva por fora do site deles.</p>
+        <p style="font-size:12px;color:var(--muted);margin:0 0 8px">As câmeras de trânsito desses órgãos foram testadas uma a uma: mudaram de endereço, exigem chave ou devolvem fotografia parada de anos atrás. Nenhuma entrega imagem viva por fora do site deles.</p>
         <span class="muted" style="font-size:12px">Nada embutido daqui.</span>
       </div>
     </div>
