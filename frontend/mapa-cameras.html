@@ -10,8 +10,16 @@
 <link rel="stylesheet" href="pro.css?v=59">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-  #map { height: 52vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
-  .visor { background: #0b0b0f; border: 2px solid var(--marco-fora); border-radius: 14px; overflow: hidden; margin-bottom: 8px; }
+  #map { height: 52vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin: 0; }
+  .palco { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+  /* Visor e mapa formam uma coluna em fluxo normal: o mapa sai colado embaixo da
+     câmera grande, sem linha de grid que possa abrir vão entre os dois. */
+  .palco .visor { margin-bottom: 14px; }
+  @media (max-width: 1100px) {
+    .palco { grid-template-columns: 1fr; }
+    .palco .grade { max-height: none !important; }
+  }
+  .visor { background: #0b0b0f; border: 2px solid var(--marco-fora); border-radius: 14px; overflow: hidden; margin-bottom: 0; }
   .visor-tela { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; }
   .visor-tela iframe, .visor-tela img { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: contain; }
   .visor-tela .vazio { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -24,10 +32,10 @@
   .stat-card { background: var(--card); border: 1px solid var(--marco-dentro); padding: 14px; border-radius: 10px; text-align: center; }
   .stat-val { font-size: 24px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .filtro { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .filtro { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 14px; }
   .filtro button { background: transparent; color: var(--marca); border: 1px solid #4a4a55; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; }
   .filtro button.ativo { background: var(--marca); color: #141414; font-weight: 800; }
-  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; margin: 16px 0 24px; }
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 14px; margin: 0; overflow-y: auto; overscroll-behavior: contain; }
   .cam-card { background: var(--card2); border: 1px solid var(--marco-dentro); border-radius: 12px; overflow: hidden; cursor: pointer; font-size: 13px; }
   .cam-card:hover { transform: translateY(-2px); }
   .cam-card.escolhida { outline: 2px solid var(--marca); }
@@ -62,22 +70,6 @@
     <p class="sub">Trânsito de Santo André (SP) em vídeo contínuo e praias, cidades, portos e mirantes de vários estados pela transmissão aberta de cada câmera. Nada de link para página de órgão público.</p>
   </section>
 
-  <div class="visor">
-    <div class="visor-tela" id="visor-tela"><div class="vazio">Escolhendo uma câmera…</div></div>
-    <div class="visor-rodape">
-      <b id="visor-nome">—</b>
-      <span class="muted" id="visor-onde">—</span>
-      <span class="muted" id="visor-fonte" style="margin-left:auto">—</span>
-    </div>
-  </div>
-
-  <div class="stat-row">
-    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Câmeras no portal</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-transito">—</div><div class="stat-lab">De trânsito (vídeo contínuo)</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-cidades">—</div><div class="stat-lab">Cidades</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última leitura</div></div>
-  </div>
-
   <div class="filtro" id="filtros">
     <button class="filtro-btn ativo" data-tipo="todos">Todas</button>
     <button class="filtro-btn" data-tipo="transito">Trânsito</button>
@@ -87,11 +79,31 @@
     <button class="filtro-btn" data-tipo="mirante">Mirantes</button>
   </div>
 
+  <div class="palco">
+    <div class="coluna">
+      <div class="visor">
+        <div class="visor-tela" id="visor-tela"><div class="vazio">Escolhendo uma câmera…</div></div>
+        <div class="visor-rodape">
+          <b id="visor-nome">—</b>
+          <span class="muted" id="visor-onde">—</span>
+          <span class="muted" id="visor-fonte" style="margin-left:auto">—</span>
+        </div>
+      </div>
+
+      <div id="map"></div>
+    </div>
+
+    <div class="grade" id="grade-cameras"></div>
+  </div>
+
   <p class="aviso" id="aviso-cameras">Carregando as câmeras…</p>
 
-  <div id="map"></div>
-
-  <div class="grade" id="grade-cameras"></div>
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Câmeras no portal</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-transito">—</div><div class="stat-lab">De trânsito (vídeo contínuo)</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-cidades">—</div><div class="stat-lab">Cidades</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última leitura</div></div>
+  </div>
 
   <section class="card">
     <div class="card-h"><h2>📡 De onde vem cada imagem</h2></div>
@@ -135,9 +147,9 @@ function esc(s) { return String(s || '—').replace(/&/g,'&amp;').replace(/</g,'
 
 function initMap() {
   map = L.map('map').setView([-18.5, -48.5], 4);
-  setTimeout(function(){ map.invalidateSize(); }, 200);
-  window.addEventListener('load', function(){ map.invalidateSize(); });
-  window.addEventListener('resize', function(){ map.invalidateSize(); });
+  setTimeout(function(){ map.invalidateSize(); encaixaColuna(); }, 200);
+  window.addEventListener('load', function(){ map.invalidateSize(); encaixaColuna(); });
+  window.addEventListener('resize', function(){ map.invalidateSize(); encaixaColuna(); });
   layers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
@@ -172,6 +184,17 @@ function rotulo(t) {
   return { transito: 'trânsito', praia: 'praia', cidade: 'cidade', porto: 'porto', mirante: 'mirante' }[t] || t;
 }
 
+// A coluna de cartões recebe a altura exata da coluna da câmera (visor + mapa) e rola
+// sozinha. Sem isso, os 40 cartões esticam o palco e o mapa perde o lugar ao pé da
+// câmera grande.
+function encaixaColuna() {
+  var grade = document.getElementById('grade-cameras');
+  var coluna = document.querySelector('.palco .coluna');
+  if (!grade || !coluna) return;
+  if (window.innerWidth <= 1100) { grade.style.maxHeight = ''; grade.scrollTop = 0; return; }
+  grade.style.maxHeight = Math.max(320, coluna.offsetHeight) + 'px';
+}
+
 function refazFiltro() {
   camerasLayer.clearLayers();
   var grade = document.getElementById('grade-cameras');
@@ -199,7 +222,8 @@ function refazFiltro() {
   });
   grade.innerHTML = html || '<p class="muted">Nenhuma câmera para este filtro.</p>';
   document.getElementById('aviso-cameras').textContent =
-    visiveis + ' câmera' + (visiveis === 1 ? '' : 's') + ' neste filtro — clique num cartão ou num ponto do mapa para abrir o vídeo aqui em cima.';
+    visiveis + ' câmera' + (visiveis === 1 ? '' : 's') + ' neste filtro — clique num cartão ao lado ou num ponto do mapa para trocar o vídeo.';
+  encaixaColuna();
 }
 
 function carrega() {
@@ -244,6 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!card) return;
     var c = TODAS.filter(function(k){ return String(k.id) === card.getAttribute('data-id'); })[0];
     mostra(c);
+    document.querySelector('.visor').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
 
   // O popup do mapa tem link "Assistir ao vivo": o Leaflet monta o popup em HTML proprio,
