@@ -12,7 +12,7 @@ var PAGINAS=[
   ['/mapa-brasil.html','weekly'],['/mapa-satelite.html','daily'],['/mapa-avioes.html','daily'],
   ['/mapa-embarcacoes.html','daily'],['/mapa-orbita.html','daily'],['/globo-satelites.html','daily'],
   ['/globo-terremotos.html','daily'],['/globo-cabos.html','weekly'],['/globo-rotas.html','weekly'],
-  ['/globo-lancamentos.html','daily'],['/mapa-cameras.html','weekly']
+  ['/globo-lancamentos.html','daily'],['/mapa-cameras.html','daily']
 ];
 function escX(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 // Host canonico do portal. Sitemap, robots e RSS nao podem sair no host da

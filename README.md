@@ -96,9 +96,9 @@ enquanto a fonte responde rápido (até 8s por pedido, alvo de 20 contratos) e, 
 de onde parou — a página pergunta a cada 5s, até 90s. A ficha fica 6h no cache (30min se a coleta
 veio incompleta, marcada `parcial`) e o último resultado bom serve de reserva quando a fonte falha.
 
-## Mapas ao vivo (aviões, navios, satélites)
+## Mapas ao vivo (aviões, navios, satélites, câmeras)
 
-Três painéis que se mexem sozinhos, todos com fonte **sem chave e sem cadastro** — o portal não pede
+Quatro painéis que se mexem sozinhos, todos com fonte **sem chave e sem cadastro** — o portal não pede
 registo a ninguém:
 
 - `/api/mapas/avioes` lê a **adsb.lol** (`/v2/lat/{lat}/lon/{lon}/dist/{km}`), rede comunitária de
@@ -110,16 +110,30 @@ registo a ninguém:
   glifo girado pelo rumo e, entre duas leituras, a posição avança por *dead reckoning* (velocidade e
   rumo que o próprio transponder reportou) a cada segundo.
 - `/api/mapas/embarcacoes` lê o **Open Waters AIS** (`/v1/vessels?bbox=minLat,minLon,maxLat,maxLon`),
-  GeoJSON aberto. A caixa grande (Brasil inteiro) truncava, por isso são 11 bboxes de porto/hidrovia
-  varridos em sequência com 150ms de pausa. Medido em 2026-10-30: 1.359 embarcações, ~168 de fato
-  navegando. Cache de 120s; a lista de portos deixou de ser o conteúdo e passou a camada fixa de
+  GeoJSON aberto. A caixa grande (Brasil inteiro) truncava, por isso são 17 bboxes de porto/hidrovia
+  varridos **em grupos de cinco ao mesmo tempo**, com 120ms de pausa entre grupos (um a um a varredura
+  passava de 30s e o visitante ficava olhando um mapa vazio). Medido em 2026-11-01: ~940 posições por leitura,
+  das quais ~140 navegando. O `max_age` da fonte **reduz** o resultado (227→173), então não é usado;
+  em vez dele a rota descarta o que passou de 24h (`IDADE_MAXIMA_AIS`) e marca o resto por frescor
+  (`agora`/`recente`/`antiga`). Cache de 120s. A lista de portos deixou de ser o conteúdo e virou camada fixa de
   referência (`portos` no payload). Na página, quem está acima de 0,9 km/h avança no mapa pelo rumo
-  reportado.
+  reportado; as demais (a maioria) saem como ponto no canvas — antes elas eram escondidas por um filtro
+  ligado por padrão, e é isso que dava a impressão de "não aparece a maioria dos navios".
 - **Cuidado com nome de caixa de bbox que não bate com a coordenada.** A antiga "Itajaí e Paranaguá"
   ia de `-26.4` para o norte, e o canal de Itajaí/Navegantes está em `-26.9`: nenhuma embarcação
   aparecia ali, não por falta de tráfego, mas porque a área nem era lida. Antes de confiar num mapa
   "vazio", confira se a caixa cobre o lugar (medido: 92 navios na caixa certa, 10 navegando). As
   coordenadas de cada caixa estão comentadas na `CAIXAS_AIS`.
+- `/api/mapas/cameras` entrega **imagem em movimento**, não link para site de terceiros. Duas fontes,
+  conferidas quadro a quadro em 2026-11-01: ① **16 câmeras de trânsito de Santo André (SP)**, servidor
+  MJPEG da prefeitura (resposta `multipart/x-mixed-replace`, ~13 qps), montadas direto no `<img>` do
+  cartão; ② **24 câmeras da SkylineWebcams** (praias, cidades, portos e mirantes em 9 estados), cujo
+  vídeo vivo é uma transmissão contínua no YouTube (`isLive=true` nos 24) — o clique liga um iframe
+  `youtube-nocookie`. Para os cartões não abrirem 16 vídeos de uma vez, `/api/mapas/camera/quadro`
+  colhe **um** JPEG por câmera no servidor (até 400KB, cache de 40s) e renova a cada 90s na página.
+  As listas têm endereços e coordenadas do OpenStreetMap (tag `contact:webcam`). As de trânsito da
+  CET-SP, DNIT, PRF e prefeituras testadas ou sumiram ou devolvem fotografia parada de anos atrás, por
+  isso não entraram.
 - `/api/mapas/orbita` baixa TLEs do **CelesTrak** (`gp.php?GROUP=…&FORMAT=tle`) para 9 grupos
   (estações orbitais, BeiDou/GPS/GLONASS/Galileo, Starlink/OneWeb, meteorológicos, observação da
   Terra). O CelesTrak responde **403 "GP data has not updated since your last request"** se o mesmo

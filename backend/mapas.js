@@ -287,26 +287,36 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
     if (hit) return res.json(hit);
 
     // Rede aberta Open Waters AIS: devolve GeoJSON de navios por caixa, sem chave e sem
-    // cadastro (medido em 2026-10-30: Santos 237, Rio 355, Itajai 129, Manaus 49 navios).
-    // Caixa grande demais da 400, entao o pais e coberto em varias caixas pequenas.
-    // As caixas sao leidas uma a uma e os nomes precisam bater com o que a caixa realmente
-    // alcanca: ate aqui a caixa "Itajaí e Paranaguá" ia de -26.4 para norte e deixava o canal
-    // de Itajaí/Navegantes (-26.9) inteiro de fora — por isso nao aparecia nenhuma embarcacao
-    // ali, nao por falta de trafego (medido: 79 navios nessa caixa, 104 ate São Francisco do
-    // Sul). Cada caixa abaixo foi medida no Open Waters em 2026-10-30.
+    // cadastro. Caixa grande demais da 400 (o teto medido e ~100 graus quadrados), entao o
+    // litoral e coberto em caixas pequenas, escolhidas por contagem real de navios e por
+    // quanto cada uma acrescenta de embarcacoes novas (medido em 2026-11-01: 1.438 MMSIs
+    // unicos no pais). Onde a rede nao tem antena — do Rio Grande do Norte ate Pernambuco,
+    // e no delta do Paraiba — a caixa devolve zero e o mapa nao inventa navio.
+    // 89% dos navios captados estao fundeados ou atracados, nao em movimento: e por isso
+    // que a pagina mostra todos e deixa o "so em movimento" desligado por padrao.
     var CAIXAS_AIS = [
       { nome: 'Santos e São Sebastião', bbox: '-25.4,-47.6,-23.0,-45.2' },
-      { nome: 'Paranaguá, Joinville e São Francisco do Sul', bbox: '-26.45,-49.00,-25.10,-48.20' },
-      { nome: 'Itajaí, Navegantes e Florianópolis', bbox: '-28.20,-49.40,-26.45,-48.20' },
-      { nome: 'Rio Grande e Lagoa dos Patos', bbox: '-32.60,-52.70,-31.60,-51.20' },
-      { nome: 'Rio de Janeiro e Espírito Santo', bbox: '-23.6,-44.2,-20.5,-40.0' },
-      { nome: 'Vitória, Açu e litoral norte do ES', bbox: '-21.40,-41.60,-19.40,-39.60' },
+      { nome: 'Angra dos Reis e Ilha Grande', bbox: '-24.9,-45.2,-22.6,-43.7' },
+      { nome: 'Baía de Guanabara e Sepetiba', bbox: '-23.6,-44.0,-22.6,-43.0' },
+      { nome: 'Cabo Frio e Búzios', bbox: '-23.4,-43.2,-22.2,-41.6' },
+      { nome: 'Macaé e Imbetibe', bbox: '-23.6,-42.6,-21.9,-41.0' },
+      { nome: 'São João da Barra (Açu)', bbox: '-22.6,-42.2,-21.2,-40.6' },
+      { nome: 'Vitória e litoral do Espírito Santo', bbox: '-21.4,-42.0,-19.6,-39.9' },
       { nome: 'Salvador e Aracaju', bbox: '-14.0,-39.4,-11.6,-37.4' },
-      { nome: 'Suape, Recife e Pecém', bbox: '-9.2,-39.1,-3.4,-34.6' },
-      { nome: 'Itaqui, São Luís e Belém', bbox: '-3.2,-50.6,-0.8,-44.0' },
-      { nome: 'Manaus e rio Negro', bbox: '-4.2,-61.0,-1.8,-58.6' },
-      { nome: 'Santarém e baixo Amazonas', bbox: '-3.4,-55.6,-1.0,-54.0' }
+      { nome: 'Ceará (Fortaleza e Pecém)', bbox: '-4.6,-39.4,-3.2,-38.0' },
+      { nome: 'São Luís e Itaqui', bbox: '-3.4,-45.6,-2.0,-44.0' },
+      { nome: 'Baião e Marajó', bbox: '-1.6,-49.8,-0.4,-48.4' },
+      { nome: 'Vila do Conde e Belém', bbox: '-1.6,-49.0,-0.2,-47.6' },
+      { nome: 'Baixo Amazonas', bbox: '-3.4,-55.6,-1.0,-54.0' },
+      { nome: 'Manaus e rio Negro', bbox: '-3.8,-61.2,-1.8,-59.8' },
+      { nome: 'Paranaguá, Joinville e São Francisco do Sul', bbox: '-26.45,-49.0,-25.1,-48.2' },
+      { nome: 'Itajaí e Navegantes', bbox: '-27.4,-49.2,-26.6,-48.4' },
+      { nome: 'Florianópolis', bbox: '-28.2,-49.2,-27.2,-48.2' }
     ];
+    // Posicao sem transmissao ha mais de um dia é fantasma: o navio ja foi embora e a
+    // antena só esqueceu de apagar o registro. Medido em 2026-11-01: das 1.425 posicoes
+    // unicas captadas, 1.051 tem menos de 24h (666 com menos de 15 minutos).
+    var IDADE_MAXIMA_AIS = 24 * 3600 * 1000;
 
     var TIPO_AIS = { 30: 'Pesca', 31: 'Reboque', 32: 'Draga / operação submersa', 33: 'Mergulho',
       34: 'Prático (pilotos)', 35: 'Apoio a embarcação', 36: 'Embarcação especial', 37: 'Antipoluição',
@@ -346,41 +356,55 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
       return BANDEIRAS[c] || (c ? c : '—');
     }
 
-    function deGeoJSONNavios(fc, caixa, mapa, out){
+    function deGeoJSONNavios(fc, caixa, mapa, out, agora){
       (fc && fc.features ? fc.features : []).forEach(function(ft){
         var co = ft.geometry && ft.geometry.coordinates;
         var p = ft.properties || {};
         if (!co || co.length < 2) return;
         var lon = Number(co[0]), lat = Number(co[1]);
         if (!isFinite(lat) || !isFinite(lon)) return;
+        var visto = p.seen ? new Date(p.seen).getTime() : NaN;
+        var idade = isFinite(visto) ? agora - visto : null;
+        if (idade !== null && idade > IDADE_MAXIMA_AIS) return;
         var chave = String(p.mmsi || (p.name || '') + lat);
         if (mapa[chave]) return;
         mapa[chave] = 1;
         var sog = typeof p.sog === 'number' ? p.sog : null;
+        var frescor = idade === null ? 'antiga' : (idade <= 15 * 60000 ? 'agora' : (idade <= 3 * 3600000 ? 'recente' : 'antiga'));
         out.push({
           nome: p.name || 'Sem nome', mmsi: p.mmsi || '—', imo: p.imo || '',
           indicativo: p.callsign || '', tipo: tipoDeAIS(p.type), tipoAis: p.type,
-          bandeira: paisDaBandeira(p.flag), status: STATUS_NAV[p.nav_status] || ('status ' + p.nav_status),
+          bandeira: paisDaBandeira(p.flag),
+          status: p.nav_status === undefined || p.nav_status === null ? 'não informado'
+                  : (STATUS_NAV[p.nav_status] || ('status ' + p.nav_status)),
           lat: lat, lon: lon,
           velocidade_kt: sog !== null ? Math.round(sog * 10) / 10 : '—',
           velocidade_kmh: sog !== null ? Math.round(sog * 1.852 * 10) / 10 : '—',
           rumo: typeof p.cog === 'number' ? p.cog : (typeof p.heading === 'number' ? p.heading : '—'),
           navegando: sog !== null && sog >= 0.5,
           destino: p.destination || '', comprimento: p.length || '', calado: p.draught || '',
-          vistoEm: p.seen || '', fonteAis: p.source || '', caixa: caixa.nome
+          vistoEm: p.seen || '', idadeMin: idade !== null ? Math.max(0, Math.round(idade / 60000)) : '',
+          frescor: frescor,
+          fonteAis: p.source || '', caixa: caixa.nome
         });
       });
     }
 
+    // As caixas sao lidas em grupos de cinco ao mesmo tempo: uma a uma a varredura
+    // passava de trinta segundos e o visitante ficava olhando um mapa vazio.
+    var GRUPO_AIS = 5;
     function varreAis(i, mapa, out){
       if (i >= CAIXAS_AIS.length) return Promise.resolve(out);
-      var c = CAIXAS_AIS[i];
-      var url = 'https://ais.openwaters.io/v1/vessels?bbox=' + c.bbox;
-      return getJSON(url, {}, 12000).then(function(r){
-        if (r.status === 200 && r.data && r.data.features) deGeoJSONNavios(r.data, c, mapa, out);
-        return espera(150);
-      }).catch(function(){ return espera(150); })
-        .then(function(){ return varreAis(i + 1, mapa, out); });
+      var grupo = CAIXAS_AIS.slice(i, i + GRUPO_AIS);
+      var agora = Date.now();
+      return Promise.all(grupo.map(function(c){
+        return getJSON('https://ais.openwaters.io/v1/vessels?bbox=' + c.bbox, {}, 15000)
+          .then(function(r){
+            if (r.status === 200 && r.data && r.data.features) deGeoJSONNavios(r.data, c, mapa, out, agora);
+          })
+          .catch(function(){});
+      })).then(function(){ return espera(120); })
+        .then(function(){ return varreAis(i + GRUPO_AIS, mapa, out); });
     }
 
     function soPortos(){
@@ -402,6 +426,10 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
       var boa = {
         fonte: 'Open Waters AIS (rede aberta de receptores)', regiao: 'Costa e rios do Brasil',
         aoVivo: true, total: embarcoes.length, navegando: navegando,
+        parados: embarcoes.length - navegando, caixas: CAIXAS_AIS.length,
+        avisoCobertura: 'A rede de antenas AIS não cobre todo o litoral: entre Natal e ' +
+          'Recife, e no delta do Paraíba, quase nenhum navio transmite para ela. O que ' +
+          'não aparece aí não é navio escondido — é falta de antena na região.',
         embarcacoes: embarcoes, portos: PORTOS, atualizadoEm: new Date().toISOString()
       };
       cacheSet(ck, boa, 120000); guardarBoa(ck, boa);
@@ -619,36 +647,164 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
     }).catch(function(){ semFonte(); });
   });
 
-  // ---- Cameras online (lista de cameras publicas do Brasil) ----
+  // ---- Cameras online ----
+  // Duas fontes que entregam a IMAGEM, não um link:
+  //  1) transito: cameras municipais de Santo André (SP), vídeo MJPEG direto do servidor
+  //     da prefeitura. O navegador abre o quadro em movimento sozinho, como numa TV.
+  //     A lista (nome, endereço da câmera e coordenada) vem do OpenStreetMap, conferida
+  //     câmera por câmera em 2026-11-01.
+  //  2) praias, cidades, portos e mirantes: as cameras abertas da SkylineWebcams. O vídeo
+  //     vivo delas é uma transmissão contínua no YouTube (conferido: isLive=true em todas),
+  //     entao o cartao traz a miniatura do quadro e o clique abre a transmissão ao vivo.
+  // As cameras de transito da CET-SP, DNIT, PRF e prefeituras que a gente testou ou sumiram
+  // ou devolvem fotografia parada de anos atras; nao ha imagem viva por fora dos sites deles.
+  var CAMERAS_YT = [
+    { id: 604,  nome: 'Copacabana — Posto 6',        cidade: 'Rio de Janeiro',      uf: 'RJ', tipo: 'praia',   lat: -22.9711, lon: -43.1822, video: 'Bz9Hkrk1NcY' },
+    { id: 4373, nome: 'Praia do Forte',              cidade: 'Cabo Frio',           uf: 'RJ', tipo: 'praia',   lat: -22.8770, lon: -42.0200, video: 'BCJtcc5lwC4' },
+    { id: 5688, nome: 'Praça Ary Parreiras',         cidade: 'Miracema',            uf: 'RJ', tipo: 'cidade',  lat: -21.4140, lon: -42.1990, video: 'BCVoIpECdBs' },
+    { id: 6208, nome: 'Praça central',               cidade: 'Santo Antônio de Pádua', uf: 'RJ', tipo: 'cidade', lat: -21.8850, lon: -42.2570, video: 'dkyI6rPJXXo' },
+    { id: 2504, nome: 'Canal do Porto de Santos',    cidade: 'Santos',              uf: 'SP', tipo: 'porto',   lat: -23.9340, lon: -46.3000, video: 'fGYrAZAdHBU' },
+    { id: 3583, nome: 'Praia Grande',                cidade: 'Praia Grande',        uf: 'SP', tipo: 'praia',   lat: -24.0091, lon: -46.4050, video: 'v8EHx_ixEKU' },
+    { id: 5584, nome: 'Acapulco — Guarujá',          cidade: 'Guarujá',             uf: 'SP', tipo: 'praia',   lat: -23.9900, lon: -46.2600, video: 'v5Y6WsD577M' },
+    { id: 4340, nome: 'Vista panorâmica',            cidade: 'Santa Fé do Sul',     uf: 'SP', tipo: 'mirante', lat: -20.2070, lon: -51.4160, video: 'kcDF1f2U0kI' },
+    { id: 5821, nome: 'Estação de Santa Fé do Sul',  cidade: 'Santa Fé do Sul',     uf: 'SP', tipo: 'cidade',  lat: -20.2140, lon: -51.4250, video: 'MGIsnMzCR7w' },
+    { id: 2682, nome: 'Barra Sul — Parque Unipraias', cidade: 'Balneário Camboriú', uf: 'SC', tipo: 'mirante', lat: -26.9900, lon: -48.6280, video: 'YAK0xJxzp_Y' },
+    { id: 3913, nome: 'Barra Norte',                 cidade: 'Balneário Camboriú',  uf: 'SC', tipo: 'praia',   lat: -26.9780, lon: -48.6420, video: 'j4Wne61IJ3I' },
+    { id: 5429, nome: 'Praia de Laranjeiras',        cidade: 'Balneário Camboriú',  uf: 'SC', tipo: 'praia',   lat: -27.0200, lon: -48.6100, video: 'yHbiTryu8WI' },
+    { id: 5690, nome: 'Avenida Brasil',              cidade: 'Balneário Camboriú',  uf: 'SC', tipo: 'cidade',  lat: -26.9930, lon: -48.6310, video: '5Xl6pSgiy3A' },
+    { id: 3886, nome: 'Barra da Lagoa',              cidade: 'Florianópolis',       uf: 'SC', tipo: 'praia',   lat: -27.7530, lon: -48.4810, video: 'SVVgY6TjIhg' },
+    { id: 5301, nome: 'Praia de Balneário Rincão',   cidade: 'Balneário Rincão',    uf: 'SC', tipo: 'praia',   lat: -28.7770, lon: -49.0970, video: 'Ghb1EcQAPNU' },
+    { id: 3584, nome: 'Vista panorâmica',            cidade: 'Porto Alegre',        uf: 'RS', tipo: 'mirante', lat: -30.0346, lon: -51.2177, video: 'Q7VS4S-fNFI' },
+    { id: 5254, nome: 'Gramado',                     cidade: 'Gramado',             uf: 'RS', tipo: 'mirante', lat: -29.3700, lon: -50.8800, video: '0tMTEejJwhc' },
+    { id: 4713, nome: 'Montenegro',                  cidade: 'Montenegro',          uf: 'RS', tipo: 'mirante', lat: -29.6900, lon: -51.4700, video: 'NsJATz4bNOw' },
+    { id: 6032, nome: 'Praia dos Artistas',          cidade: 'Natal',               uf: 'RN', tipo: 'praia',   lat: -5.7900,  lon: -35.2060, video: '8quWDK9i-v0' },
+    { id: 3984, nome: 'Praia de Boqueirão',          cidade: 'Boqueirão',           uf: 'PB', tipo: 'praia',   lat: -7.1300,  lon: -34.9570, video: 'kawl6kTUfaE' },
+    { id: 3047, nome: 'Ponta Negra',                 cidade: 'Manaus',              uf: 'AM', tipo: 'praia',   lat: -3.0355,  lon: -60.0289, video: 'xt5k4nWXOEc' },
+    { id: 5300, nome: 'Vieiralves',                  cidade: 'Manaus',              uf: 'AM', tipo: 'cidade',  lat: -3.0880,  lon: -60.0100, video: 'RzuMa_pzqkk' },
+    { id: 6203, nome: 'Bom Jesus do Norte',          cidade: 'Bom Jesus do Norte',  uf: 'ES', tipo: 'mirante', lat: -21.1350, lon: -41.8400, video: 'x4nWJFbESLw' },
+    { id: 6227, nome: 'Centro de Goioerê',           cidade: 'Goioerê',             uf: 'PR', tipo: 'cidade',  lat: -24.2370, lon: -52.9870, video: 'MEQ16z1xyJ4' }
+  ];
+  CAMERAS_YT.forEach(function (c) {
+    c.modo = 'youtube';
+    c.grupo = 'paisagem';
+    c.imagem = 'https://i.ytimg.com/vi/' + c.video + '/hqdefault.jpg';
+    c.player = 'https://www.youtube-nocookie.com/embed/' + c.video + '?autoplay=1&mute=1&playsinline=1&rel=0';
+    c.url = 'https://www.youtube.com/watch?v=' + c.video;
+    c.fonte = 'SkylineWebcams (transmissão contínua no YouTube)';
+  });
+
   app.get('/api/mapas/cameras', function(req, res) {
-    var ck = 'mapa_cameras';
-    var hit = cacheGet(ck);
-    if (hit) return res.json(hit);
-
-    var cameras = [
-      { nome: 'CET-SP - Av. Paulista', lat: -23.5616, lon: -46.6533, tipo: 'transito', cidade: 'São Paulo', uf: 'SP', url: 'https://www.cetsp.com.br/' },
-      { nome: 'CET-SP - Marginal Pinheiros', lat: -23.5600, lon: -46.6900, tipo: 'transito', cidade: 'São Paulo', uf: 'SP', url: 'https://www.cetsp.com.br/' },
-      { nome: 'CET-SP - Av. dos Estados', lat: -23.5900, lon: -46.7100, tipo: 'transito', cidade: 'São Paulo', uf: 'SP', url: 'https://www.cetsp.com.br/' },
-      { nome: 'DNIT - BR-116 (SP)', lat: -23.5500, lon: -46.6333, tipo: 'rodovia', cidade: 'São Paulo', uf: 'SP', url: 'https://www.dnit.gov.br/' },
-      { nome: 'DNIT - BR-040 (DF/GO)', lat: -15.8267, lon: -47.9218, tipo: 'rodovia', cidade: 'Brasília', uf: 'DF', url: 'https://www.dnit.gov.br/' },
-      { nome: 'DNIT - BR-101 (BA)', lat: -12.9714, lon: -38.5014, tipo: 'rodovia', cidade: 'Salvador', uf: 'BA', url: 'https://www.dnit.gov.br/' },
-      { nome: 'DNIT - BR-277 (PR)', lat: -25.4284, lon: -49.2733, tipo: 'rodovia', cidade: 'Curitiba', uf: 'PR', url: 'https://www.dnit.gov.br/' },
-      { nome: 'INMET - Brasília', lat: -15.8267, lon: -47.9218, tipo: 'clima', cidade: 'Brasília', uf: 'DF', url: 'https://portal.inmet.gov.br/' },
-      { nome: 'INMET - São Paulo', lat: -23.5505, lon: -46.6333, tipo: 'clima', cidade: 'São Paulo', uf: 'SP', url: 'https://portal.inmet.gov.br/' },
-      { nome: 'INMET - Rio de Janeiro', lat: -22.9068, lon: -43.1729, tipo: 'clima', cidade: 'Rio de Janeiro', uf: 'RJ', url: 'https://portal.inmet.gov.br/' },
-      { nome: 'Rio - Centro (Orla)', lat: -22.9711, lon: -43.2253, tipo: 'cidade', cidade: 'Rio de Janeiro', uf: 'RJ', url: 'https://www.rio.rj.gov.br/' },
-      { nome: 'Salvador - Pelourinho', lat: -12.9714, lon: -38.5014, tipo: 'cidade', cidade: 'Salvador', uf: 'BA', url: 'https://www.salvador.ba.gov.br/' },
-      { nome: 'Florianópolis - Beira-Mar', lat: -27.5949, lon: -48.5480, tipo: 'cidade', cidade: 'Florianópolis', uf: 'SC', url: 'https://www.florianopolis.sc.gov.br/' }
-    ];
-
+    var todas = CAMERAS_SA.concat(CAMERAS_YT);
+    var cidades = {}, ufs = {};
+    todas.forEach(function (c) { cidades[c.cidade] = 1; ufs[c.uf] = 1; });
     var out = {
-      fonte: 'Câmeras públicas municipais, estaduais e federais (Brasil)',
-      total: cameras.length, cameras: cameras,
-      aviso: 'Lista de referência com portais oficiais; o vídeo ao vivo está em cada órgão.',
+      fonte: 'Câmeras municipais de Santo André (SP) + SkylineWebcams ao vivo',
+      total: todas.length,
+      transito: CAMERAS_SA.length,
+      cidades: Object.keys(cidades).length,
+      ufs: Object.keys(ufs).sort(),
+      cameras: todas,
+      aviso: 'As de trânsito abrem o vídeo no próprio quadro, sem sair do portal. ' +
+             'Nas de praia e cidade o clique liga a transmissão ao vivo da câmera.',
       atualizadoEm: new Date().toISOString()
     };
-    cacheSet(ck, out, 3600000);
+    res.set('Cache-Control', 'public, max-age=300');
     res.json(out);
+  });
+
+  // Lista do OpenStreetMap, verificada câmera a câmera em 2026-11-01: das 28 cadastradas,
+  // 16 devolvem JPEG novo (as outras respondem um XML de "objeto não encontrado").
+  var CAMERAS_SA = [
+    { id: 'coi04/ID_553', nome: 'Rio Tamanduateí — Rhodia',            cidade: 'Santo André', uf: 'SP', lat: -23.6524, lon: -46.5200 },
+    { id: 'coi04/ID_644', nome: 'Av. das Nações × Rua América do Sul', cidade: 'Santo André', uf: 'SP', lat: -23.6340, lon: -46.5029 },
+    { id: 'coi04/ID_593', nome: 'Av. Ramiro Colleoni × Rua Venezuela', cidade: 'Santo André', uf: 'SP', lat: -23.6642, lon: -46.5316 },
+    { id: 'coi04/ID_642', nome: 'Av. Cap. Mário Toledo × Av. S. B. do Campo', cidade: 'Santo André', uf: 'SP', lat: -23.6983, lon: -46.5060 },
+    { id: 'coi03/ID_261', nome: 'Rua André Ramalho × Av. dos Estados', cidade: 'Santo André', uf: 'SP', lat: -23.6519, lon: -46.5111 },
+    { id: 'coi02/ID_139', nome: 'Av. dos Estados × Rua Caraguatatuba', cidade: 'Santo André', uf: 'SP', lat: -23.6521, lon: -46.5199 },
+    { id: 'coi02/ID_078', nome: 'Rua João Pessoa × Av. Sapopemba',     cidade: 'Santo André', uf: 'SP', lat: -23.6149, lon: -46.5222 },
+    { id: 'coi04/ID_650', nome: 'Câmera ID 650 (Centro)',              cidade: 'Santo André', uf: 'SP', lat: -23.6530, lon: -46.5631 },
+    { id: 'coi02/ID_075', nome: 'Praça 14 Bis',                        cidade: 'Santo André', uf: 'SP', lat: -23.6636, lon: -46.5111 },
+    { id: 'coi04/ID_558', nome: 'Rua Erato',                           cidade: 'Santo André', uf: 'SP', lat: -23.6647, lon: -46.5110 },
+    { id: 'coi02/ID_102', nome: 'Câmera ID 102 (Centro)',              cidade: 'Santo André', uf: 'SP', lat: -23.6473, lon: -46.5246 },
+    { id: 'coi03/ID_256', nome: 'Av. Mico Leão Dourado',               cidade: 'Santo André', uf: 'SP', lat: -23.7340, lon: -46.4804 },
+    { id: 'coi02/ID_065', nome: 'Câmera ID 065 (Centro)',              cidade: 'Santo André', uf: 'SP', lat: -23.6251, lon: -46.5429 },
+    { id: 'coi04/ID_594', nome: 'Viaduto Cassaquera',                  cidade: 'Santo André', uf: 'SP', lat: -23.6633, lon: -46.4975 },
+    { id: 'coi03/ID_257', nome: 'Av. Eduardo Prado × Av. das Nações',  cidade: 'Santo André', uf: 'SP', lat: -23.6396, lon: -46.4999 },
+    { id: 'coi04/ID_576', nome: 'Câmera ID 576 (Centro)',              cidade: 'Santo André', uf: 'SP', lat: -23.6526, lon: -46.5282 }
+  ];
+  CAMERAS_SA.forEach(function (c) {
+    c.tipo = 'transito';
+    c.modo = 'mjpeg';
+    c.grupo = 'transito';
+    c.stream = 'https://cameras.santoandre.sp.gov.br/' + c.id;
+    // Para o cartao nao abre 16 videos de uma vez: aqui a gente colhe um unico quadro
+    // do video e entrega como fotografia.
+    c.imagem = '/api/mapas/camera/quadro?id=' + encodeURIComponent(c.id);
+    c.player = '';
+    c.url = 'https://www.santoandre.sp.gov.br/';
+    c.fonte = 'Prefeitura de Santo André (SP) — monitoramento de trânsito';
+  });
+
+  // Um quadro do video MJPEG: abre o stream, pega o primeiro JPEG inteiro e fecha a conexao.
+  // A moldura do cartao e servida daqui porque o servidor da camera nao aceita o navegador
+  // do visitante chegando sem endereco dele proprio.
+  var QUADROS = {};
+  var IDADE_QUADRO = 45000;
+
+  function cameraSA(id) {
+    for (var i = 0; i < CAMERAS_SA.length; i++) if (CAMERAS_SA[i].id === id) return CAMERAS_SA[i];
+    return null;
+  }
+
+  // O MJPEG vem com lixo de cabeçalho antes e depois; o JPEG verdadeiro esta entre
+  // FFD8 (inicio) e FFD9 (fim). Sem achar os dois, nao ha quadro.
+  function primeiroJpeg(buf) {
+    var i = 0, n = buf.length;
+    while (i < n - 3) { if (buf[i] === 0xFF && buf[i + 1] === 0xD8) break; i++; }
+    if (i >= n - 3) return null;
+    var j = i + 2;
+    while (j < n - 2) { if (buf[j] === 0xFF && buf[j + 1] === 0xD9) return buf.slice(i, j + 2); j++; }
+    return null;
+  }
+
+  app.get('/api/mapas/camera/quadro', function(req, res) {
+    var id = String(req.query.id || '');
+    var c = /^[a-z0-9]{2,8}\/ID_[0-9]{3}$/.test(id) ? cameraSA(id) : null;
+    if (!c) return res.status(404).json({ erro: 'câmera não cadastrada' });
+    var agora = Date.now(), guardado = QUADROS[id];
+    function envia(buf, idade) {
+      res.set('Content-Type', 'image/jpeg');
+      res.set('Cache-Control', 'public, max-age=40');
+      res.set('X-Idade-do-Quadro', String(Math.round(idade / 1000)) + 's');
+      res.send(buf);
+    }
+    if (guardado && agora - guardado.t < IDADE_QUADRO) return envia(guardado.buf, agora - guardado.t);
+
+    var pedaco = [], bytes = 0, encerrado = false;
+    var p = fetch(c.stream, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36' },
+                              signal: AbortSignal.timeout(12000) });
+    p.then(function(r){
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      var leitor = r.body.getReader();
+      function ronda(){
+        return leitor.read().then(function(resultado){
+          if (resultado.done) throw new Error('fim do stream sem quadro');
+          var fatia = Buffer.from(resultado.value);
+          pedaco.push(fatia); bytes += fatia.length;
+          var quadro = primeiroJpeg(Buffer.concat(pedaco));
+          if (quadro) { encerrado = true; try { leitor.cancel(); } catch (e) {} return quadro; }
+          if (bytes > 400000) throw new Error('stream pesado demais');
+          return ronda();
+        });
+      }
+      return ronda();
+    }).then(function(quadro){
+      QUADROS[id] = { t: Date.now(), buf: quadro };
+      envia(quadro, 0);
+    }).catch(function(){
+      if (guardado) return envia(guardado.buf, agora - guardado.t);
+      res.status(502).json({ erro: 'câmera sem imagem agora' });
+    });
   });
 
   // ================= globos 3D: cabos, rotas aereas, lancamentos =================

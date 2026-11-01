@@ -3,31 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Câmeras — BrBRICS</title>
-<meta name="description" content="Câmeras online públicas do Brasil: trânsito (CET-SP), rodovias (DNIT), clima (INMET) e cidades.">
+<title>Câmeras ao Vivo — BrBRICS</title>
+<meta name="description" content="Câmeras ao vivo do Brasil dentro do portal: trânsito de Santo André (SP) em vídeo contínuo e praias, cidades, portos e mirantes do país pela transmissão aberta de cada câmera.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=57">
-<link rel="stylesheet" href="pro.css?v=57">
+<link rel="stylesheet" href="style.css?v=59">
+<link rel="stylesheet" href="pro.css?v=59">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-  #map { height: 60vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
-  .layer-panel { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
-  .layer-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
-  .layer-row label { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
-  .layer-row input { accent-color: var(--marca); }
-  .btn-sm { background: var(--grad); color: #141414; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
-  .btn-sm:hover { transform: translateY(-1px); }
-  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
-  .stat-card { background: var(--card); padding: 14px; border-radius: 10px; text-align: center; }
-  .stat-val { font-size: 26px; font-weight: 800; color: var(--marca); }
+  #map { height: 52vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
+  .visor { background: #0b0b0f; border: 2px solid var(--marco-fora); border-radius: 14px; overflow: hidden; margin-bottom: 8px; }
+  .visor-tela { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; }
+  .visor-tela iframe, .visor-tela img { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: contain; }
+  .visor-tela .vazio { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 14px; text-align: center; padding: 20px; }
+  .visor-rodape { display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; padding: 9px 12px;
+    background: var(--card); border-top: 1px solid var(--marco-dentro); font-size: 13px; }
+  .visor-rodape b { color: var(--paper); }
+  .visor-rodape .muted { color: var(--muted); font-size: 12px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+  .stat-card { background: var(--card); border: 1px solid var(--marco-dentro); padding: 14px; border-radius: 10px; text-align: center; }
+  .stat-val { font-size: 24px; font-weight: 800; color: var(--marca); }
   .stat-lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .cam-card { background: var(--card2); border-radius: 10px; padding: 12px; margin: 8px 0; border: 1px solid var(--pos-deep); font-size: 13px; }
-  .cam-card b { color: var(--paper); display: block; margin-bottom: 4px; }
-  .cam-card .muted { color: var(--muted); font-size: 11px; }
-  .cam-img { width: 100%; max-width: 320px; height: 180px; object-fit: cover; border-radius: 8px; margin: 8px 0; border: 1px solid var(--line); background: #000; }
   .filtro { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
   .filtro button { background: transparent; color: var(--marca); border: 1px solid #4a4a55; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; }
   .filtro button.ativo { background: var(--marca); color: #141414; font-weight: 800; }
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; margin: 16px 0 24px; }
+  .cam-card { background: var(--card2); border: 1px solid var(--marco-dentro); border-radius: 12px; overflow: hidden; cursor: pointer; font-size: 13px; }
+  .cam-card:hover { transform: translateY(-2px); }
+  .cam-card.escolhida { outline: 2px solid var(--marca); }
+  .cam-foto { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; }
+  .cam-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cam-foto .play { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,.55); color: var(--marca);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid var(--marca); }
+  .cam-foto .ao-vivo { position: absolute; left: 8px; top: 8px; background: rgba(0,0,0,.6); color: #FF6B6B;
+    font-size: 10px; font-weight: 800; letter-spacing: .6px; padding: 3px 7px; border-radius: 6px; }
+  .cam-txt { padding: 9px 11px 11px; }
+  .cam-txt b { color: var(--paper); display: block; margin-bottom: 3px; font-size: 13px; }
+  .cam-txt .muted { color: var(--muted); font-size: 11px; }
+  .selo { display: inline-block; font-size: 10px; border: 1px solid var(--marco-dentro); border-radius: 999px; padding: 1px 8px; margin-top: 6px; color: var(--muted); }
+  .aviso { background: var(--card2); border: 1px solid var(--marco-dentro); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
 </style>
 </head>
 <body>
@@ -41,171 +56,213 @@
   <div class="ticker mkt-ticker"><div class="ticker-track" id="ticker-mkt"><span class="muted">Carregando mercado financeiro...</span></div></div>
 </header>
 <main class="wrap">
-  <section class="hero" style="padding:28px 0;text-align:center">
-    <p class="kicker">📹 Câmeras Online — Brasil</p>
-    <h1>Câmeras Públicas por Cidade e Tipo</h1>
-    <p class="sub">Trânsito (CET-SP), rodovias federais (DNIT), clima (INMET) e câmeras municipais.</p>
+  <section class="hero" style="padding:24px 0;text-align:center">
+    <p class="kicker">📹 Câmeras ao vivo</p>
+    <h1>O vídeo da câmera dentro do portal</h1>
+    <p class="sub">Trânsito de Santo André (SP) em vídeo contínuo e praias, cidades, portos e mirantes de vários estados pela transmissão aberta de cada câmera. Nada de link para página de órgão público.</p>
   </section>
 
-  <div class="stat-row">
-    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Câmeras cadastradas</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última atualização</div></div>
-  </div>
-
-  <div class="filtro">
-    <button class="filtro-btn ativo" data-tipo="todos">Todas</button>
-    <button class="filtro-btn" data-tipo="transito">Trânsito</button>
-    <button class="filtro-btn" data-tipo="rodovia">Rodovias</button>
-    <button class="filtro-btn" data-tipo="clima">Clima</button>
-    <button class="filtro-btn" data-tipo="cidade">Cidades</button>
-  </div>
-
-  <div class="layer-panel">
-    <div class="layer-row"><strong style="color:var(--paper)">Camadas:</strong></div>
-    <div class="layer-row">
-      <label><input type="checkbox" id="lyr-osm" checked> OpenStreetMap</label>
-      <label><input type="checkbox" id="lyr-satelite"> Satélite (Esri)</label>
-      <label><input type="checkbox" id="lyr-cameras" checked> Marcadores de câmeras</label>
+  <div class="visor">
+    <div class="visor-tela" id="visor-tela"><div class="vazio">Escolhendo uma câmera…</div></div>
+    <div class="visor-rodape">
+      <b id="visor-nome">—</b>
+      <span class="muted" id="visor-onde">—</span>
+      <span class="muted" id="visor-fonte" style="margin-left:auto">—</span>
     </div>
   </div>
 
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Câmeras no portal</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-transito">—</div><div class="stat-lab">De trânsito (vídeo contínuo)</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-cidades">—</div><div class="stat-lab">Cidades</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última leitura</div></div>
+  </div>
+
+  <div class="filtro" id="filtros">
+    <button class="filtro-btn ativo" data-tipo="todos">Todas</button>
+    <button class="filtro-btn" data-tipo="transito">Trânsito</button>
+    <button class="filtro-btn" data-tipo="praia">Praias</button>
+    <button class="filtro-btn" data-tipo="cidade">Cidades</button>
+    <button class="filtro-btn" data-tipo="porto">Portos</button>
+    <button class="filtro-btn" data-tipo="mirante">Mirantes</button>
+  </div>
+
+  <p class="aviso" id="aviso-cameras">Carregando as câmeras…</p>
+
   <div id="map"></div>
 
-  <div id="lista-cameras" style="margin-bottom: 24px;"></div>
+  <div class="grade" id="grade-cameras"></div>
 
   <section class="card">
-    <div class="card-h"><h2>🔗 Mais fontes de câmeras online</h2></div>
+    <div class="card-h"><h2>📡 De onde vem cada imagem</h2></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
-      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--pos-deep)">
-        <h4 style="margin:0 0 8px;color:var(--marca)">CET-SP (São Paulo)</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Câmeras de trânsito da capital e região metropolitana.</p>
-        <a href="https://www.cetsp.com.br/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">CET-SP →</a>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--marco-dentro)">
+        <h4 style="margin:0 0 8px;color:var(--marca)">Trânsito — Santo André (SP)</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Vídeo MJPEG do centro de monitoramento da prefeitura. As 16 câmeras vivas foram conferidas uma a uma: só entrou quem entrega quadro novo.</p>
+        <a href="https://www.santoandre.sp.gov.br/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">Prefeitura de Santo André →</a>
       </div>
-      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--pos-deep)">
-        <h4 style="margin:0 0 8px;color:var(--marca)">DNIT</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Câmeras de rodovias federais em todo o Brasil.</p>
-        <a href="https://www.dnit.gov.br/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">DNIT →</a>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--marco-dentro)">
+        <h4 style="margin:0 0 8px;color:var(--marca)">Praias e cidades — SkylineWebcams</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Câmeras abertas de vários estados. O vídeo vivo delas é uma transmissão contínua no YouTube, e é ela que abre aqui no portal.</p>
+        <a href="https://www.skylinewebcams.com/pt/webcam/brasil.html" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">SkylineWebcams →</a>
       </div>
-      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--pos-deep)">
-        <h4 style="margin:0 0 8px;color:var(--marca)">INMET</h4>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Estações meteorológicas com imagens de câmeras.</p>
-        <a href="https://portal.inmet.gov.br/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">INMET →</a>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--marco-dentro)">
+        <h4 style="margin:0 0 8px;color:var(--marca)">Por que não CET-SP e DNIT</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">As câmeras de trânsito desses órgãos foram testadas uma a uma: mudaram de endereço, exigem chave ou devolvem fotografia parada de anos atrás. Nenhuma entrega imagem viva por fora do site deles.</p>
+        <span class="muted" style="font-size:12px">Nada embutido daqui.</span>
       </div>
     </div>
   </section>
 </main>
 <footer>
   <div class="wrap foot">
-    <div><b>BrBRICS</b> — câmeras públicas municipais, estaduais e federais + OpenStreetMap.</div>
+    <div><b>BrBRICS</b> — vídeo das câmeras públicas municipais e de redes abertas de webcam, com mapa base OpenStreetMap.</div>
     <div class="flinks"><a href="globo-satelites.html">Globo 3D</a><a href="mapa-satelite.html">Satélite</a><a href="mapa-avioes.html">Aviões</a><a href="mapa-embarcacoes.html">Embarcações</a><a href="mapa-orbita.html">Órbita</a><a href="mapa-brasil.html">Mapa Brasil</a></div>
   </div>
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=57"></script>
+<script src="common.js?v=59"></script>
 <script src="app.js?v=50"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// Estado
-var map = null;
-var layers = {};
-var camerasLayer = null;
-var camerasMarkers = [];
-var filtroAtual = 'todos';
+var map = null, layers = {}, camerasLayer = null;
+var TODAS = [], FILTRO = 'todos', ESCOLHIDA = null, MARCA = {};
+
+var COR_TIPO = { transito: '#FACC15', praia: '#7DD3FC', cidade: '#86EFAC', porto: '#F97316', mirante: '#C4B5FD' };
+
+function esc(s) { return String(s || '—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function initMap() {
-  map = L.map('map').setView([-14.2, -51.9], 4);
-  // O container mede a altura em vh: sem recalcular depois do layout o Leaflet
-  // projeta tudo em 0,0 e o mapa parece em branco.
+  map = L.map('map').setView([-18.5, -48.5], 4);
   setTimeout(function(){ map.invalidateSize(); }, 200);
   window.addEventListener('load', function(){ map.invalidateSize(); });
   window.addEventListener('resize', function(){ map.invalidateSize(); });
-
   layers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
-
-  layers.satelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: '&copy; Esri, Maxar, Earthstar Geographics'
-  });
-
   camerasLayer = L.layerGroup().addTo(map);
 }
 
-function toggleLayer(id, layer) {
-  var cb = document.getElementById(id);
-  if (!cb) return;
-  if (cb.checked) {
-    if (!map.hasLayer(layer)) layer.addTo(map);
+function mostra(c) {
+  if (!c) return;
+  ESCOLHIDA = c;
+  var tela = document.getElementById('visor-tela');
+  tela.innerHTML = '';
+  if (c.modo === 'youtube') {
+    var f = document.createElement('iframe');
+    f.src = c.player; f.title = c.nome;
+    f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+    f.setAttribute('allowfullscreen', '');
+    tela.appendChild(f);
   } else {
-    map.removeLayer(layer);
+    var img = document.createElement('img');
+    img.src = c.stream; img.alt = 'Vídeo ao vivo — ' + c.nome;
+    tela.appendChild(img);
   }
+  document.getElementById('visor-nome').textContent = c.nome;
+  document.getElementById('visor-onde').textContent = c.cidade + ' — ' + c.uf + ' · ' + rotulo(c.tipo);
+  document.getElementById('visor-fonte').textContent = c.fonte;
+  document.querySelectorAll('.cam-card').forEach(function(el) {
+    el.classList.toggle('escolhida', el.getAttribute('data-id') === String(c.id));
+  });
 }
 
-function esc(s) { return String(s || '—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function rotulo(t) {
+  return { transito: 'trânsito', praia: 'praia', cidade: 'cidade', porto: 'porto', mirante: 'mirante' }[t] || t;
+}
 
-function carregarCameras() {
-  fetch('/api/mapas/cameras').then(function(r){ return r.json(); }).then(function(d) {
-    camerasLayer.clearLayers();
-    camerasMarkers = [];
-
-    document.getElementById('stat-total').textContent = d.total || 0;
-    document.getElementById('stat-atualizacao').textContent = horaBR(d.atualizadoEm);
-
-    var lista = document.getElementById('lista-cameras');
-    var html = d.aviso ? '<div style="background:var(--card2);border-radius:8px;padding:8px;margin:6px 0;font-size:13px;color:var(--muted)">' + esc(d.aviso) + '</div>' : '';
-
-    (d.cameras || []).forEach(function(c) {
-      if (filtroAtual !== 'todos' && c.tipo !== filtroAtual) return;
-      var marker = L.marker([c.lat, c.lon], { title: esc(c.nome) });
-      marker.bindPopup(
-        '<b>📹 ' + esc(c.nome) + '</b><br>' +
-        '<small>Tipo: ' + esc(c.tipo) + ' | Cidade: ' + esc(c.cidade) + ' — ' + esc(c.uf) + '</small><br>' +
-        '<a href="' + esc(c.url) + '" target="_blank" rel="noopener">Abrir câmera oficial →</a>'
-      );
-      camerasMarkers.push(marker);
-      camerasLayer.addLayer(marker);
-
-      html += '<div class="cam-card">' +
-        '<b>📹 ' + esc(c.nome) + '</b>' +
-        '<span class="muted">Tipo: ' + esc(c.tipo) + ' · ' + esc(c.cidade) + ' — ' + esc(c.uf) + '</span>' +
-        '<br><a href="' + esc(c.url) + '" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">Abrir imagem oficial →</a>' +
-        '</div>';
+function refazFiltro() {
+  camerasLayer.clearLayers();
+  var grade = document.getElementById('grade-cameras');
+  var html = '';
+  var visiveis = 0;
+  TODAS.forEach(function(c) {
+    if (FILTRO !== 'todos' && c.tipo !== FILTRO) return;
+    visiveis++;
+    var m = L.circleMarker([c.lat, c.lon], {
+      radius: 8, color: COR_TIPO[c.tipo] || '#fff', weight: 2,
+      fillColor: COR_TIPO[c.tipo] || '#fff', fillOpacity: 0.55
     });
+    m.bindPopup('<b>📹 ' + esc(c.nome) + '</b><br>' + esc(c.cidade) + ' — ' + esc(c.uf) +
+      ' · ' + rotulo(c.tipo) + '<br><a href="#" class="liga-camera" data-id="' + esc(c.id) + '">▶ Assistir ao vivo</a>');
+    camerasLayer.addLayer(m);
+    MARCA[String(c.id)] = m;
 
-    if (html) {
-      lista.innerHTML = html;
-      lista.style.display = 'block';
-    } else {
-      lista.innerHTML = '<p class="muted">Nenhuma câmera para este filtro.</p>';
-      lista.style.display = 'block';
-    }
+    html += '<div class="cam-card' + (ESCOLHIDA && String(ESCOLHIDA.id) === String(c.id) ? ' escolhida' : '') + '" data-id="' + esc(c.id) + '">' +
+      '<div class="cam-foto"><img src="' + esc(c.imagem) + '" alt="' + esc(c.nome) + '" loading="lazy">' +
+      '<span class="ao-vivo">AO VIVO</span><span class="play">▶</span></div>' +
+      '<div class="cam-txt"><b>' + esc(c.nome) + '</b>' +
+      '<span class="muted">' + esc(c.cidade) + ' — ' + esc(c.uf) + '</span>' +
+      '<br><span class="selo">' + rotulo(c.tipo) + (c.modo === 'mjpeg' ? ' · vídeo contínuo' : ' · SkylineWebcams') + '</span></div>' +
+      '</div>';
+  });
+  grade.innerHTML = html || '<p class="muted">Nenhuma câmera para este filtro.</p>';
+  document.getElementById('aviso-cameras').textContent =
+    visiveis + ' câmera' + (visiveis === 1 ? '' : 's') + ' neste filtro — clique num cartão ou num ponto do mapa para abrir o vídeo aqui em cima.';
+}
+
+function carrega() {
+  fetch('/api/mapas/cameras').then(function(r){ return r.json(); }).then(function(d) {
+    TODAS = d.cameras || [];
+    document.getElementById('stat-total').textContent = d.total || 0;
+    document.getElementById('stat-transito').textContent = d.transito || 0;
+    document.getElementById('stat-cidades').textContent = d.cidades || 0;
+    document.getElementById('stat-atualizacao').textContent = horaBR(d.atualizadoEm);
+    refazFiltro();
+    if (!ESCOLHIDA && TODAS.length) mostra(TODAS[0]);
   }).catch(function(e) {
-    toast('Erro ao carregar câmeras: ' + e.message);
+    toast('Erro ao carregar as câmeras: ' + e.message);
+  });
+}
+
+// Os quadros do trânsito são uma fotografia colhida do vídeo: renova a cada minuto e meio
+// para o cartao nao congelar num quadro velho.
+function renovaQuadros() {
+  document.querySelectorAll('.cam-card').forEach(function(el) {
+    var c = TODAS.filter(function(k){ return String(k.id) === el.getAttribute('data-id'); })[0];
+    if (!c || c.modo !== 'mjpeg') return;
+    var img = el.querySelector('img');
+    if (img) img.src = c.imagem + '&x=' + Date.now();
   });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   initMap();
 
-  document.getElementById('lyr-osm').onchange = function() { toggleLayer('lyr-osm', layers.osm); };
-  document.getElementById('lyr-satelite').onchange = function() { toggleLayer('lyr-satelite', layers.satelite); };
-  document.getElementById('lyr-cameras').onchange = function() { toggleLayer('lyr-cameras', camerasLayer); };
-
-  var btns = document.querySelectorAll('.filtro-btn');
-  btns.forEach(function(btn) {
+  document.querySelectorAll('.filtro-btn').forEach(function(btn) {
     btn.onclick = function() {
-      btns.forEach(function(b){ b.classList.remove('ativo'); });
+      document.querySelectorAll('.filtro-btn').forEach(function(b){ b.classList.remove('ativo'); });
       btn.classList.add('ativo');
-      filtroAtual = btn.getAttribute('data-tipo');
-      carregarCameras();
+      FILTRO = btn.getAttribute('data-tipo');
+      refazFiltro();
     };
   });
 
-  carregarCameras();
+  document.getElementById('grade-cameras').onclick = function(ev) {
+    var card = ev.target.closest ? ev.target.closest('.cam-card') : null;
+    if (!card) return;
+    var c = TODAS.filter(function(k){ return String(k.id) === card.getAttribute('data-id'); })[0];
+    mostra(c);
+  };
+
+  // O popup do mapa tem link "Assistir ao vivo": o Leaflet monta o popup em HTML proprio,
+  // entao o clique e pegado no documento inteiro.
+  document.addEventListener('click', function(ev) {
+    var a = ev.target.closest ? ev.target.closest('.liga-camera') : null;
+    if (!a) return;
+    ev.preventDefault();
+    var c = TODAS.filter(function(k){ return String(k.id) === a.getAttribute('data-id'); })[0];
+    mostra(c);
+    document.querySelector('.visor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  carrega();
+  setInterval(carrega, 300000);
+  setInterval(renovaQuadros, 90000);
 });
 
-if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; }
+if (typeof toast === 'undefined') { window.toast = function(m){ var el=document.getElementById('toast'); if(el){el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);} }; };
 </script>
 </body>
 </html>

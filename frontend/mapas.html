@@ -16,8 +16,8 @@
 <meta property="og:image" content="https://brbrics.com.br/logo-brics.png?v=50">
 <meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://brbrics.com.br/mapas.html">
-<link rel="stylesheet" href="style.css?v=57">
-<link rel="stylesheet" href="pro.css?v=57">
+<link rel="stylesheet" href="style.css?v=59">
+<link rel="stylesheet" href="pro.css?v=59">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
@@ -54,7 +54,7 @@
     <div class="card-h"><h2>📌 Pontos oficiais — Google Meu Mapas</h2><a href="https://mymaps.google.com" target="_blank" rel="noopener">Criar mapa no Google</a></div>
     <div class="toolbar" style="flex-wrap:wrap;gap:10px">
       <p class="muted" style="margin:0 0 10px 0">Desenhe pontos, linhas e áreas no mapa (órgãos públicos, tribunais, fiscais, etc.) e incorpore no site.</p>
-      <div style="display:flex;align-items:center;justify-content:center;max-width:100%;aspect-ratio:16/9;border:1px solid var(--pos-deep);border-radius:8px;overflow:hidden;background:var(--bg2);color:var(--muted);font-size:13px;line-height:1.5;padding:12px;text-align:center">
+      <div style="display:flex;align-items:center;justify-content:center;max-width:100%;aspect-ratio:16/9;border:1px solid var(--marco-dentro);border-radius:8px;overflow:hidden;background:var(--bg2);color:var(--muted);font-size:13px;line-height:1.5;padding:12px;text-align:center">
         📍 <b>Cole aqui o iframe do Google Meu Mapas</b><br>
         <span style="font-size:12px;color:var(--muted)">Passo: mymaps.google.com → Criar mapa → adicionar pontos → Compartilhar → Incorporar no meu site → copiar código.</span>
       </div>
@@ -135,19 +135,19 @@
     </div>
   </section>
 
-  <section style="max-width:1100px;margin:0 auto;padding:20px">
+  <section style="max-width:none;margin:0 auto;padding:20px">
     <h2>Dados Governamentais — incorporados diretamente (sem sair do site)</h2>
     <p>Buscas diretas via fetch para APIs públicas: BrasilAPI, PNCP, IBGE, Querido Diário (feed). Nenhum link externo obrigatório.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px;margin-bottom:20px">
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:15px;border-radius:8px">
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:15px;border-radius:8px">
         <h3 style="margin-top:0">BrasilAPI — CEP exemplo</h3>
         <div id="brasilapi-box">Carregando...</div>
       </div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:15px;border-radius:8px">
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:15px;border-radius:8px">
         <h3 style="margin-top:0">PNCP — licitações recentes</h3>
         <div id="pncp-box">Carregando...</div>
       </div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:15px;border-radius:8px">
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:15px;border-radius:8px">
         <h3 style="margin-top:0">Querido Diário — feed</h3>
         <p style="font-size:12px;color:var(--muted)">Diários oficiais pesquisáveis de 5.000+ cidades. Para incorporação direta, use feed de uma cidade específica.</p>
         <a href="https://queridodiario.ok.org.br/" target="_blank" rel="noopener" style="font-size:12px">Acessar feed (opcional)</a>
@@ -155,7 +155,7 @@
     </div>
   </section>
 
-  <section style="max-width:1100px;margin:0 auto;padding:0 20px 20px">
+  <section style="max-width:none;margin:0 auto;padding:0 20px 20px">
     <h2>Mapa Interativo — Base IBGE + Leaflet</h2>
     <p>Malha oficial de estados (IBGE) + exemplo de choropleth por valor de licitação. Para municípios, use versão simplificada (<strong>tilacog/br-atlas</strong>, <strong>cristoferluch/GeoDadosBrasil</strong>).</p>
     <div style="position:relative;height:600px;border-radius:8px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:20px"><div id="map-implantao" style="height:100%;width:100%"></div></div>
@@ -171,18 +171,18 @@
     </div>
   </section>
 
-  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+  <section style="max-width:none;margin:30px auto;padding:0 20px">
     <h2>1. Bases Geográficas — todos os repositórios</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:18px;border-radius:10px"><h3>tilacog/br-atlas</h3><p class="small">TopoJSON/GeoJSON do IBGE. BSD 3-Clause. Gera Brasil, estados e municípios.</p></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:18px;border-radius:10px"><h3>cristoferluch/GeoDadosBrasil</h3><p class="small">GeoJSON 3 níveis: mínimo (leve), intermediário, máximo. Escolha o leve para mapa rápido.</p></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:18px;border-radius:10px"><h3>ggondim/ibge-cidades-com-poligonos</h3><p class="small">Municípios já cruzados com polígonos. Liga código do município a licitação/despesa.</p></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:18px;border-radius:10px"><h3>0e1/localidades</h3><p class="small">Coordenadas, bandeiras, gentílicos das UFs. <strong>ODbL — exige citar fonte.</strong></p></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:18px;border-radius:10px"><h3>igorjba/malha</h3><p class="small">5.570 municípios com indicadores IBGE. Referência de 5 métodos de classificação de cores.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:18px;border-radius:10px"><h3>tilacog/br-atlas</h3><p class="small">TopoJSON/GeoJSON do IBGE. BSD 3-Clause. Gera Brasil, estados e municípios.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:18px;border-radius:10px"><h3>cristoferluch/GeoDadosBrasil</h3><p class="small">GeoJSON 3 níveis: mínimo (leve), intermediário, máximo. Escolha o leve para mapa rápido.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:18px;border-radius:10px"><h3>ggondim/ibge-cidades-com-poligonos</h3><p class="small">Municípios já cruzados com polígonos. Liga código do município a licitação/despesa.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:18px;border-radius:10px"><h3>0e1/localidades</h3><p class="small">Coordenadas, bandeiras, gentílicos das UFs. <strong>ODbL — exige citar fonte.</strong></p></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:18px;border-radius:10px"><h3>igorjba/malha</h3><p class="small">5.570 municípios com indicadores IBGE. Referência de 5 métodos de classificação de cores.</p></div>
     </div>
   </section>
 
-  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+  <section style="max-width:none;margin:30px auto;padding:0 20px">
     <h2>2. Mapa de calor — exemplo Leaflet + dados por município</h2>
     <p>Combine qualquer base acima com <strong>Leaflet</strong> (mapas) e <strong>Chart.js</strong> (gráficos). Exemplo de uso: valor de licitações por município. Use a versão <strong>simplificada ou TopoJSON</strong> do GeoDadosBrasil para não travar no celular.</p>
     <div style="background:#0f172a;color:#e2e8f0;padding:20px;border-radius:10px;font-family:monospace;font-size:.85rem;overflow-x:auto">
@@ -193,39 +193,39 @@
     </div>
   </section>
 
-  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+  <section style="max-width:none;margin:30px auto;padding:0 20px">
     <h2>3. Fontes de Dados — incorporadas diretamente</h2>
     <div class="grid-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>jxnxts/mcp-brasil</h3><p class="small"><strong>Catálogo de APIs.</strong> Câmara, Senado, Portal Transparência, TCU, PNCP/ComprasNet, DataJud/CNJ, STF/STJ/TST, TSE, IBGE, TCEs, INPE. Não exige chave na maioria.</p></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>BrasilAPI</h3><p class="small">CEP, CNPJ, bancos, câmbio. Útil para enriquecer registros de fornecedores.</p></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Querido Diário (OK Brasil)</h3><p class="small">5.000+ diários oficiais, pesquisáveis. Entra como feed de atos municipais.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>jxnxts/mcp-brasil</h3><p class="small"><strong>Catálogo de APIs.</strong> Câmara, Senado, Portal Transparência, TCU, PNCP/ComprasNet, DataJud/CNJ, STF/STJ/TST, TSE, IBGE, TCEs, INPE. Não exige chave na maioria.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>BrasilAPI</h3><p class="small">CEP, CNPJ, bancos, câmbio. Útil para enriquecer registros de fornecedores.</p></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Querido Diário (OK Brasil)</h3><p class="small">5.000+ diários oficiais, pesquisáveis. Entra como feed de atos municipais.</p></div>
     </div>
   </section>
 
-  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+  <section style="max-width:none;margin:30px auto;padding:0 20px">
     <h2>4. Google Sites — incorporação</h2>
     <p>O Google Sites não roda código do GitHub. <strong>Publique o mapa/painel no GitHub Pages</strong> (grátis, repositório <code>luiscadilhac/brbrics</code>) e incorpore via <strong>Inserir → Incorporar → URL</strong>. Os GeoJSON pesados devem ser substituídos pela versão simplificada para não travar no celular.</p>
   </section>
 
-  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+  <section style="max-width:none;margin:30px auto;padding:0 20px">
     <h2>5. Licenças — verifique antes de usar</h2>
     <p><strong>BSD 3-Clause</strong> (br-atlas), <strong>MIT</strong> (outros), <strong>ODbL</strong> (0e1/localidades, Querido Diário — exige citações). Do BrasilAPI e Querido Diário só confirmei as fontes; abra os repositórios para ver o estado atual antes de republicar.</p>
   </section>
 
-  <section style="max-width:1200px;margin:30px auto;padding:0 20px">
+  <section style="max-width:none;margin:30px auto;padding:0 20px">
     <h2>6. Painéis incorporados — funcionando no site</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Mapa interativo IBGE</h3><p>Malha oficial de estados + cor por licitação.</p><a href="mapa-brasil.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Focos de calor (INPE)</h3><p>Malha do IBGE + focos das últimas 48h direto do BDQueimadas.</p><a href="mapa-satelite.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Aviões ao vivo (ADS-B)</h3><p>Transponder ADS-B lido pela rede comunitária adsb.lol, com reserva na OpenSky. As aeronaves avançam no mapa entre uma leitura e outra.</p><a href="mapa-avioes.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Embarcações ao vivo (AIS)</h3><p>Posição, rumo e velocidade emitidos pelo transponder AIS, coletados pela rede aberta Open Waters nos portos, na costa e nos rios.</p><a href="mapa-embarcacoes.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Satélites em órbita</h3><p>Elementos orbitais do CelesTrak — ou da base aberta da SATNOGS, quando ele não responde — propagados pelo motor SGP4 (satellite.js) no seu navegador: onde está cada satélite agora, por país e finalidade.</p><a href="mapa-orbita.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Globo 3D dos satélites</h3><p>A mesma leitura em três dimensões: gire a Terra, aproxime e clique num ponto para segui-lo na órbita dele. O dia e a noite são os de verdade, calculados pela posição real do Sol. Tem camada de nuvens e os focos de calor do INPE desta semana por cima do planeta.</p><a href="globo-satelites.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Globo 3D dos terremotos</h3><p>Cada pilar é um sismo que o USGS registrou: a altura cresce com a magnitude e a cor conta a profundidade. Escolha 24 horas, 7 dias ou 30 dias e clique num pilar para ler a ficha oficial.</p><a href="globo-terremotos.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Globo 3D dos cabos submarinos</h3><p>Os cabos de internet que cruzam os oceanos, desenhados traço por traço no planeta inteiro. Filtre por nome, veja quantos trechos e vértices cada um tem e por onde eles chegam ao litoral do Brasil.</p><a href="globo-cabos.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Globo 3D das rotas aéreas</h3><p>A malha de voos do mundo em arcos ligando aeroportos, com o tráfego mais frequente por cima. Todas as ligações com origem ou destino no Brasil entram no desenho, e o painel lateral lista as mais movimentadas daqui.</p><a href="globo-rotas.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Globo 3D dos lançamentos</h3><p>As cartelas de onde vai decolar cada foguete anunciado, com foguete, empresa, data e o país do lançamento. As que decolam na semana pulsam, e a lista ao lado ordena pela espera.</p><a href="globo-lancamentos.html">Ver →</a></div>
-      <div style="background:var(--card2);border:1px solid var(--pos-deep);padding:16px;border-radius:10px"><h3>Câmeras públicas</h3><p>Endereços oficiais de trânsito, clima e monitoramento, reunidos num mapa só.</p><a href="mapa-cameras.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Mapa interativo IBGE</h3><p>Malha oficial de estados + cor por licitação.</p><a href="mapa-brasil.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Focos de calor (INPE)</h3><p>Malha do IBGE + focos das últimas 48h direto do BDQueimadas.</p><a href="mapa-satelite.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Aviões ao vivo (ADS-B)</h3><p>Transponder ADS-B lido pela rede comunitária adsb.lol, com reserva na OpenSky. As aeronaves avançam no mapa entre uma leitura e outra.</p><a href="mapa-avioes.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Embarcações ao vivo (AIS)</h3><p>Posição, rumo e velocidade emitidos pelo transponder AIS, coletados pela rede aberta Open Waters em 17 áreas dos portos, da costa e dos rios. Aparecem também as que estão fundeadas ou atracadas.</p><a href="mapa-embarcacoes.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Satélites em órbita</h3><p>Elementos orbitais do CelesTrak — ou da base aberta da SATNOGS, quando ele não responde — propagados pelo motor SGP4 (satellite.js) no seu navegador: onde está cada satélite agora, por país e finalidade.</p><a href="mapa-orbita.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Globo 3D dos satélites</h3><p>A mesma leitura em três dimensões: gire a Terra, aproxime e clique num ponto para segui-lo na órbita dele. O dia e a noite são os de verdade, calculados pela posição real do Sol. Tem camada de nuvens e os focos de calor do INPE desta semana por cima do planeta.</p><a href="globo-satelites.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Globo 3D dos terremotos</h3><p>Cada pilar é um sismo que o USGS registrou: a altura cresce com a magnitude e a cor conta a profundidade. Escolha 24 horas, 7 dias ou 30 dias e clique num pilar para ler a ficha oficial.</p><a href="globo-terremotos.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Globo 3D dos cabos submarinos</h3><p>Os cabos de internet que cruzam os oceanos, desenhados traço por traço no planeta inteiro. Filtre por nome, veja quantos trechos e vértices cada um tem e por onde eles chegam ao litoral do Brasil.</p><a href="globo-cabos.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Globo 3D das rotas aéreas</h3><p>A malha de voos do mundo em arcos ligando aeroportos, com o tráfego mais frequente por cima. Todas as ligações com origem ou destino no Brasil entram no desenho, e o painel lateral lista as mais movimentadas daqui.</p><a href="globo-rotas.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Globo 3D dos lançamentos</h3><p>As cartelas de onde vai decolar cada foguete anunciado, com foguete, empresa, data e o país do lançamento. As que decolam na semana pulsam, e a lista ao lado ordena pela espera.</p><a href="globo-lancamentos.html">Ver →</a></div>
+      <div style="background:var(--card2);border:1px solid var(--marco-dentro);padding:16px;border-radius:10px"><h3>Câmeras ao vivo</h3><p>Imagem que se move de verdade: 16 câmeras de trânsito de Santo André (SP) e 24 transmissões contínuas de praias, cidades, portos e mirantes, todas abertas no próprio quadro.</p><a href="mapa-cameras.html">Ver →</a></div>
     </div>
   </section>
 
@@ -238,7 +238,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=57"></script>
+<script src="common.js?v=59"></script>
 <script src="app.js?v=50"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>

@@ -6,8 +6,8 @@
 <title>Mapa de Embarcações — BrBRICS</title>
 <meta name="description" content="Navios navegando na costa e nos rios do Brasil em tempo real pelo AIS (Automatic Identification System) da rede aberta Open Waters, sem cadastro e sem chave de API.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
-<link rel="stylesheet" href="style.css?v=57">
-<link rel="stylesheet" href="pro.css?v=57">
+<link rel="stylesheet" href="style.css?v=59">
+<link rel="stylesheet" href="pro.css?v=59">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   #map { height: 70vh; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 16px; }
@@ -47,7 +47,7 @@
   <section class="hero" style="padding:28px 0;text-align:center">
     <p class="kicker">🚢 Embarcações ao vivo — AIS</p>
     <h1>Navios navegando pelo litoral e pelos rios do Brasil</h1>
-    <p class="sub">Cada posição vem do transponder AIS da própria embarcação, coletado pela rede aberta de receptores Open Waters. Os navios que estão em movimento avançam no mapa entre uma leitura e outra. Sem cadastro e sem chave de API.</p>
+    <p class="sub">Cada posição vem do transponder AIS da própria embarcação, coletado pela rede aberta de receptores Open Waters. Estão no mapa tanto os navios em movimento quanto os fundeados e atracados — que são a maioria. Quem está em movimento avança no mapa entre uma leitura e outra. Sem cadastro e sem chave de API.</p>
   </section>
 
   <div class="stat-row">
@@ -65,7 +65,7 @@
       <label><input type="checkbox" id="lyr-navios" checked> Embarcações</label>
       <label><input type="checkbox" id="lyr-portos" checked> Portos de referência</label>
       <label><input type="checkbox" id="lyr-movimento" checked> Movimento contínuo entre leituras</label>
-      <label><input type="checkbox" id="flt-navegando" checked> Só quem está em movimento</label>
+      <label><input type="checkbox" id="flt-navegando"> Só quem está em movimento</label>
     </div>
     <div class="layer-row">
       <span class="muted" style="font-size:13px">Tipo:</span>
@@ -79,7 +79,8 @@
     </div>
     <div class="layer-row chips" style="margin-top:10px">
       <span style="color:var(--acc)">▲ navegando</span>
-      <span style="color:var(--marca)">● fundeado / parado</span>
+      <span style="color:var(--marca)">● fundeado / atracado</span>
+      <span style="color:#8b8b96">○ posição sem transmissão recente</span>
       <span style="color:var(--ico-vivo)">⚓ porto organizador</span>
     </div>
     <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Consultando os receptores AIS…</p>
@@ -88,7 +89,7 @@
   <div id="map"></div>
 
   <div class="legend">
-    <strong style="color:var(--paper)">📋 Como ler:</strong> o ícone apontado para o rumo é um navio; o ponto verde está fundeado ou atracado; o ⚓ é a boca do porto, camada fixa de referência. Clique para ver nome, MMSI, bandeira, tipo, calado e destino. Quem está em movimento avança no mapa pela própria velocidade reportada no AIS até a próxima leitura.
+    <strong style="color:var(--paper)">📋 Como ler:</strong> o ícone apontado para o rumo é um navio em movimento; o ponto verde cheio está fundeado ou atracado agora; o círculo cinza oco é posição que não transmite há mais de três horas — o navio provavelmente já saiu dali; o ⚓ é a boca do porto, camada fixa de referência. Clique para ver nome, MMSI, bandeira, tipo, calado e destino. Quem está em movimento avança no mapa pela própria velocidade reportada no AIS até a próxima leitura.
   </div>
 
   <div id="lista-navios" style="display:none;max-height:320px;overflow-y:auto;background:var(--card2);border-radius:10px;padding:12px;margin-bottom:16px;border:1px solid var(--line)"></div>
@@ -122,7 +123,7 @@
 </footer>
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" title="Voltar ao topo">up</button>
-<script src="common.js?v=57"></script>
+<script src="common.js?v=59"></script>
 <script src="app.js?v=50"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -148,9 +149,8 @@ var CASCO = '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
   '<path d="M18.5 13.6 19.9 17c.3.9-.2 1.7-1.1 1.7h-1.6" fill="none" stroke="COR" stroke-width="1.4" stroke-linecap="round"/></svg>';
 
 function iconeNavio(n) {
-  var cor = n.navegando ? '#7DD3FC' : '#86EFAC';
+  var cor = '#7DD3FC';
   var glifo = CASCO.replace(/COR/g, cor);
-  if (!n.navegando) return L.divIcon({ className: 'navio-icone', html: '<div style="width:12px;height:12px;margin:5px;border-radius:50%;background:' + cor + '"></div>', iconSize: [22, 22], iconAnchor: [11, 11] });
   var rumo = num(n.rumo, 0);
   return L.divIcon({
     className: 'navio-icone',
@@ -168,11 +168,14 @@ function popupNavio(n) {
     'Rumo: ' + txt(n.rumo) + '° · Situação: ' + txt(n.status) + '<br>' +
     (n.destino ? 'Destino: ' + txt(n.destino) + '<br>' : '') +
     (n.comprimento ? 'Comprimento: ' + txt(n.comprimento) + ' m' + (n.calado ? ' · Calado ' + txt(n.calado) + ' m' : '') + '<br>' : '') +
-    '<small>Capitania/região: ' + txt(n.caixa) + ' · AIS ' + txt(n.fonteAis) + '</small>';
+    '<small>Capitania/região: ' + txt(n.caixa) + ' · AIS ' + txt(n.fonteAis) +
+    (typeof n.idadeMin === 'number' ? ' · última transmissão há ' +
+      (n.idadeMin < 1 ? 'menos de 1 min' : n.idadeMin + ' min') +
+      (n.frescor === 'antiga' ? ' (posição antiga)' : '') : '') + '</small>';
 }
 
 function initMap() {
-  map = L.map('map').setView([-14.2, -51.9], 4);
+  map = L.map('map', { preferCanvas: true }).setView([-14.2, -51.9], 4);
   // O container mede a altura em vh: sem recalcular depois do layout o Leaflet
   // projeta tudo em 0,0 e o mapa parece em branco.
   setTimeout(function(){ map.invalidateSize(); }, 200);
@@ -220,7 +223,13 @@ function refazMarcadores() {
     if (f.soMovimento && !n.navegando) return;
     if (f.tipo && n.tipo !== f.tipo) return;
     if (f.caixa && n.caixa !== f.caixa) return;
-    var m = L.marker([n.lat, n.lon], { icon: iconeNavio(n) });
+    var m = n.navegando
+      ? L.marker([n.lat, n.lon], { icon: iconeNavio(n) })
+      // fundeados são a maioria: ponto desenhado em canvas, que é muito mais leve que
+      // um ícone de HTML para cada um dos mais de mil navios parados.
+      : L.circleMarker([n.lat, n.lon], n.frescor === 'antiga'
+          ? { radius: 4, color: '#8b8b96', weight: 1.4, fillColor: '#8b8b96', fillOpacity: 0.15 }
+          : { radius: 5, color: '#86EFAC', weight: 1.4, fillColor: '#86EFAC', fillOpacity: 0.85 });
     m.bindPopup(popupNavio(n));
     naviosLayer.addLayer(m);
     FLOTA.push({ d: n, m: m, lat: n.lat, lon: n.lon, rumo: num(n.rumo, 0),
@@ -305,9 +314,11 @@ function avisa() {
   if (DADOS.aoVivo === false) {
     st.textContent = DADOS.aviso || 'O AIS ao vivo não respondeu agora.';
   } else {
-    st.textContent = br(DADOS.total) + ' embarcações captadas, ' + br(DADOS.navegando) + ' navegando — ' +
-      br(naTela) + ' no mapa' + (f.soMovimento ? ' (filtro: só em movimento)' : '') +
-      (DADOS.stale ? ' — ' + (DADOS.aviso || 'última leitura válida') : '');
+    st.textContent = br(DADOS.total) + ' embarcações captadas — ' + br(DADOS.navegando) + ' em movimento, ' +
+      br(DADOS.parados || 0) + ' fundeadas ou atracadas · ' + br(naTela) + ' no mapa' +
+      (f.soMovimento ? ' (filtro: só em movimento)' : '') +
+      (DADOS.stale ? ' — ' + (DADOS.aviso || 'última leitura válida') : '') +
+      ' · ' + (DADOS.avisoCobertura || '');
   }
 }
 
