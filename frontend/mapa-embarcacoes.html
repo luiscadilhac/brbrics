@@ -80,7 +80,7 @@
     <div class="layer-row chips" style="margin-top:10px">
       <span style="color:var(--acc)">▲ navegando</span>
       <span style="color:var(--marca)">● fundeado / atracado</span>
-      <span style="color:#8b8b96">○ posição sem transmissão recente</span>
+      <span style="color:#8b8b96">● atracado, sem transmissão recente</span>
       <span style="color:var(--ico-vivo)">⚓ porto organizador</span>
     </div>
     <p id="status-dados" class="muted" style="font-size:13px;margin:8px 0 0">Consultando os receptores AIS…</p>
@@ -89,7 +89,7 @@
   <div id="map"></div>
 
   <div class="legend">
-    <strong style="color:var(--paper)">📋 Como ler:</strong> o ícone apontado para o rumo é um navio em movimento; o ponto verde cheio está fundeado ou atracado agora; o círculo cinza oco é posição que não transmite há mais de três horas — o navio provavelmente já saiu dali; o ⚓ é a boca do porto, camada fixa de referência. Clique para ver nome, MMSI, bandeira, tipo, calado e destino. Quem está em movimento avança no mapa pela própria velocidade reportada no AIS até a próxima leitura.
+    <strong style="color:var(--paper)">📋 Como ler:</strong> o ícone apontado para o rumo é um navio em movimento; o ponto verde cheio está fundeado ou atracado agora; o ponto cinza está atracado ou fundeado e sem transmissão há mais de três horas — como navio parado não anda, a posição ainda vale e o clique mostra há quanto tempo foi a última transmissão; o ⚓ é a boca do porto, camada fixa de referência. Clique para ver nome, MMSI, bandeira, tipo, calado e destino. Quem está em movimento avança no mapa pela própria velocidade reportada no AIS até a próxima leitura.
   </div>
 
   <div id="lista-navios" style="display:none;max-height:320px;overflow-y:auto;background:var(--card2);border-radius:10px;padding:12px;margin-bottom:16px;border:1px solid var(--line)"></div>
@@ -226,9 +226,11 @@ function refazMarcadores() {
     var m = n.navegando
       ? L.marker([n.lat, n.lon], { icon: iconeNavio(n) })
       // fundeados são a maioria: ponto desenhado em canvas, que é muito mais leve que
-      // um ícone de HTML para cada um dos mais de mil navios parados.
+      // um ícone de HTML para cada um dos mais de mil navios parados. Navio parado não
+      // anda: posição de horas atrás ainda vale, então até a "antiga" fica bem visível —
+      // apenas em cinza, para diferenciar da posição confirmada agora.
       : L.circleMarker([n.lat, n.lon], n.frescor === 'antiga'
-          ? { radius: 4, color: '#8b8b96', weight: 1.4, fillColor: '#8b8b96', fillOpacity: 0.15 }
+          ? { radius: 5, color: '#8b8b96', weight: 1.5, fillColor: '#8b8b96', fillOpacity: 0.65 }
           : { radius: 5, color: '#86EFAC', weight: 1.4, fillColor: '#86EFAC', fillOpacity: 0.85 });
     m.bindPopup(popupNavio(n));
     naviosLayer.addLayer(m);
