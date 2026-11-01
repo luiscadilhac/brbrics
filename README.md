@@ -124,16 +124,33 @@ registo a ninguém:
   aparecia ali, não por falta de tráfego, mas porque a área nem era lida. Antes de confiar num mapa
   "vazio", confira se a caixa cobre o lugar (medido: 92 navios na caixa certa, 10 navegando). As
   coordenadas de cada caixa estão comentadas na `CAIXAS_AIS`.
-- `/api/mapas/cameras` entrega **imagem em movimento**, não link para site de terceiros. Duas fontes,
+- `/api/mapas/cameras` entrega **imagem em movimento**, não link para site de terceiros. Três fontes,
   conferidas quadro a quadro em 2026-11-01: ① **16 câmeras de trânsito de Santo André (SP)**, servidor
   MJPEG da prefeitura (resposta `multipart/x-mixed-replace`, ~13 qps), montadas direto no `<img>` do
-  cartão; ② **24 câmeras da SkylineWebcams** (praias, cidades, portos e mirantes em 9 estados), cujo
-  vídeo vivo é uma transmissão contínua no YouTube (`isLive=true` nos 24) — o clique liga um iframe
+  cartão; ② **24 câmeras da SkylineWebcams** do Brasil (praias, cidades, portos e mirantes em 9 estados);
+  ③ **62 câmeras públicas do mundo**, em 23 países: 9 portos (Roterdã, Hamburgo, Helsinki, Dublin,
+  Sydney), 11 praias, 17 cidades, 7 mirantes, 15 de natureza (poços de água de reservas na África pela
+  Africam, geleiras e auroras pela Explore.org) e 3 aeroportos (Praga, Lisboa, Heathrow). ② e ③ são
+  **transmissões contínuas de 24h que o próprio dono da câmera abre no YouTube** — autoridade portuária,
+  prefeitura, concessão ferroviária (ProRail), hotel, EarthCam — e o clique liga um iframe
   `youtube-nocookie`. Para os cartões não abrirem 16 vídeos de uma vez, `/api/mapas/camera/quadro`
   colhe **um** JPEG por câmera no servidor (até 400KB, cache de 40s) e renova a cada 90s na página.
   As listas têm endereços e coordenadas do OpenStreetMap (tag `contact:webcam`). As de trânsito da
   CET-SP, DNIT, PRF e prefeituras testadas ou sumiram ou devolvem fotografia parada de anos atrás, por
   isso não entraram.
+- **Como se confere uma transmissão do YouTube sem entrar no site dela:**
+  `https://i.ytimg.com/vi/<id>/hqdefault_live.jpg` responde **200 enquanto o vídeo está no ar** e 404
+  quando acabou. É esse teste, e não o `isLive` da página de assist (que um IP de datacenter recebe
+  como CAPTCHA), que peneirou as 86 entradas do YouTube acima. A miniatura do cartão usa o quadro vivo e
+  cai para `hqdefault.jpg` se ele falhar. Que o vídeo **abre aqui dentro** foi conferido com a IFrame
+  Player API rodando fora do domínio do YouTube: os códigos 101/150 são o bloqueio de embed e nenhum
+  deles apareceu. Testar embed com iframe `youtube.com/embed` dentro de uma aba que já é do YouTube dá
+  "Error code: 152" para tudo — falso negativo, não use.
+- **O que foi recusado de propósito:** listas de "CCTV aberta" (random-robbie *Open Cameras / CCTV Stream
+  URLs*, ckcctv *Open CCTV Finder*, *Cameradar*) entregam milhares de URLs de câmeras de segurança
+  alheias sem senha, justamente porque alguém esqueceu a senha. Isso é acesso não autorizado, não janela
+  pública, e não entra no portal. O vídeo internacional da SkylineWebcams também não entra: é HLS com
+  token que expira e o player deles não embute fora do site.
 - `/api/mapas/orbita` baixa TLEs do **CelesTrak** (`gp.php?GROUP=…&FORMAT=tle`) para 9 grupos
   (estações orbitais, BeiDou/GPS/GLONASS/Galileo, Starlink/OneWeb, meteorológicos, observação da
   Terra). O CelesTrak responde **403 "GP data has not updated since your last request"** se o mesmo

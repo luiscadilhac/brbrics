@@ -648,7 +648,7 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
   });
 
   // ---- Cameras online ----
-  // Duas fontes que entregam a IMAGEM, não um link:
+  // Três fontes que entregam a IMAGEM, não um link:
   //  1) transito: cameras municipais de Santo André (SP), vídeo MJPEG direto do servidor
   //     da prefeitura. O navegador abre o quadro em movimento sozinho, como numa TV.
   //     A lista (nome, endereço da câmera e coordenada) vem do OpenStreetMap, conferida
@@ -687,25 +687,112 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
   CAMERAS_YT.forEach(function (c) {
     c.modo = 'youtube';
     c.grupo = 'paisagem';
-    c.imagem = 'https://i.ytimg.com/vi/' + c.video + '/hqdefault.jpg';
+    // A miniatura "_live" é o quadro de agora da transmissão; a comum é pôster antigo.
+    c.imagem = 'https://i.ytimg.com/vi/' + c.video + '/hqdefault_live.jpg';
+    c.imagemPlano = 'https://i.ytimg.com/vi/' + c.video + '/hqdefault.jpg';
     c.player = 'https://www.youtube-nocookie.com/embed/' + c.video + '?autoplay=1&mute=1&playsinline=1&rel=0';
     c.url = 'https://www.youtube.com/watch?v=' + c.video;
     c.fonte = 'SkylineWebcams (transmissão contínua no YouTube)';
   });
 
+  // 3) o mundo. Cada linha abaixo é uma transmissão contínua pública no YouTube, aberta
+  //    pelo próprio dono da câmera: autoridade portuária (Helsinki, Roterdã, Dublin,
+  //    Hamburgo), prefeitura (Hollywood Beach, Praga), concessionária de trem (ProRail),
+  //    hotel ou rede profissional de câmeras (EarthCam, Africam, Explore.org).
+  //    Nenhuma é cópia de sinal fechado nem câmera de segurança alheia.
+  //    Todas foram conferidas em 2026-11-01 em dois pontos: o quadro ao vivo do YouTube
+  //    respondeu (i.ytimg.com/vi/<id>/hqdefault_live.jpg = 200, que só existe em
+  //    transmissão no ar) e o player abriu de fora do youtube.com.
+  //    O "uf" dos cartões do mundo traz o país, para a linha de baixo ler
+  //    "Helsinki — Finlândia" do mesmo jeito que lê "Santos — SP".
+  var CAMERAS_MUNDO = [
+    { id: 1000, nome: 'Porto de Helsinki — Porto Sul', cidade: 'Helsinki', uf: 'Finlândia', tipo: 'porto', lat: 60.1637, lon: 24.9520, video: 'CvOB-Is_yYU' },
+    { id: 1001, nome: 'Porto de Roterdã — Amazonehaven', cidade: 'Roterdã', uf: 'Países Baixos', tipo: 'porto', lat: 51.9470, lon: 4.0930, video: 'M09NaBVPjAI' },
+    { id: 1002, nome: 'Porto de Dublin — rio Liffey', cidade: 'Dublin', uf: 'Irlanda', tipo: 'porto', lat: 53.3440, lon: -6.2370, video: 'K_ye7QHXosQ' },
+    { id: 1003, nome: 'Porto de Hamburgo — Cruise Center Altona', cidade: 'Hamburgo', uf: 'Alemanha', tipo: 'porto', lat: 53.5390, lon: 9.9130, video: 'GF1DYvxDq44' },
+    { id: 1004, nome: 'Porto de Lyme Regis', cidade: 'Lyme Regis', uf: 'Reino Unido', tipo: 'porto', lat: 50.7560, lon: -2.9440, video: 'rulGLEdCHZU' },
+    { id: 1005, nome: 'Porto de Stornoway', cidade: 'Stornoway', uf: 'Reino Unido', tipo: 'porto', lat: 58.2090, lon: -6.3860, video: 'Xajlompi7JA' },
+    { id: 1006, nome: 'Porto de Friday Harbor', cidade: 'Friday Harbor', uf: 'Estados Unidos', tipo: 'porto', lat: 48.5340, lon: -123.0180, video: 'pr2p_uvmXh8' },
+    { id: 1007, nome: 'Porto de Sydney', cidade: 'Sydney', uf: 'Austrália', tipo: 'porto', lat: -33.8570, lon: 151.2120, video: '5uZa3-RMFos' },
+    { id: 1008, nome: 'Canal de Duluth', cidade: 'Duluth', uf: 'Estados Unidos', tipo: 'porto', lat: 46.7720, lon: -92.1060, video: 'HPS48TMmNag' },
+    { id: 1009, nome: 'Hollywood Beach Broadwalk', cidade: 'Hollywood', uf: 'Estados Unidos', tipo: 'praia', lat: 26.0100, lon: -80.1160, video: 'cmkAbDUEoyA' },
+    { id: 1010, nome: 'Maho Beach', cidade: 'Sint Maarten', uf: 'São Martinho', tipo: 'praia', lat: 18.0430, lon: -63.1080, video: 'iSeH45R-8R0' },
+    { id: 1011, nome: 'Mambo Beach', cidade: 'Willemstad', uf: 'Curaçao', tipo: 'praia', lat: 11.9960, lon: -68.9610, video: 'loHbMM9JfCs' },
+    { id: 1012, nome: 'White Bay Beach', cidade: 'Jost Van Dyke', uf: 'Ilhas Virgens Britânicas', tipo: 'praia', lat: 18.4320, lon: -64.7480, video: 'V_I168MM-ik' },
+    { id: 1013, nome: 'Lamai Beach', cidade: 'Koh Samui', uf: 'Tailândia', tipo: 'praia', lat: 9.5760, lon: 100.0720, video: 'g-noWsNhRg0' },
+    { id: 1014, nome: 'South Beach — Collins Avenue', cidade: 'Miami Beach', uf: 'Estados Unidos', tipo: 'praia', lat: 25.7830, lon: -80.1300, video: 'dyg7bu7QRjg' },
+    { id: 1015, nome: 'Costa da Caparica', cidade: 'Almada', uf: 'Portugal', tipo: 'praia', lat: 35.6830, lon: -9.2280, video: 'oDbKeeojgyk' },
+    { id: 1016, nome: 'Penha de França', cidade: 'Funchal', uf: 'Portugal', tipo: 'praia', lat: 32.6400, lon: -16.9080, video: 'CqyPIduELzA' },
+    { id: 1017, nome: 'Tamariu', cidade: 'Tamariu', uf: 'Espanha', tipo: 'praia', lat: 41.9000, lon: 3.2100, video: 'wiVzU1mcCTA' },
+    { id: 1018, nome: 'Los Angeles — Venice Beach', cidade: 'Los Angeles', uf: 'Estados Unidos', tipo: 'praia', lat: 33.9850, lon: -118.4690, video: 'EO_1LWqsCNE' },
+    { id: 1019, nome: 'Sanibel Island', cidade: 'Sanibel', uf: 'Estados Unidos', tipo: 'praia', lat: 26.4500, lon: -82.0100, video: '4LTSTw4jnZc' },
+    { id: 1020, nome: 'Veneza — Grande Canal em giro', cidade: 'Veneza', uf: 'Itália', tipo: 'cidade', lat: 45.4380, lon: 12.3300, video: 'a1mcaV3Sf9U' },
+    { id: 1021, nome: 'Veneza — Ponte de Rialto', cidade: 'Veneza', uf: 'Itália', tipo: 'cidade', lat: 45.4380, lon: 12.3358, video: 'nviU2HYj-Jc' },
+    { id: 1022, nome: 'Veneza — Bacia de São Marcos', cidade: 'Veneza', uf: 'Itália', tipo: 'cidade', lat: 45.4320, lon: 12.3400, video: '7-XBRpKSv4Q' },
+    { id: 1023, nome: 'Londres — Notting Hill Gate', cidade: 'Londres', uf: 'Reino Unido', tipo: 'cidade', lat: 51.5090, lon: -0.1970, video: 'U-XyMFyX4x0' },
+    { id: 1024, nome: 'Oxford — Broad Street', cidade: 'Oxford', uf: 'Reino Unido', tipo: 'cidade', lat: 51.7540, lon: -1.2570, video: 'h8glPXsnezU' },
+    { id: 1025, nome: 'Amsterdã — Praça Dam', cidade: 'Amsterdã', uf: 'Países Baixos', tipo: 'cidade', lat: 52.3730, lon: 4.8930, video: 'Gd9d4q6WvUY' },
+    { id: 1026, nome: 'Amsterdã — Estação Centraal', cidade: 'Amsterdã', uf: 'Países Baixos', tipo: 'cidade', lat: 52.3790, lon: 4.9000, video: 'FHJH2yMe6Hw' },
+    { id: 1027, nome: 'Tóquio — Shinjuku Kabukicho', cidade: 'Tóquio', uf: 'Japão', tipo: 'cidade', lat: 35.6950, lon: 139.7050, video: 'DjdUEyjx8GM' },
+    { id: 1028, nome: 'Tóquio — Cruzamento de Shibuya', cidade: 'Tóquio', uf: 'Japão', tipo: 'cidade', lat: 35.6595, lon: 139.7005, video: 'dfVK7ld38Ys' },
+    { id: 1029, nome: 'Praga — centro', cidade: 'Praga', uf: 'Tchéquia', tipo: 'cidade', lat: 50.0870, lon: 14.4360, video: '3C8W4Rlgiog' },
+    { id: 1030, nome: 'Lisboa — vista da cidade', cidade: 'Lisboa', uf: 'Portugal', tipo: 'cidade', lat: 38.7220, lon: -9.1390, video: 'tKIgNtEgLN0' },
+    { id: 1031, nome: 'Melbourne — cruzamento', cidade: 'Melbourne', uf: 'Austrália', tipo: 'cidade', lat: -37.8140, lon: 144.9630, video: 'gEbrHdFRgpQ' },
+    { id: 1032, nome: 'Nova York — World Trade Center', cidade: 'Nova York', uf: 'Estados Unidos', tipo: 'cidade', lat: 40.7120, lon: -74.0130, video: '5C9oM7C2Q9k' },
+    { id: 1033, nome: 'Nova York — Times Square', cidade: 'Nova York', uf: 'Estados Unidos', tipo: 'cidade', lat: 40.7580, lon: -73.9860, video: 'KHy_n-EMWY8' },
+    { id: 1034, nome: 'Dublin — vista da cidade', cidade: 'Dublin', uf: 'Irlanda', tipo: 'cidade', lat: 53.3480, lon: -6.2600, video: '3nyPER2kzqk' },
+    { id: 1035, nome: 'Maiorca', cidade: 'Palma de Maiorca', uf: 'Espanha', tipo: 'cidade', lat: 39.5700, lon: 2.6500, video: 'jtdyLykT_XY' },
+    { id: 1036, nome: 'Nova Orleans — vista da rua', cidade: 'Nova Orleans', uf: 'Estados Unidos', tipo: 'cidade', lat: 29.9550, lon: -90.0700, video: 'xqdukYhcGEU' },
+    { id: 1037, nome: 'Londres — Abbey Road', cidade: 'Londres', uf: 'Reino Unido', tipo: 'mirante', lat: 51.5320, lon: -0.1780, video: 'zMCea32gpmg' },
+    { id: 1038, nome: 'Sydney — Ponte e Casa de Ópera', cidade: 'Sydney', uf: 'Austrália', tipo: 'mirante', lat: -33.8570, lon: 151.2130, video: '3IPgK1Hqx6A' },
+    { id: 1039, nome: 'Nova York — Ponte do Brooklyn', cidade: 'Nova York', uf: 'Estados Unidos', tipo: 'mirante', lat: 40.7060, lon: -73.9970, video: 'tErYxn2UM5Y' },
+    { id: 1040, nome: 'Nova York — Estátua da Liberdade', cidade: 'Nova York', uf: 'Estados Unidos', tipo: 'mirante', lat: 40.6900, lon: -74.0450, video: 'o5Ie_LpZ9uk' },
+    { id: 1041, nome: 'Washington — Monumento', cidade: 'Washington', uf: 'Estados Unidos', tipo: 'mirante', lat: 38.8890, lon: -77.0350, video: 'oDCAAfOSqvA' },
+    { id: 1042, nome: 'Baía de Tóquio', cidade: 'Tóquio', uf: 'Japão', tipo: 'mirante', lat: 35.6260, lon: 139.7750, video: 'Ac0E6CrnDxA' },
+    { id: 1043, nome: 'Amsterdã — telhado Mövenpick', cidade: 'Amsterdã', uf: 'Países Baixos', tipo: 'mirante', lat: 52.3900, lon: 4.9100, video: '9Pm6Ji6tm7s' },
+    { id: 1044, nome: 'Bebedouro de Amboseli e o Kilimanjaro', cidade: 'Amboseli', uf: 'Quênia', tipo: 'natureza', lat: -2.6500, lon: 37.2600, video: 'XyPU5-pNg5E' },
+    { id: 1045, nome: 'Bebedouro da Victoria Falls Safari Lodge', cidade: 'Victoria Falls', uf: 'Zimbábue', tipo: 'natureza', lat: -17.9250, lon: 25.8550, video: 'f9uqHbXChno' },
+    { id: 1046, nome: 'Bebedouro de Senyati, Chobe', cidade: 'Chobe', uf: 'Botsuana', tipo: 'natureza', lat: -19.1500, lon: 24.9000, video: 'EdDdTrahHjI' },
+    { id: 1047, nome: 'Travessia do Mara — grande migração', cidade: 'Masai Mara', uf: 'Quênia', tipo: 'natureza', lat: -1.4500, lon: 35.0500, video: 'Io1Kle7QR-E' },
+    { id: 1048, nome: 'Ol Donyo Lodge', cidade: 'Taita-Taveta', uf: 'Quênia', tipo: 'natureza', lat: -3.2700, lon: 38.0500, video: 'XsOU8JnEpNM' },
+    { id: 1049, nome: 'Bebedouro de Okaukuejo, Etosha', cidade: 'Etosha', uf: 'Namíbia', tipo: 'natureza', lat: -18.8500, lon: 16.1170, video: 'AeMUdOPFcXI' },
+    { id: 1050, nome: 'Linkwasha, Hwange', cidade: 'Hwange', uf: 'Zimbábue', tipo: 'natureza', lat: -19.3000, lon: 26.5000, video: '-rXriX4SiQk' },
+    { id: 1051, nome: 'Sabi Sand', cidade: 'Sabi Sand', uf: 'África do Sul', tipo: 'natureza', lat: -24.9000, lon: 31.4000, video: 'sQAhSkjRKGk' },
+    { id: 1052, nome: 'Deserto do Namibe', cidade: 'Namibe', uf: 'Namíbia', tipo: 'natureza', lat: -24.7500, lon: 15.9130, video: 'ydYDqZQpim8' },
+    { id: 1053, nome: 'Geleira Mendenhall', cidade: 'Juneau', uf: 'Estados Unidos', tipo: 'natureza', lat: 58.4700, lon: -134.6800, video: 'jJI5w_RVGtQ' },
+    { id: 1054, nome: 'Dumpling Mountain, Katmai', cidade: 'Parque Katmai', uf: 'Estados Unidos', tipo: 'natureza', lat: 58.6300, lon: -154.7000, video: 'uLgdUiT9WZQ' },
+    { id: 1055, nome: 'Aurora boreal de Churchill', cidade: 'Churchill', uf: 'Canadá', tipo: 'natureza', lat: 58.7700, lon: -94.1700, video: 'a0i1Kg6fROg' },
+    { id: 1056, nome: 'Aurora boreal de Fairbanks', cidade: 'Fairbanks', uf: 'Estados Unidos', tipo: 'natureza', lat: 64.8400, lon: -147.7200, video: 'O52zDyxg5QI' },
+    { id: 1057, nome: 'Lago Big Bear', cidade: 'Big Bear Lake', uf: 'Estados Unidos', tipo: 'natureza', lat: 34.2440, lon: -116.9100, video: 'pofGnqJbCBY' },
+    { id: 1058, nome: 'Floresta dinamarquesa', cidade: 'Ikast', uf: 'Dinamarca', tipo: 'natureza', lat: 56.2640, lon: 9.5020, video: 'F0GOOP82094' },
+    { id: 1059, nome: 'Aeroporto de Praga', cidade: 'Praga', uf: 'Tchéquia', tipo: 'aeroporto', lat: 50.1030, lon: 14.2640, video: 'Deo_lcwn8lk' },
+    { id: 1060, nome: 'Aeroporto de Lisboa', cidade: 'Lisboa', uf: 'Portugal', tipo: 'aeroporto', lat: 38.7710, lon: -9.1300, video: 'cpNMQzMyMLQ' },
+    { id: 1061, nome: 'Aeroporto de Heathrow', cidade: 'Londres', uf: 'Reino Unido', tipo: 'aeroporto', lat: 51.4700, lon: -0.4540, video: 'uDBYuEV4zjI' }
+  ];
+  CAMERAS_MUNDO.forEach(function (c) {
+    c.modo = 'youtube';
+    c.grupo = 'mundo';
+    c.imagem = 'https://i.ytimg.com/vi/' + c.video + '/hqdefault_live.jpg';
+    c.imagemPlano = 'https://i.ytimg.com/vi/' + c.video + '/hqdefault.jpg';
+    c.player = 'https://www.youtube-nocookie.com/embed/' + c.video + '?autoplay=1&mute=1&playsinline=1&rel=0';
+    c.url = 'https://www.youtube.com/watch?v=' + c.video;
+    c.fonte = 'Câmera pública de ' + c.cidade + ' (' + c.uf + ') — transmissão contínua no YouTube';
+  });
+
   app.get('/api/mapas/cameras', function(req, res) {
-    var todas = CAMERAS_SA.concat(CAMERAS_YT);
+    var todas = CAMERAS_SA.concat(CAMERAS_YT, CAMERAS_MUNDO);
     var cidades = {}, ufs = {};
     todas.forEach(function (c) { cidades[c.cidade] = 1; ufs[c.uf] = 1; });
     var out = {
-      fonte: 'Câmeras municipais de Santo André (SP) + SkylineWebcams ao vivo',
+      fonte: 'Câmeras municipais de Santo André (SP) + SkylineWebcams + câmeras públicas do mundo',
       total: todas.length,
       transito: CAMERAS_SA.length,
+      mundo: CAMERAS_MUNDO.length,
       cidades: Object.keys(cidades).length,
       ufs: Object.keys(ufs).sort(),
       cameras: todas,
       aviso: 'As de trânsito abrem o vídeo no próprio quadro, sem sair do portal. ' +
-             'Nas de praia e cidade o clique liga a transmissão ao vivo da câmera.',
+             'Nas demais, o clique liga a transmissão ao vivo da câmera.',
       atualizadoEm: new Date().toISOString()
     };
     res.set('Cache-Control', 'public, max-age=300');

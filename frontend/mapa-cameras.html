@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Câmeras ao Vivo — BrBRICS</title>
-<meta name="description" content="Câmeras ao vivo do Brasil dentro do portal: trânsito de Santo André (SP) em vídeo contínuo e praias, cidades, portos e mirantes do país pela transmissão aberta de cada câmera.">
+<meta name="description" content="Câmeras ao vivo dentro do portal: trânsito de Santo André (SP) em vídeo contínuo, praias, cidades, portos e mirantes do Brasil e do mundo pela transmissão aberta de cada câmera.">
 <link rel="icon" href="favicon.ico?v=50" type="image/x-icon">
 <link rel="stylesheet" href="style.css?v=59">
 <link rel="stylesheet" href="pro.css?v=59">
@@ -67,7 +67,7 @@
   <section class="hero" style="padding:24px 0;text-align:center">
     <p class="kicker">📹 Câmeras ao vivo</p>
     <h1>O vídeo da câmera dentro do portal</h1>
-    <p class="sub">Trânsito de Santo André (SP) em vídeo contínuo e praias, cidades, portos e mirantes de vários estados pela transmissão aberta de cada câmera. Nada de link para página de órgão público.</p>
+    <p class="sub">Trânsito de Santo André (SP) em vídeo contínuo, praias, cidades, portos e mirantes de vários estados e mais 62 câmeras públicas do mundo — portos, praias, cidades, mirantes, natureza e aeroportos — pela transmissão aberta de cada câmera. Nada de link para página de órgão público.</p>
   </section>
 
   <div class="filtro" id="filtros">
@@ -77,6 +77,9 @@
     <button class="filtro-btn" data-tipo="cidade">Cidades</button>
     <button class="filtro-btn" data-tipo="porto">Portos</button>
     <button class="filtro-btn" data-tipo="mirante">Mirantes</button>
+    <button class="filtro-btn" data-tipo="natureza">Natureza</button>
+    <button class="filtro-btn" data-tipo="aeroporto">Aeroportos</button>
+    <button class="filtro-btn" data-tipo="mundo">No mundo</button>
   </div>
 
   <div class="palco">
@@ -101,6 +104,7 @@
   <div class="stat-row">
     <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lab">Câmeras no portal</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-transito">—</div><div class="stat-lab">De trânsito (vídeo contínuo)</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-mundo">—</div><div class="stat-lab">No mundo</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-cidades">—</div><div class="stat-lab">Cidades</div></div>
     <div class="stat-card"><div class="stat-val" id="stat-atualizacao">—</div><div class="stat-lab">Última leitura</div></div>
   </div>
@@ -119,6 +123,11 @@
         <a href="https://www.skylinewebcams.com/pt/webcam/brasil.html" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">SkylineWebcams →</a>
       </div>
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--marco-dentro)">
+        <h4 style="margin:0 0 8px;color:var(--marca)">No mundo — autoridade do porto, prefeitura, reserva</h4>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">62 câmeras em 23 países: portos de Roterdã, Hamburgo, Helsinki, Dublin, Sydney; praias e praças de cidades; mirantes; aeroportos de Praga, Lisboa e Heathrow; poços de água de reservas na África e geleiras no norte. Todas são transmissões 24 horas que o próprio dono da câmera abre no YouTube — nada de TV paga e nada de câmera de segurança de terceiros exposta por engano. Cada uma foi conferida em 1º de novembro de 2026: quadro novo e vídeo que abre aqui dentro.</p>
+        <a href="https://www.earthcam.net/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">EarthCam (uma das redes) →</a>
+      </div>
+      <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--marco-dentro)">
         <h4 style="margin:0 0 8px;color:var(--marca)">Por que não CET-SP e DNIT</h4>
         <p style="font-size:13px;color:var(--muted);margin:0 0 8px">As câmeras de trânsito desses órgãos foram testadas uma a uma: mudaram de endereço, exigem chave ou devolvem fotografia parada de anos atrás. Nenhuma entrega imagem viva por fora do site deles.</p>
         <span class="muted" style="font-size:12px">Nada embutido daqui.</span>
@@ -128,7 +137,7 @@
 </main>
 <footer>
   <div class="wrap foot">
-    <div><b>BrBRICS</b> — vídeo das câmeras públicas municipais e de redes abertas de webcam, com mapa base OpenStreetMap.</div>
+    <div><b>BrBRICS</b> — vídeo das câmeras públicas municipais, de redes abertas de webcam e de transmissões contínuas do mundo, com mapa base OpenStreetMap.</div>
     <div class="flinks"><a href="globo-satelites.html">Globo 3D</a><a href="mapa-satelite.html">Satélite</a><a href="mapa-avioes.html">Aviões</a><a href="mapa-embarcacoes.html">Embarcações</a><a href="mapa-orbita.html">Órbita</a><a href="mapa-brasil.html">Mapa Brasil</a></div>
   </div>
 </footer>
@@ -141,7 +150,7 @@
 var map = null, layers = {}, camerasLayer = null;
 var TODAS = [], FILTRO = 'todos', ESCOLHIDA = null, MARCA = {};
 
-var COR_TIPO = { transito: '#FACC15', praia: '#7DD3FC', cidade: '#86EFAC', porto: '#F97316', mirante: '#C4B5FD' };
+var COR_TIPO = { transito: '#FACC15', praia: '#7DD3FC', cidade: '#86EFAC', porto: '#F97316', mirante: '#C4B5FD', natureza: '#FB7185', aeroporto: '#22D3EE' };
 
 function esc(s) { return String(s || '—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -181,7 +190,7 @@ function mostra(c) {
 }
 
 function rotulo(t) {
-  return { transito: 'trânsito', praia: 'praia', cidade: 'cidade', porto: 'porto', mirante: 'mirante' }[t] || t;
+  return { transito: 'trânsito', praia: 'praia', cidade: 'cidade', porto: 'porto', mirante: 'mirante', natureza: 'natureza', aeroporto: 'aeroporto' }[t] || t;
 }
 
 // A coluna de cartões recebe a altura exata da coluna da câmera (visor + mapa) e rola
@@ -201,7 +210,8 @@ function refazFiltro() {
   var html = '';
   var visiveis = 0;
   TODAS.forEach(function(c) {
-    if (FILTRO !== 'todos' && c.tipo !== FILTRO) return;
+    if (FILTRO === 'mundo') { if (c.grupo !== 'mundo') return; }
+    else if (FILTRO !== 'todos' && c.tipo !== FILTRO) return;
     visiveis++;
     var m = L.circleMarker([c.lat, c.lon], {
       radius: 8, color: COR_TIPO[c.tipo] || '#fff', weight: 2,
@@ -213,11 +223,11 @@ function refazFiltro() {
     MARCA[String(c.id)] = m;
 
     html += '<div class="cam-card' + (ESCOLHIDA && String(ESCOLHIDA.id) === String(c.id) ? ' escolhida' : '') + '" data-id="' + esc(c.id) + '">' +
-      '<div class="cam-foto"><img src="' + esc(c.imagem) + '" alt="' + esc(c.nome) + '" loading="lazy">' +
+      '<div class="cam-foto"><img src="' + esc(c.imagem) + '" alt="' + esc(c.nome) + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + esc(c.imagemPlano || c.imagem) + '\'">' +
       '<span class="ao-vivo">AO VIVO</span><span class="play">▶</span></div>' +
       '<div class="cam-txt"><b>' + esc(c.nome) + '</b>' +
       '<span class="muted">' + esc(c.cidade) + ' — ' + esc(c.uf) + '</span>' +
-      '<br><span class="selo">' + rotulo(c.tipo) + (c.modo === 'mjpeg' ? ' · vídeo contínuo' : ' · SkylineWebcams') + '</span></div>' +
+      '<br><span class="selo">' + rotulo(c.tipo) + (c.modo === 'mjpeg' ? ' · vídeo contínuo' : (c.grupo === 'mundo' ? ' · transmissão pública' : ' · SkylineWebcams')) + '</span></div>' +
       '</div>';
   });
   grade.innerHTML = html || '<p class="muted">Nenhuma câmera para este filtro.</p>';
@@ -226,11 +236,22 @@ function refazFiltro() {
   encaixaColuna();
 }
 
+// O filtro muda e o mapa tem de acompanhar: as câmeras do mundo ficam fora da vista do
+// Brasil e, sem isto, o usuário filtraria "No mundo" e veria um mapa vazio.
+function encaixaMapa() {
+  if (!map || !camerasLayer) return;
+  var ls = camerasLayer.getLayers();
+  if (!ls.length) return;
+  if (ls.length === 1) { map.setView(ls[0].getLatLng(), 11); return; }
+  map.fitBounds(L.latLngBounds(ls.map(function(l){ return l.getLatLng(); })), { padding: [24, 24], maxZoom: 13 });
+}
+
 function carrega() {
   fetch('/api/mapas/cameras').then(function(r){ return r.json(); }).then(function(d) {
     TODAS = d.cameras || [];
     document.getElementById('stat-total').textContent = d.total || 0;
     document.getElementById('stat-transito').textContent = d.transito || 0;
+    document.getElementById('stat-mundo').textContent = d.mundo || 0;
     document.getElementById('stat-cidades').textContent = d.cidades || 0;
     document.getElementById('stat-atualizacao').textContent = horaBR(d.atualizadoEm);
     refazFiltro();
@@ -260,6 +281,8 @@ document.addEventListener('DOMContentLoaded', function() {
       btn.classList.add('ativo');
       FILTRO = btn.getAttribute('data-tipo');
       refazFiltro();
+      map.invalidateSize();
+      encaixaMapa();
     };
   });
 
