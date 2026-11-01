@@ -44,6 +44,8 @@ O menu principal vem de `BRBRICS_NAV` em [frontend/common.js](frontend/common.js
 no HTML, que serve de fallback antes do JavaScript correr — **ao mexer em `BRBRICS_NAV`, sincroniza
 esses blocos fixos**, senão ficam desactualizados. O rodapé é gerado por `buildFooter()` no mesmo
 ficheiro, e o ticker de manchetes/mercado também.
+No rodapé, cada grupo de links (`.f-col`) tem as suas listas dentro de `.f-links`, que corre em
+**duas colunas** para a lista de nomes não ficar comprida; abaixo de 700px volta a uma coluna.
 
 Ícones do menu: apenas as chaves definidas em `NAV_ICONS` em `common.js` produzem ícone; chave
 desconhecida significa item sem ícone, sem erro.

@@ -380,17 +380,17 @@ function buildFooter(){
   for(var i=0;i<fts.length;i++){
     fts[i].innerHTML='<div class="wrap foot-grid">'
     +'<div class="f-brand"><img src="logo-brics.png?v=50" alt="BrBRICS"><div><b>BrBRICS</b><p class="muted">Transparência de dados do setor público — direto das fontes oficiais, sem intermediários.</p></div></div>'
-    +'<div class="f-col"><h4>Seções</h4><a href="index.html">Início</a><a href="edicao.html">Diário Oficial</a><a href="licitacoes.html">Licitações</a><a href="proposicoes.html">Congresso</a><a href="indicadores.html">Indicadores</a><a href="tribunais.html">Tribunais</a></div>'
-    +'<div class="f-col"><h4>Território (IBGE)</h4><a href="territorio.html">Território</a></div>'
-    +'<div class="f-col"><h4>Clima nas capitais</h4><a href="clima.html">Clima</a></div>'
-    +'<div class="f-col"><h4>Contas públicas</h4><a href="contas.html">Contas</a></div>'
-    +'<div class="f-col"><h4>Energia</h4><a href="energia.html">Energia</a></div>'
-    +'<div class="f-col"><h4>Comércio exterior</h4><a href="comex.html">Comércio</a></div>'
-    +'<div class="f-col"><h4>Guia Fipe</h4><a href="fipe.html">Fipe</a></div>'
-    +'<div class="f-col"><h4>Agro e safra</h4><a href="agro.html">Agro</a></div>'
-    +'<div class="f-col"><h4>Mapas e Satélite</h4><a href="mapas.html">Mapas</a></div>'
-    +'<div class="f-col"><h4>Institucional</h4><a href="sobre.html">Sobre</a><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="privacidade.html">Privacidade (LGPD)</a><a href="contato.html">Contato</a><a href="painel.html">Painel de visitas</a><a href="/rss.xml">RSS</a></div>'
-    +'<div class="f-col"><h4>Fontes oficiais</h4><a href="https://pncp.gov.br" target="_blank" rel="noopener">PNCP</a><a href="https://dadosabertos.camara.leg.br/" target="_blank" rel="noopener">Câmara</a><a href="https://www.bcb.gov.br/" target="_blank" rel="noopener">BCB</a><a href="https://servicodados.ibge.gov.br/api/docs/" target="_blank" rel="noopener">IBGE</a><a href="https://www.gov.br/cgu/pt-br" target="_blank" rel="noopener">CGU</a><a href="https://dadosabertos.aneel.gov.br/" target="_blank" rel="noopener">ANEEL</a></div>'
+    +'<div class="f-col"><h4>Seções</h4><div class="f-links"><a href="index.html">Início</a><a href="edicao.html">Diário Oficial</a><a href="licitacoes.html">Licitações</a><a href="proposicoes.html">Congresso</a><a href="indicadores.html">Indicadores</a><a href="tribunais.html">Tribunais</a></div></div>'
+    +'<div class="f-col"><h4>Território (IBGE)</h4><div class="f-links"><a href="territorio.html">Território</a></div></div>'
+    +'<div class="f-col"><h4>Clima nas capitais</h4><div class="f-links"><a href="clima.html">Clima</a></div></div>'
+    +'<div class="f-col"><h4>Contas públicas</h4><div class="f-links"><a href="contas.html">Contas</a></div></div>'
+    +'<div class="f-col"><h4>Energia</h4><div class="f-links"><a href="energia.html">Energia</a></div></div>'
+    +'<div class="f-col"><h4>Comércio exterior</h4><div class="f-links"><a href="comex.html">Comércio</a></div></div>'
+    +'<div class="f-col"><h4>Guia Fipe</h4><div class="f-links"><a href="fipe.html">Fipe</a></div></div>'
+    +'<div class="f-col"><h4>Agro e safra</h4><div class="f-links"><a href="agro.html">Agro</a></div></div>'
+    +'<div class="f-col"><h4>Mapas e Satélite</h4><div class="f-links"><a href="mapas.html">Mapas</a></div></div>'
+    +'<div class="f-col"><h4>Institucional</h4><div class="f-links"><a href="sobre.html">Sobre</a><a href="sobre.html">Como produzimos</a><a href="sobre.html">Fontes</a><a href="sobre.html">Termos</a><a href="privacidade.html">Privacidade (LGPD)</a><a href="contato.html">Contato</a><a href="painel.html">Painel de visitas</a><a href="/rss.xml">RSS</a></div></div>'
+    +'<div class="f-col"><h4>Fontes oficiais</h4><div class="f-links"><a href="https://pncp.gov.br" target="_blank" rel="noopener">PNCP</a><a href="https://dadosabertos.camara.leg.br/" target="_blank" rel="noopener">Câmara</a><a href="https://www.bcb.gov.br/" target="_blank" rel="noopener">BCB</a><a href="https://servicodados.ibge.gov.br/api/docs/" target="_blank" rel="noopener">IBGE</a><a href="https://www.gov.br/cgu/pt-br" target="_blank" rel="noopener">CGU</a><a href="https://dadosabertos.aneel.gov.br/" target="_blank" rel="noopener">ANEEL</a></div></div>'
     +'</div><div class="wrap foot-base"><small class="muted">© '+new Date().getFullYear()+' BrBRICS · Dados públicos com link de conferência na fonte.</small></div>';
   }
 }

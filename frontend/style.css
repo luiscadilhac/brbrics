@@ -278,6 +278,10 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 .f-col h4{margin:0 0 10px;font-size:11px;color:var(--ico);text-transform:uppercase;letter-spacing:.08em}
 .f-col a{display:block;color:var(--muted);text-decoration:none;font-size:13px;padding:3px 0}
 .f-col a:hover{color:var(--acc)}
+/* duas colunas de nomes por grupo: a lista deixa de ficar comprida */
+.f-links{columns:2;column-gap:18px}
+.f-links a{break-inside:avoid}
+@media(max-width:700px){.f-links{columns:1}}
 .foot-base{border-top:1px solid var(--line);margin-top:14px;padding:14px 22px 22px}
 @media(max-width:900px){.foot-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.foot-grid{grid-template-columns:1fr}}
