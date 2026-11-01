@@ -296,6 +296,12 @@ que também é público e sem chave. Dois cuidados que custaram medição:
   alerta de busca foram removidas por isso (guardavam e-mail em `dados/`, que o plano free do Render
   apaga a cada deploy). Nenhum endpoint deve guardar dado pessoal em cache nem entregá-lo ao
   navegador: é o que sustenta a promessa do `privacidade.html`.
+- **Carrossel das manchetes** (`index.html`, `manchetes.html`, `reguladores.html`): o contentor
+  `.carousel` não tem altura fixa — quem define a altura é o `.car-slide` (420px no `pro.css`).
+  Ao mexer em qualquer um dos dois, conferir no navegador se o título e a linha da fonte da legenda
+  continuam inteiros; estiveram cortados porque o contentor tinha 360px e a legenda ficava nos
+  últimos 60px. Os pontos de navegação ficam no canto superior direito para não caírem por cima
+  da legenda, e o degradê escuro por baixo da foto é o que garante o branco legível.
 - **Validar antes de commitar**: `node --check` em cada `.js` tocado, e confirmar em
   `http://localhost:3000` que o menu e os dados aparecem.
 - Não há testes automatizados nem linter; a verificação é feita a correr o servidor.

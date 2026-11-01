@@ -72,7 +72,7 @@ tr.clickable:hover td{color:var(--marca);}
 .lic-card{cursor:pointer;transition:border-color .15s,transform .15s;}
 .lic-card:hover{border-color:var(--acc);transform:translateY(-2px);}
 /* ===== Manchetes: carrossel + lightbox + grid ===== */
-.carousel{position:relative;overflow:hidden;border-radius:16px;margin:18px 0 8px;height:360px;background:#0c0c0e}
+.carousel{position:relative;overflow:hidden;border-radius:16px;margin:18px 0 8px;background:#0c0c0e}
 .car-track{display:flex;height:100%;transition:transform .55s cubic-bezier(.65,.05,.36,1)}
 .car-slide{position:relative;min-width:100%;height:100%}
 .car-slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;cursor:zoom-in}
@@ -199,10 +199,10 @@ tr.clickable:hover td{color:var(--marca);}
 
 /* ===== Carrossel de manchetes ===== */
 .carousel{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--marco-fora);margin:16px 0;background:#0f0f12}
-.car-track{display:flex;transition:transform .6s cubic-bezier(.4,0,.2,1)}
+.car-track{display:flex;height:auto;transition:transform .6s cubic-bezier(.4,0,.2,1)}
 .car-slide{min-width:100%;position:relative;height:420px;cursor:pointer}
 .car-slide img{width:100%;height:100%;object-fit:cover;display:block}
-.car-fade{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,6,8,.96) 6%,rgba(6,6,8,.4) 52%,rgba(6,6,8,.04));pointer-events:none}
+.car-fade{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,6,8,.97) 0%,rgba(6,6,8,.9) 30%,rgba(6,6,8,.5) 55%,rgba(6,6,8,0) 100%);pointer-events:none}
 .car-cap{position:absolute;left:0;right:0;bottom:0;padding:26px 30px;z-index:2}
 .car-cap h3{color:var(--paper);font-size:1.14rem;margin:8px 0;line-height:1.25;max-width:82%}
 .car-cap h3 a{color:var(--paper);text-decoration:none}
@@ -215,7 +215,7 @@ tr.clickable:hover td{color:var(--marca);}
 .car-nav:hover{background:var(--grad);color:#111;border-color:transparent}
 .car-nav.prev{left:14px}
 .car-nav.next{right:14px}
-.car-dots{position:absolute;bottom:16px;right:26px;display:flex;gap:7px;z-index:3}
+.car-dots{position:absolute;top:16px;bottom:auto;left:auto;right:26px;transform:none;display:flex;gap:7px;z-index:3}
 .car-dots button{width:9px;height:9px;border-radius:50%;border:none;background:#55555f;cursor:pointer;padding:0}
 .car-dots button.active{background:var(--acc);width:24px;border-radius:5px}
 
