@@ -101,8 +101,8 @@ tr.clickable:hover td{color:var(--marca);}
 .mch-layout{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start}
 @media(max-width:960px){.mch-layout{grid-template-columns:1fr}}
 .news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-.news-card{background:var(--card);border:1px solid var(--marco-dentro);border-radius:14px;overflow:hidden;transition:.2s;cursor:pointer;display:flex;flex-direction:column}
-.news-card:hover{transform:translateY(-3px);border-color:#3f3f4a;box-shadow:0 12px 28px rgba(0,0,0,.45)}
+.news-card{background:var(--card);border:1px solid var(--marco-dentro);border-radius:12px;overflow:hidden;transition:.2s;cursor:pointer;display:flex;flex-direction:column}
+.news-card:hover{transform:translateY(-3px);border-color:#3f3f4a;box-shadow:0 8px 22px rgba(0,0,0,.3)}
 .news-thumb{position:relative;height:150px;background:#131316;overflow:hidden}
 .news-thumb img{width:100%;height:100%;object-fit:cover;cursor:zoom-in}
 .news-thumb .noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;opacity:.5}
@@ -114,7 +114,7 @@ tr.clickable:hover td{color:var(--marca);}
 .news-src{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted);margin-top:auto}
 
 /* sidebar */
-.side-card{background:var(--card);border:1px solid var(--marco-fora);border-radius:14px;padding:16px 18px;margin-bottom:18px}
+.side-card{background:var(--card);border:1px solid var(--marco-fora);border-radius:12px;padding:16px 18px;margin-bottom:18px}
 .side-card h3{margin:0 0 10px;font-size:12.5px;color:var(--paper);border-bottom:1px solid var(--line);padding-bottom:8px}
 .rank{display:flex;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
 .rank:last-child{border-bottom:none}
@@ -139,7 +139,7 @@ tr.clickable:hover td{color:var(--marca);}
 .lb-close:hover{background:var(--grad);color:#141414}
 
 /* ===== Manchetes (portal de noticias com fotos) ===== */
-.hero{position:relative;border-radius:14px;overflow:hidden;margin:14px 0 18px;border:1px solid var(--marco-fora);background:#111114;}
+.hero{position:relative;border-radius:12px;overflow:hidden;margin:14px 0 18px;border:1px solid var(--marco-fora);background:#111114;}
 .hero-img{width:100%;height:340px;object-fit:cover;display:block;}
 .hero-body{position:absolute;inset:auto 0 0 0;padding:22px;background:linear-gradient(to top,rgba(6,6,8,.95) 10%,rgba(6,6,8,.55) 65%,rgba(6,6,8,0));}
 .hero-body h2{color:var(--paper);font-size:1.14rem;margin:8px 0;line-height:1.25;}
@@ -180,7 +180,7 @@ tr.clickable:hover td{color:var(--marca);}
 /* ===== Submenus do menu principal (sem vão + tolerância ao sair do mouse) ===== */
 .navgrp{position:relative}
 .nav .navtop{cursor:pointer;user-select:none}
-.navgrp .sub{position:absolute;top:calc(100% - 2px);left:0;min-width:230px;background:var(--card);border:1px solid var(--marco-fora);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:2px;box-shadow:0 16px 40px rgba(0,0,0,.55);z-index:40;visibility:hidden;opacity:0;transform:translateY(6px);transition:opacity .15s ease,transform .15s ease,visibility 0s linear .25s}
+.navgrp .sub{position:absolute;top:calc(100% - 2px);left:0;min-width:230px;background:var(--card);border:1px solid var(--marco-fora);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:2px;box-shadow:0 12px 30px rgba(0,0,0,.45);z-index:40;visibility:hidden;opacity:0;transform:translateY(6px);transition:opacity .15s ease,transform .15s ease,visibility 0s linear .25s}
 .navgrp:hover .sub,.navgrp:focus-within .sub,.navgrp.open .sub{visibility:visible;opacity:1;transform:translateY(0);transition-delay:0s}
 .navgrp .sub a{width:100%;padding:5px 10px;border-radius:8px;white-space:nowrap;display:block;font-size:.78rem}
 .navgrp .sub a:hover{background:rgba(34,197,94,.12);color:var(--pos-deep);box-shadow:inset 0 0 0 1px rgba(134,239,172,.28)}
@@ -198,7 +198,7 @@ tr.clickable:hover td{color:var(--marca);}
 }
 
 /* ===== Carrossel de manchetes ===== */
-.carousel{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--marco-fora);margin:16px 0;background:#0f0f12}
+.carousel{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--marco-fora);margin:16px 0;background:#0f0f12}
 .car-track{display:flex;height:auto;transition:transform .6s cubic-bezier(.4,0,.2,1)}
 .car-slide{min-width:100%;position:relative;height:420px;cursor:pointer}
 .car-slide img{width:100%;height:100%;object-fit:cover;display:block}
