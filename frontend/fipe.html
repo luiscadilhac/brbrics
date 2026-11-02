@@ -158,6 +158,10 @@ document.getElementById('btn-fipe').onclick=function(){
     _fipeFoto('fipe-foto', t, v.Marca||'', v.Modelo||'');
   }).catch(function(e){document.getElementById('res-fipe').innerHTML='<p class="muted">Erro: '+esc(e.message)+'</p>';});
 };
+try{
+  var _tp=(location.search.match(/[?&]tipo=([^&]+)/)||[])[1];
+  if(_tp){_tp=decodeURIComponent(_tp);if(['carros','motos','caminhoes'].indexOf(_tp)>=0)document.getElementById('f-tipo').value=_tp;}
+}catch(e){}
 carregarMarcas();
 </script>
 <script src="app.js?v=50"></script>
