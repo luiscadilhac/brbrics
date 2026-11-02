@@ -4,7 +4,7 @@
   --marca:#86EFAC;
   /* --marco-fora: caixas que vão de ponta a ponta da página; --marco-dentro: caixas dentro delas */
   --marco-fora:#2b4a35; --marco-dentro:#2a2a32;
-  --acc:#86EFAC; --acc-deep:#22C55E; --ico:#86EFAC; --ico-vivo:#86EFAC;
+  --acc:#86EFAC; --acc-deep:#22C55E; --ico:#86EFAC; --ico-vivo:#20E070;
   --pos:#86EFAC; --pos-deep:#22C55E; --neg:#f87171;
   --grad:var(--acc);
   --radius:12px;
@@ -277,7 +277,7 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 .f-brand img{width:54px;height:54px;border-radius:12px;flex:none}
 .f-brand b{color:var(--paper);font-size:14px}
 .f-brand p{margin:6px 0 0;font-size:13px;color:var(--muted)}
-.f-col h4{margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);font-size:11.5px;font-weight:800;color:var(--marca);text-transform:uppercase;letter-spacing:.08em}
+.f-col h4{margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);font-size:11.5px;font-weight:800;color:var(--pos-deep);text-transform:uppercase;letter-spacing:.08em}
 .f-col a{display:block;color:#86EFAC;text-decoration:none;font-size:13px;padding:4px 0;line-height:1.4}
 .f-col a:hover{color:#22C55E}
 /* duas colunas de nomes por grupo: a lista deixa de ficar comprida */
