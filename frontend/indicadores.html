@@ -219,9 +219,9 @@ function carregar(){
     renderTable(r.dados||{});
     tendencia(r.dados.ipca,'t-ipca');tendencia(r.dados.selic,'t-selic');tendencia(r.dados.cambio,'t-cambio');tendencia(r.dados.igpm,'t-igpm');
     mkChart('c-ipca', r.dados.ipca, '#86EFAC', 433);
-    mkChart('c-selic', r.dados.selic, '#3B82F6', 432);
-    mkChart('c-cambio', r.dados.cambio, '#8B5CF6', 3698);
-    mkChart('c-igpm', r.dados.igpm, '#06B6D4', 189);
+mkChart('c-selic', r.dados.selic, '#20E070', 432);
+  mkChart('c-cambio', r.dados.cambio, '#22C55E', 3698);
+  mkChart('c-igpm', r.dados.igpm, '#4ADE80', 189);
     document.getElementById('s').textContent = 'Fonte: '+(r.fonte||'BCB')+(r.offline?' (offline)':'');
   }).catch(function(e){document.getElementById('tb').innerHTML='<tr><td colspan="3" class="muted">Erro: '+e.message+'</td></tr>';});
   jget('/api/focus').then(renderFocus).catch(function(){});
