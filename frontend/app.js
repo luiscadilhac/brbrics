@@ -279,24 +279,50 @@ var _CLIMA_CIDADES=[
   ['Pequim','China',39.90,116.40],
   ['Pretória','África do Sul',-25.75,28.19]
 ];
+var _CLIMA_TZ={
+  'America/Sao_Paulo':['São Paulo','Brasil',-23.55,-46.63],
+  'America/Bahia':['Salvador','Brasil',-12.97,-38.50],
+  'America/Fortaleza':['Fortaleza','Brasil',-3.73,-38.52],
+  'America/Recife':['Recife','Brasil',-8.05,-34.88],
+  'America/Belem':['Belém','Brasil',-1.46,-48.49],
+  'America/Manaus':['Manaus','Brasil',-3.12,-60.02],
+  'America/Cuiaba':['Cuiabá','Brasil',-15.60,-56.10],
+  'America/Campo_Grande':['Campo Grande','Brasil',-20.47,-54.62],
+  'America/Porto_Velho':['Porto Velho','Brasil',-8.76,-63.90],
+  'America/Rio_Branco':['Rio Branco','Brasil',-9.97,-67.81],
+  'America/Boa_Vista':['Boa Vista','Brasil',2.82,-60.67],
+  'America/Noronha':['Fernando de Noronha','Brasil',-3.85,-32.42],
+  'America/Argentina/Buenos_Aires':['Buenos Aires','Argentina',-34.60,-58.38],
+  'America/New_York':['Nova York','EUA',40.71,-74.01],
+  'Europe/Lisbon':['Lisboa','Portugal',38.72,-9.14],
+  'Europe/London':['Londres','Reino Unido',51.51,-0.13],
+  'Europe/Moscow':['Moscou','Rússia',55.76,37.62],
+  'Asia/Kolkata':['Nova Délhi','Índia',28.61,77.21],
+  'Asia/Shanghai':['Pequim','China',39.90,116.40],
+  'Africa/Johannesburg':['Pretória','África do Sul',-25.75,28.19]
+};
 function _climaWmo(c){c=+c;if(c===0)return {txt:'Céu limpo',ico:'sol'};if(c===1||c===2)return {txt:'Parcialmente nublado',ico:'sol'};if(c===3)return {txt:'Nublado',ico:'nuvem'};if(c===45||c===48)return {txt:'Nevoeiro',ico:'nevoa'};if(c>=51&&c<=57)return {txt:'Garoa',ico:'chuva'};if((c>=61&&c<=67)||(c>=80&&c<=82))return {txt:'Chuva',ico:'chuva'};if((c>=71&&c<=77)||c===85||c===86)return {txt:'Neve',ico:'neve'};if(c>=95)return {txt:'Tempestade',ico:'tempest'};return {txt:'—',ico:'nuvem'};}
 function _climaFonte(lat,lon){
   var url='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto';
   return fetch(url).then(function(r){if(!r.ok)throw new Error('clima '+r.status);return r.json();});
 }
-function _climaItemHTML(cidade,pais,cur){
+function _climaItemHTML(cidade,pais,cur,local){
   var w=_climaWmo(cur.weather_code);
   var ico=_CLIMA_SVG[w.ico]||_CLIMA_SVG.nuvem;
   var t=(cur.temperature_2m!=null?Math.round(cur.temperature_2m)+'°C':'—');
   var hum=(cur.relative_humidity_2m!=null?Math.round(cur.relative_humidity_2m)+'%':'—');
   var vento=(cur.wind_speed_10m!=null?Math.round(cur.wind_speed_10m)+' km/h':'—');
   var sens=(cur.apparent_temperature!=null?Math.round(cur.apparent_temperature)+'°':'—');
-  var tip=pais+' · '+w.txt+' · sensação '+sens+' · umidade '+hum+' · vento '+vento;
-  return '<span class="clima-item" title="'+escA(tip)+'"><span class="ci-ico">'+ico+'</span><b>'+esc(cidade)+' '+t+'</b><span class="ci-pais">'+esc(pais)+'</span></span>';
+  var tip=(local?'Sua região · ':'')+pais+' · '+w.txt+' · sensação '+sens+' · umidade '+hum+' · vento '+vento;
+  return '<span class="clima-item'+(local?' clima-item-local':'')+'" title="'+escA(tip)+'"><span class="ci-ico">'+ico+'</span><b>'+esc(cidade)+' '+t+'</b><span class="ci-pais">'+esc(pais)+'</span>'+(local?'<span class="ci-local">você</span>':'')+'</span>';
 }
 (function(){
   var box=document.getElementById('clima-top-itens'); if(!box)return;
-  Promise.all(_CLIMA_CIDADES.map(function(c){
-    return _climaFonte(c[2],c[3]).then(function(d){return _climaItemHTML(c[0],c[1],(d&&d.current)||{});}).catch(function(){return '<span class="clima-item"><span class="ci-ico">'+_CLIMA_SVG.nuvem+'</span><b>'+esc(c[0])+' —</b></span>';});
+  var lista=_CLIMA_CIDADES.slice(), local=null;
+  try{local=_CLIMA_TZ[Intl.DateTimeFormat().resolvedOptions().timeZone]||null;}catch(e){}
+  if(local&&!lista.some(function(c){return c[0]===local[0];}))lista.unshift(local);
+  Promise.all(lista.map(function(c){
+    var isLocal=!!(local&&c[0]===local[0]);
+    return _climaFonte(c[2],c[3]).then(function(d){return _climaItemHTML(c[0],c[1],(d&&d.current)||{},isLocal);}).catch(function(){return '<span class="clima-item"><span class="ci-ico">'+_CLIMA_SVG.nuvem+'</span><b>'+esc(c[0])+' —</b></span>';});
   })).then(function(itens){box.innerHTML=itens.join('<span class="clima-sep">·</span>');});
 })();

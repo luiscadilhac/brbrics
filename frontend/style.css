@@ -325,5 +325,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .clima-item .ci-ico svg{width:15px;height:15px}
 .clima-item b{color:var(--paper);font-weight:700}
 .clima-item .ci-pais{color:var(--verde-sub);font-size:10px;text-transform:uppercase;letter-spacing:.03em}
+.clima-item-local b{color:var(--verde-ico)}
+.ci-local{font-size:9px;line-height:1;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 5px}
 .clima-sep{color:var(--line)}
 @media(max-width:760px){.clima-lbl{display:none}}
