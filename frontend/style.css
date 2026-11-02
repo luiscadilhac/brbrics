@@ -3,7 +3,7 @@
   --ink:#e8ecf3; --paper:#e8ecf3; --muted:#a7a7b3; --line:#2a2a32;
   --marca:#86EFAC;
   /* --marco-fora: caixas que vão de ponta a ponta da página; --marco-dentro: caixas dentro delas */
-  --marco-fora:#FACC15; --marco-dentro:#F97316;
+  --marco-fora:#2E7D32; --marco-dentro:#F97316;
   --acc:#7DD3FC; --acc-deep:#3B82F6; --ico:#7DD3FC; --ico-vivo:#FF2D20;
   --pos:#86EFAC; --pos-deep:#22C55E; --neg:#f87171;
   --grad:var(--acc);

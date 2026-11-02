@@ -705,6 +705,10 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
   //    transmissão no ar) e o player abriu de fora do youtube.com.
   //    O "uf" dos cartões do mundo traz o país, para a linha de baixo ler
   //    "Helsinki — Finlândia" do mesmo jeito que lê "Santos — SP".
+// Dia em que a última leva de transmissões foi conferida, quadro a quadro. Os textos
+// das páginas leem este valor pelo /api/mapas/cameras, então basta mexer aqui
+// quando o catálogo for conferido de novo.
+var CONFERIDO_EM = '2026-11-02';
   var CAMERAS_MUNDO = [
     { id: 1000, nome: 'Porto de Helsinki — Porto Sul', cidade: 'Helsinki', uf: 'Finlândia', tipo: 'porto', lat: 60.1637, lon: 24.9520, video: 'CvOB-Is_yYU' },
     { id: 1001, nome: 'Porto de Roterdã — Amazonehaven', cidade: 'Roterdã', uf: 'Países Baixos', tipo: 'porto', lat: 51.9470, lon: 4.0930, video: 'M09NaBVPjAI' },
@@ -788,6 +792,8 @@ module.exports.registrarMapas = function(app, cacheGet, cacheSet, getJSON) {
       total: todas.length,
       transito: CAMERAS_SA.length,
       mundo: CAMERAS_MUNDO.length,
+      paisesMundo: (function(){ var s={}; CAMERAS_MUNDO.forEach(function(c){ s[c.uf]=1; }); return Object.keys(s).length; })(),
+      conferidoEm: CONFERIDO_EM,
       cidades: Object.keys(cidades).length,
       ufs: Object.keys(ufs).sort(),
       cameras: todas,

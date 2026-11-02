@@ -35,6 +35,10 @@
   .filtro { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 14px; }
   .filtro button { background: transparent; color: var(--marca); border: 1px solid #4a4a55; padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; }
   .filtro button.ativo { background: var(--marca); color: #141414; font-weight: 800; }
+  .filtro input { border: 1px solid #4a4a55; padding: 6px 10px; border-radius: 8px; font-size: 12px; }
+  /* o catálogo passou de algumas dezenas para centenas: a lista vem em levas */
+  .cam-mais { grid-column: 1/-1; justify-self: center; background: transparent; color: var(--marca); border: 1px solid #4a4a55; padding: 8px 18px; border-radius: 8px; font-size: 12px; cursor: pointer; margin: 4px 0 10px; }
+  .cam-mais:hover { background: var(--marca); color: #141414; }
   .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 14px; margin: 0; overflow-y: auto; overscroll-behavior: contain; }
   .cam-card { background: var(--card2); border: 1px solid var(--marco-dentro); border-radius: 12px; overflow: hidden; cursor: pointer; font-size: 12px; }
   .cam-card:hover { transform: translateY(-2px); }
@@ -67,7 +71,7 @@
   <section class="hero hero-centro" style="padding:24px 0;text-align:center">
     <p class="kicker">📹 Câmeras ao vivo</p>
     <h1>O vídeo da câmera dentro do portal</h1>
-    <p class="sub">Trânsito de Santo André (SP) em vídeo contínuo, praias, cidades, portos e mirantes de vários estados e mais 62 câmeras públicas do mundo — portos, praias, cidades, mirantes, natureza e aeroportos — pela transmissão aberta de cada câmera. Nada de link para página de órgão público.</p>
+    <p class="sub">Trânsito de Santo André (SP) em vídeo contínuo, praias, cidades, portos e mirantes de vários estados e <b><span id="txt-mundo-qtd">dezenas</span> câmeras públicas do mundo</b>, espalhadas por <span id="txt-paises-qtd">vários</span> países — portos, praias, cidades, mirantes, natureza e aeroportos — pela transmissão aberta de cada câmera. Nada de link para página de órgão público.</p>
   </section>
 
   <div class="filtro" id="filtros">
@@ -80,6 +84,8 @@
     <button class="filtro-btn" data-tipo="natureza">Natureza</button>
     <button class="filtro-btn" data-tipo="aeroporto">Aeroportos</button>
     <button class="filtro-btn" data-tipo="mundo">No mundo</button>
+    <input id="busca-camera" type="search" placeholder="Buscar cidade, país ou câmera" autocomplete="off"
+      style="flex:1 1 190px;min-width:170px;padding:7px 10px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:11.5px">
   </div>
 
   <div class="palco">
@@ -124,7 +130,7 @@
       </div>
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--marco-dentro)">
         <h4 style="margin:0 0 8px;color:var(--marca)">No mundo — autoridade do porto, prefeitura, reserva</h4>
-        <p style="font-size:12px;color:var(--muted);margin:0 0 8px">62 câmeras em 23 países: portos de Roterdã, Hamburgo, Helsinki, Dublin, Sydney; praias e praças de cidades; mirantes; aeroportos de Praga, Lisboa e Heathrow; poços de água de reservas na África e geleiras no norte. Todas são transmissões 24 horas que o próprio dono da câmera abre no YouTube — nada de TV paga e nada de câmera de segurança de terceiros exposta por engano. Cada uma foi conferida em 1º de novembro de 2026: quadro novo e vídeo que abre aqui dentro.</p>
+        <p style="font-size:12px;color:var(--muted);margin:0 0 8px"><span id="txt-mundo-caixa">Muitas</span> câmeras em <span id="txt-paises-caixa">vários</span> países: portos de Roterdã, Hamburgo, Helsinki, Dublin, Sydney; praias e praças de cidades; mirantes; aeroportos de Praga, Lisboa e Heathrow; poços de água de reservas na África e geleiras no norte. Todas são transmissões 24 horas que o próprio dono da câmera abre no YouTube — nada de TV paga e nada de câmera de segurança de terceiros exposta por engano. Cada uma foi conferida uma a uma em <span id="txt-conferido-em">1º de novembro de 2026</span>: quadro novo e vídeo que abre aqui dentro.</p>
         <a href="https://www.earthcam.net/" target="_blank" rel="noopener" style="color:var(--marca);font-size:12px">EarthCam (uma das redes) →</a>
       </div>
       <div style="background:var(--card2);padding:14px;border-radius:10px;border:1px solid var(--marco-dentro)">
@@ -149,13 +155,15 @@
 <script>
 var map = null, layers = {}, camerasLayer = null;
 var TODAS = [], FILTRO = 'todos', ESCOLHIDA = null, MARCA = {};
+var FILTRADAS = [], BUSCA = '', cartoes = 0, LOTE = 60, MAPAAJUSTADO = false;
 
 var COR_TIPO = { transito: '#FACC15', praia: '#7DD3FC', cidade: '#86EFAC', porto: '#F97316', mirante: '#C4B5FD', natureza: '#FB7185', aeroporto: '#22D3EE' };
 
 function esc(s) { return String(s || '—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function initMap() {
-  map = L.map('map').setView([-18.5, -48.5], 4);
+  // canvas em vez de SVG: com centenas de pontos o arrastar do mapa continuava leve
+  map = L.map('map', { preferCanvas: true }).setView([-18.5, -48.5], 4);
   setTimeout(function(){ map.invalidateSize(); encaixaColuna(); }, 200);
   window.addEventListener('load', function(){ map.invalidateSize(); encaixaColuna(); });
   window.addEventListener('resize', function(){ map.invalidateSize(); encaixaColuna(); });
@@ -206,13 +214,15 @@ function encaixaColuna() {
 
 function refazFiltro() {
   camerasLayer.clearLayers();
-  var grade = document.getElementById('grade-cameras');
-  var html = '';
-  var visiveis = 0;
-  TODAS.forEach(function(c) {
-    if (FILTRO === 'mundo') { if (c.grupo !== 'mundo') return; }
-    else if (FILTRO !== 'todos' && c.tipo !== FILTRO) return;
-    visiveis++;
+  var q = BUSCA.trim().toLowerCase();
+  FILTRADAS = TODAS.filter(function(c) {
+    if (FILTRO === 'mundo') { if (c.grupo !== 'mundo') return false; }
+    else if (FILTRO !== 'todos' && c.tipo !== FILTRO) return false;
+    if (q && (escoteiro(c) + ' ' + c.nome).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+  // Todo o filtro vai para o mapa: os cartões é que chegam em levas.
+  FILTRADAS.forEach(function(c) {
     var m = L.circleMarker([c.lat, c.lon], {
       radius: 8, color: COR_TIPO[c.tipo] || '#fff', weight: 2,
       fillColor: COR_TIPO[c.tipo] || '#fff', fillOpacity: 0.55
@@ -221,18 +231,48 @@ function refazFiltro() {
       ' · ' + rotulo(c.tipo) + '<br><a href="#" class="liga-camera" data-id="' + esc(c.id) + '">▶ Assistir ao vivo</a>');
     camerasLayer.addLayer(m);
     MARCA[String(c.id)] = m;
-
-    html += '<div class="cam-card' + (ESCOLHIDA && String(ESCOLHIDA.id) === String(c.id) ? ' escolhida' : '') + '" data-id="' + esc(c.id) + '">' +
-      '<div class="cam-foto"><img src="' + esc(c.imagem) + '" alt="' + esc(c.nome) + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + esc(c.imagemPlano || c.imagem) + '\'">' +
-      '<span class="ao-vivo">AO VIVO</span><span class="play">▶</span></div>' +
-      '<div class="cam-txt"><b>' + esc(c.nome) + '</b>' +
-      '<span class="muted">' + esc(c.cidade) + ' — ' + esc(c.uf) + '</span>' +
-      '<br><span class="selo">' + rotulo(c.tipo) + (c.modo === 'mjpeg' ? ' · vídeo contínuo' : (c.grupo === 'mundo' ? ' · transmissão pública' : ' · SkylineWebcams')) + '</span></div>' +
-      '</div>';
   });
-  grade.innerHTML = html || '<p class="muted">Nenhuma câmera para este filtro.</p>';
+  document.getElementById('grade-cameras').innerHTML = '';
+  cartoes = 0;
+  poeCartoes();
+}
+
+// Os nomes que a busca tem de acertar: cidade, país, tipo e o nome da fonte.
+function escoteiro(c) { return [c.cidade, c.uf, rotulo(c.tipo), c.fonte].join(' '); }
+
+function cartaoHtml(c) {
+  return '<div class="cam-card' + (ESCOLHIDA && String(ESCOLHIDA.id) === String(c.id) ? ' escolhida' : '') + '" data-id="' + esc(c.id) + '">' +
+    '<div class="cam-foto"><img src="' + esc(c.imagem) + '" alt="' + esc(c.nome) + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + esc(c.imagemPlano || c.imagem) + '\'">' +
+    '<span class="ao-vivo">AO VIVO</span><span class="play">▶</span></div>' +
+    '<div class="cam-txt"><b>' + esc(c.nome) + '</b>' +
+    '<span class="muted">' + esc(c.cidade) + ' — ' + esc(c.uf) + '</span>' +
+    '<br><span class="selo">' + rotulo(c.tipo) + (c.modo === 'mjpeg' ? ' · vídeo contínuo' : (c.grupo === 'mundo' ? ' · transmissão pública' : ' · SkylineWebcams')) + '</span></div>' +
+    '</div>';
+}
+
+// Centenas de cartões de uma vez pesam no navegador e afogam o mapa. Vem LOTE por vez.
+function poeCartoes() {
+  var grade = document.getElementById('grade-cameras');
+  var proximos = FILTRADAS.slice(cartoes, cartoes + LOTE);
+  var html = proximos.map(cartaoHtml).join('');
+  cartoes += proximos.length;
+  if (cartoes < FILTRADAS.length) {
+    html += '<button class="cam-mais" id="botao-mais">Mostrar mais — ' +
+      (FILTRADAS.length - cartoes) + ' de ' + FILTRADAS.length + '</button>';
+  } else if (FILTRADAS.length > LOTE) {
+    html += '<button class="cam-mais" id="botao-mais">Começar do começo (' + FILTRADAS.length + ')</button>';
+  }
+  var antigo = document.getElementById('botao-mais');
+  if (antigo) antigo.remove();
+  grade.insertAdjacentHTML('beforeend', FILTRADAS.length ? html : '<p class="muted">Nenhuma câmera para este filtro.</p>');  var btn = document.getElementById('botao-mais');
+  if (btn) btn.onclick = function() {
+    if (cartoes >= FILTRADAS.length) { grade.innerHTML = ''; cartoes = 0; poeCartoes(); document.getElementById('grade-cameras').scrollTop = 0; }
+    else poeCartoes();
+  };
   document.getElementById('aviso-cameras').textContent =
-    visiveis + ' câmera' + (visiveis === 1 ? '' : 's') + ' neste filtro — clique num cartão ao lado ou num ponto do mapa para trocar o vídeo.';
+    FILTRADAS.length + ' câmera' + (FILTRADAS.length === 1 ? '' : 's') + ' neste filtro' +
+    (cartoes < FILTRADAS.length ? ' — ' + cartoes + ' na lista, clique em "Mostrar mais"' : '') +
+    ' — clique num cartão ao lado ou num ponto do mapa para trocar o vídeo.';
   encaixaColuna();
 }
 
@@ -246,6 +286,26 @@ function encaixaMapa() {
   map.fitBounds(L.latLngBounds(ls.map(function(l){ return l.getLatLng(); })), { padding: [24, 24], maxZoom: 13 });
 }
 
+// Os números do texto explicativo vêm dos dados, não de uma frase escrita à mão:
+// assim a página continua verdadeira quando o catálogo cresce.
+function preencheNumeros(d) {
+  var texto = function(id, valor) { var el = document.getElementById(id); if (el) el.textContent = valor; };
+  texto('txt-mundo-qtd', d.mundo);
+  texto('txt-paises-qtd', d.paisesMundo);
+  texto('txt-mundo-caixa', d.mundo);
+  texto('txt-paises-caixa', d.paisesMundo);
+  texto('txt-conferido-em', d.conferidoEm ? dataPorExtensoBR(d.conferidoEm) : '1º de novembro de 2026');
+}
+
+// 2026-11-02 -> "2 de novembro de 2026", sem depender da localidade do navegador.
+function dataPorExtensoBR(iso) {
+  var MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho',
+               'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso));
+  if (!m) return String(iso);
+  return Number(m[3]) + ' de ' + MESES[Number(m[2]) - 1] + ' de ' + m[1];
+}
+
 function carrega() {
   fetch('/api/mapas/cameras').then(function(r){ return r.json(); }).then(function(d) {
     TODAS = d.cameras || [];
@@ -254,7 +314,11 @@ function carrega() {
     document.getElementById('stat-mundo').textContent = d.mundo || 0;
     document.getElementById('stat-cidades').textContent = d.cidades || 0;
     document.getElementById('stat-atualizacao').textContent = horaBR(d.atualizadoEm);
+    preencheNumeros(d);
     refazFiltro();
+    // Na primeira carga o mapa se ajusta ao mundo inteiro; nas recargas de 5 em 5
+    // minutos ele fica onde o usuário deixou.
+    if (!MAPAAJUSTADO && TODAS.length) { encaixaMapa(); MAPAAJUSTADO = true; }
     if (!ESCOLHIDA && TODAS.length) mostra(TODAS[0]);
   }).catch(function(e) {
     toast('Erro ao carregar as câmeras: ' + e.message);
@@ -285,6 +349,19 @@ document.addEventListener('DOMContentLoaded', function() {
       encaixaMapa();
     };
   });
+
+  // Com centenas de câmeras, a caixa de busca é o atalho: digita a cidade e a lista encolhe.
+  // A lista espera 250 ms depois da última tecla — refazer pinos a cada letra travava o teclado.
+  var BUSCA_TIMER = null;
+  document.getElementById('busca-camera').oninput = function() {
+    var valor = this.value;
+    clearTimeout(BUSCA_TIMER);
+    BUSCA_TIMER = setTimeout(function() {
+      BUSCA = valor;
+      refazFiltro();
+      encaixaMapa();
+    }, 250);
+  };
 
   document.getElementById('grade-cameras').onclick = function(ev) {
     var card = ev.target.closest ? ev.target.closest('.cam-card') : null;
