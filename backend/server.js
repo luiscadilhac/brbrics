@@ -8,7 +8,14 @@ var seoCabecalhos = require('./seo');
 app.use(cors());
 app.use(express.json());
 seoCabecalhos.aplicarCabecalhos(app);
-app.use(express.static(path.join(__dirname, '..', 'frontend')));
+app.use(express.static(path.join(__dirname, '..', 'frontend'), {
+  setHeaders: function(res, filePath){
+    var p=String(filePath||'').toLowerCase();
+    if(/\.(png|jpe?g|gif|webp|svg|ico|woff2?|ttf)$/.test(p)) res.setHeader('Cache-Control','public, max-age=2592000');
+    else if(/\.(css|js)$/.test(p)) res.setHeader('Cache-Control','no-cache');
+    else if(/\.(html?)$/.test(p)) res.setHeader('Cache-Control','no-cache');
+  }
+}));
 var fetch = require('node-fetch');
 var dou = require('./dou.js');
 
