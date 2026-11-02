@@ -398,21 +398,45 @@ try {
 app.get('/licitacao/*', function(req, res){
   var id = String((req.params&&req.params[0])||'').trim();
   if(!id) return res.redirect(301, '/licitacoes.html');
-  res.sendFile(path.join(__dirname, '..', 'frontend', 'licitacao-detalhe.html'));
+  seoCabecalhos.renderDetalhe(req, res, 'licitacao-detalhe.html', '/api/licitacao/'+encodeURIComponent(id), function(d){
+    var l=(d&&d.licitacao)||{};
+    var org=((l.orgaoEntidade||{}).razaoSocial)||'';
+    var obj=l.objetoCompra||('Licitação '+id);
+    var valor='';
+    try{ if(l.valorTotalEstimado!=null) valor=' Valor estimado: '+Number(l.valorTotalEstimado).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})+'.'; }catch(e){}
+    var url=(d&&d.canonical)||(siteBase()+'/licitacao/'+encodeURIComponent(id));
+    return {title:obj.slice(0,110)+' — BrBRICS', desc:('Licitação no PNCP'+(org?' — órgão '+org:'')+': '+obj+'.'+valor).slice(0,300), url:url, image:siteBase()+'/logo-brics.png?v=50',
+      jsonld:{"@context":"https://schema.org","@type":"WebPage","name":obj,"description":obj,"url":url,"isPartOf":{"@type":"WebSite","name":"BrBRICS","url":siteBase()+'/'}}};
+  });
 });
 
 // /proposicao/:id.html
 app.get('/proposicao/:id', function(req, res){
   var id = String(req.params.id||'').replace(/\D/g,'');
   if(!id) return res.redirect(301, '/proposicoes.html');
-  res.sendFile(path.join(__dirname, '..', 'frontend', 'proposicao-detalhe.html'));
+  seoCabecalhos.renderDetalhe(req, res, 'proposicao-detalhe.html', '/api/proposicao/'+id, function(d){
+    var p=(d&&d.proposicao)||{};
+    var nome=((p.siglaTipo||'Proposição')+' '+(p.numero||'')+(p.ano?('/'+p.ano):'')).trim();
+    var ementa=p.ementa||('Detalhes da proposição '+nome+' na Câmara dos Deputados.');
+    var url=(d&&d.canonical)||(siteBase()+'/proposicao/'+id);
+    return {title:nome+' — BrBRICS', desc:ementa.slice(0,300), url:url, image:siteBase()+'/logo-brics.png?v=50',
+      jsonld:{"@context":"https://schema.org","@type":"Legislation","name":nome,"description":ementa,"url":url,"legislationIdentifier":nome,"isPartOf":{"@type":"WebSite","name":"BrBRICS","url":siteBase()+'/'}}};
+  });
 });
 
 // /deputado/:id.html
 app.get('/deputado/:id', function(req, res){
   var id = String(req.params.id||'').replace(/\D/g,'');
   if(!id) return res.redirect(301, '/proposicoes.html');
-  res.sendFile(path.join(__dirname, '..', 'frontend', 'deputado-detalhe.html'));
+  seoCabecalhos.renderDetalhe(req, res, 'deputado-detalhe.html', '/api/deputado/'+id, function(d){
+    var dep=(d&&d.deputado)||{};
+    var nome=dep.nome||('Deputado '+id);
+    var part=dep.siglaPartido||''; var uf=dep.siglaUf||'';
+    var sub=part?(' ('+part+(uf?('/'+uf):'')+')'):'';
+    var url=siteBase()+'/deputado/'+id;
+    return {title:nome+sub+' — BrBRICS', desc:('Perfil do deputado '+nome+sub+': gastos com cota parlamentar, presença em plenário e proposições.').slice(0,300), url:url, image:(dep.urlFoto||siteBase()+'/logo-brics.png?v=50'),
+      jsonld:{"@context":"https://schema.org","@type":"Person","name":nome,"identifier":id,"url":url}};
+  });
 });
 
 app.listen(PORT, function(){ console.log('BrBRICS em http://localhost:'+PORT); });

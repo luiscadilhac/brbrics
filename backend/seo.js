@@ -1,4 +1,6 @@
 // BrBRICS - modulo SEO: robots.txt + sitemap.xml + RSS geral (sem chave)
+var fs=require('fs');
+var pathMod=require('path');
 var PAGINAS=[
   ['/','daily'],['/index.html','daily'],['/manchetes.html','daily'],['/edicao.html','weekly'],
   ['/licitacoes.html','daily'],['/contratos.html','daily'],['/orgao.html','weekly'],['/proposicoes.html','daily'],['/legislacao.html','weekly'],
@@ -117,4 +119,35 @@ function registrarSEO(app, cacheGet, cacheSet){
     res.send('google.com, pub-9633564064128096, DIRECT, f08c47fec0942fa0\n');
   });
 }
-module.exports={registrarSEO:registrarSEO, aplicarCabecalhos:aplicarCabecalhos};
+function escMeta(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function injetarMeta(html, m){
+  m=m||{};
+  var titulo=escMeta(m.title||'BrBRICS');
+  var desc=escMeta(m.desc||'Transparência e dados do setor público.');
+  var url=escMeta(m.url||base({get:function(){return '';},protocol:'https'}));
+  var img=escMeta(m.image||'https://brbrics.com.br/logo-brics.png?v=50');
+  function rep(re, val){ html=html.replace(re, function(_,a,b){return a+val+b;}); }
+  html=html.replace(/<title id="pg-title">[\s\S]*?<\/title>/i,'<title id="pg-title">'+titulo+'</title>');
+  rep(/(<meta name="description" id="pg-desc" content=")[^"]*(")/i, desc);
+  rep(/(<meta property="og:title" content=")[^"]*(")/i, titulo);
+  rep(/(<meta property="og:description" content=")[^"]*(")/i, desc);
+  rep(/(<meta property="og:url" id="og-url" content=")[^"]*(")/i, url);
+  rep(/(<meta property="og:image" content=")[^"]*(")/i, img);
+  rep(/(<link rel="canonical" id="canonical" href=")[^"]*(")/i, url);
+  var jm=m.jsonld?JSON.stringify(m.jsonld).replace(/<\//g,'<\\/'):'';
+  rep(/(<script type="application\/ld\+json" id="jsonld">)[\s\S]*?(<\/script>)/i, jm);
+  return html;
+}
+function renderDetalhe(req,res,template,apiPath,buildMeta){
+  var file=pathMod.join(__dirname,'..','frontend',template);
+  function fallback(){ res.sendFile(file); }
+  interno(apiPath).then(function(d){
+    if(!d) return fallback();
+    var m; try{ m=buildMeta(d,req); }catch(e){ return fallback(); }
+    fs.readFile(file,'utf8',function(err,html){
+      if(err) return fallback();
+      res.type('html').send(injetarMeta(html,m));
+    });
+  }).catch(fallback);
+}
+module.exports={registrarSEO:registrarSEO, aplicarCabecalhos:aplicarCabecalhos, renderDetalhe:renderDetalhe};
