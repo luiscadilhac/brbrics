@@ -270,8 +270,9 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 .mkt-down{color:var(--neg);font-weight:800;white-space:nowrap}
 .mkt-flat{color:var(--muted);font-weight:800;white-space:nowrap}
 /* ===== Rodapé com menus ===== */
-.foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:22px;padding:26px 22px 6px}
-.f-brand{display:flex;gap:12px;align-items:flex-start}
+.foot-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:22px;padding:26px 22px 6px}
+/* logo e frase numa linha propria, acima dos grupos de links */
+.f-brand{display:flex;gap:12px;align-items:flex-start;grid-column:1/-1;max-width:620px;margin-bottom:8px}
 .f-brand img{width:54px;height:54px;border-radius:14px;flex:none}
 .f-brand b{color:var(--paper);font-size:13px}
 .f-brand p{margin:6px 0;font-size:12.5px}
