@@ -9,6 +9,7 @@ function initSearch(){
   for(var k=0;k<inputs.length;k++){
     (function(b){
       if(b.getAttribute('data-bound')==='1')return; b.setAttribute('data-bound','1');
+      if(!b.getAttribute('aria-label'))b.setAttribute('aria-label','Buscar no portal');
       b.addEventListener('keydown',function(e){
         if(e.key==='Enter'){
           e.preventDefault();
