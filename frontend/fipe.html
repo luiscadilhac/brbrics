@@ -63,6 +63,62 @@ function carregarMarcas(){
     fillSel('f-marca', r.marcas||[], 'codigo', 'nome');
   }).catch(function(e){sel.innerHTML='<option value="">Erro</option>';});
 }
+function fipeIco(t){
+  var p;
+  if(t==='motos')p='<circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M5.5 17.5l4-7h6l3 7"/><path d="M9.5 10.5h5"/>';
+  else if(t==='caminhoes')p='<path d="M2 7h12v9H2z"/><path d="M14 10h4l4 4v2h-8z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>';
+  else p='<path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="1"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/>';
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:56px;height:56px;color:var(--ico-vivo)">'+p+'</svg>';
+}
+function _fipeWiki(q){
+  var api='https://pt.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=640';
+  return fetch(api).then(function(r){return r.json();}).then(function(d){
+    var pages=d&&d.query&&d.query.pages; if(!pages)return null;
+    var p=pages[Object.keys(pages)[0]];
+    var toks=String(q).toLowerCase().split(/\s+/).filter(function(w){return w.length>=4;});
+    var tit=String((p&&p.title)||'').toLowerCase();
+    var relevante=toks.some(function(w){return tit.indexOf(w)>=0;});
+    if(p&&p.thumbnail&&p.thumbnail.source&&relevante)return {url:p.thumbnail.source,page:'https://pt.wikipedia.org/wiki/'+encodeURIComponent(p.title||''),credit:'Foto: Wikipédia/Wikimedia'};
+    return null;
+  }).catch(function(){return null;});
+}
+function _fipeCommons(q){
+  var api='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch='+encodeURIComponent(q+' filetype:bitmap')+'&gsrnamespace=6&gsrlimit=1&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640';
+  return fetch(api).then(function(r){return r.json();}).then(function(d){
+    var pages=d&&d.query&&d.query.pages; if(!pages)return null;
+    var p=pages[Object.keys(pages)[0]]; var ii=p&&p.imageinfo&&p.imageinfo[0];
+    if(!ii||!ii.thumburl)return null;
+    var md=ii.extmetadata||{};
+    var artista=md.Artist&&md.Artist.value?String(md.Artist.value).replace(/<[^>]*>/g,'').slice(0,70):'';
+    var lic=md.LicenseShortName&&md.LicenseShortName.value?String(md.LicenseShortName.value).slice(0,40):'';
+    return {url:ii.thumburl,page:ii.descriptionurl||'',credit:'Foto: '+(artista?artista+' · ':'')+(lic?lic+' · ':'')+'Wikimedia Commons'};
+  }).catch(function(){return null;});
+}
+function _fipeTenta(qs){
+  if(!qs.length)return Promise.resolve(null);
+  var q=qs[0];
+  return _fipeWiki(q).then(function(w){return w||_fipeCommons(q);}).then(function(f){return f||_fipeTenta(qs.slice(1));});
+}
+function _fipeFoto(el,t,marca,modelo){
+  var box=document.getElementById(el); if(!box)return;
+  var qs=[];
+  if(modelo)qs.push(modelo);
+  if(marca&&modelo)qs.push(marca+' '+modelo);
+  _fipeTenta(qs).then(function(f){
+    if(!f||!f.url)return;
+    var img=document.createElement('img');
+    img.alt='Foto ilustrativa — '+marca+' '+modelo;
+    img.loading='lazy';
+    img.onerror=function(){box.innerHTML='<div class="fipe-foto-ph">'+fipeIco(t)+'<span>Imagem ilustrativa</span></div>';};
+    img.src=f.url;
+    box.innerHTML='';
+    box.appendChild(img);
+    if(f.credit){
+      var a=document.createElement('a'); a.className='fipe-credito'; a.href=f.page||f.url; a.target='_blank'; a.rel='noopener'; a.textContent=f.credit;
+      box.appendChild(a);
+    }
+  }).catch(function(){});
+}
 document.getElementById('f-tipo').onchange=carregarMarcas;
 document.getElementById('f-marca').onchange=function(){
   var t=document.getElementById('f-tipo').value, m=this.value;
@@ -87,11 +143,14 @@ document.getElementById('btn-fipe').onclick=function(){
   document.getElementById('res-fipe').innerHTML='<div class="skel"></div>';
   jget('/api/fipe/valor?tipo='+t+'&marca='+m+'&modelo='+mo+'&ano='+encodeURIComponent(a)).then(function(r){
     var v=r.avaliacao||{};
-    document.getElementById('res-fipe').innerHTML='<div class="kpis">'
+    document.getElementById('res-fipe').innerHTML='<div class="fipe-res">'
+    +'<div class="fipe-foto" id="fipe-foto"><div class="fipe-foto-ph">'+fipeIco(t)+'<span>Imagem ilustrativa</span></div></div>'
+    +'<div class="fipe-info"><div class="kpis">'
     +'<div class="kpi"><b>'+esc(v.Modelo||'')+'</b> — '+esc(v.Marca||'')+' · '+esc(v.AnoModelo||'')+' · '+esc(v.Combustivel||'')+'</div>'
     +'<div class="kpi"><b>Valor médio</b> — '+esc(v.Valor||'—')+'</div>'
     +'<div class="kpi"><b>Referência</b> — '+esc(v.MesReferencia||'')+' · Código Fipe '+esc(v.CodigoFipe||'')+'</div></div>'
-    +'<small class="muted">Fonte: '+esc(r.fonte||'')+'. Valor de referência para negociação — consulte um avaliador para laudo.</small>';
+    +'<small class="muted">Fonte: '+esc(r.fonte||'')+'. Valor de referência para negociação — consulte um avaliador para laudo.</small></div></div>';
+    _fipeFoto('fipe-foto', t, v.Marca||'', v.Modelo||'');
   }).catch(function(e){document.getElementById('res-fipe').innerHTML='<p class="muted">Erro: '+esc(e.message)+'</p>';});
 };
 carregarMarcas();
