@@ -70,6 +70,9 @@ function fipeIco(t){
   else p='<path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="1"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/>';
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:56px;height:56px;color:var(--ico-vivo)">'+p+'</svg>';
 }
+function _fipeNorm(u){
+  return String(u||'').replace('https://thumb.wikimedia.org/','https://upload.wikimedia.org/').split('?')[0];
+}
 function _fipeWiki(q){
   var api='https://pt.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=640';
   return fetch(api).then(function(r){return r.json();}).then(function(d){
@@ -78,7 +81,7 @@ function _fipeWiki(q){
     var toks=String(q).toLowerCase().split(/\s+/).filter(function(w){return w.length>=4;});
     var tit=String((p&&p.title)||'').toLowerCase();
     var relevante=toks.some(function(w){return tit.indexOf(w)>=0;});
-    if(p&&p.thumbnail&&p.thumbnail.source&&relevante)return {url:p.thumbnail.source,page:'https://pt.wikipedia.org/wiki/'+encodeURIComponent(p.title||''),credit:'Foto: Wikipédia/Wikimedia'};
+    if(p&&p.thumbnail&&p.thumbnail.source&&relevante)return {url:_fipeNorm(p.thumbnail.source),page:'https://pt.wikipedia.org/wiki/'+encodeURIComponent(p.title||''),credit:'Foto: Wikipédia/Wikimedia'};
     return null;
   }).catch(function(){return null;});
 }
@@ -91,7 +94,7 @@ function _fipeCommons(q){
     var md=ii.extmetadata||{};
     var artista=md.Artist&&md.Artist.value?String(md.Artist.value).replace(/<[^>]*>/g,'').slice(0,70):'';
     var lic=md.LicenseShortName&&md.LicenseShortName.value?String(md.LicenseShortName.value).slice(0,40):'';
-    return {url:ii.thumburl,page:ii.descriptionurl||'',credit:'Foto: '+(artista?artista+' · ':'')+(lic?lic+' · ':'')+'Wikimedia Commons'};
+    return {url:_fipeNorm(ii.thumburl),page:ii.descriptionurl||'',credit:'Foto: '+(artista?artista+' · ':'')+(lic?lic+' · ':'')+'Wikimedia Commons'};
   }).catch(function(){return null;});
 }
 function _fipeTenta(qs){
@@ -109,6 +112,8 @@ function _fipeFoto(el,t,marca,modelo){
     var img=document.createElement('img');
     img.alt='Foto ilustrativa — '+marca+' '+modelo;
     img.loading='lazy';
+    img.decoding='async';
+    img.referrerPolicy='no-referrer';
     img.onerror=function(){box.innerHTML='<div class="fipe-foto-ph">'+fipeIco(t)+'<span>Imagem ilustrativa</span></div>';};
     img.src=f.url;
     box.innerHTML='';
