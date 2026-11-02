@@ -1,5 +1,12 @@
 // BrBRICS - modulo Clima: previsão nas capitais (Open-Meteo, sem chave) + atalhos INMET
 var CAPS=[['AC','Rio Branco',-9.97,-67.81],['AL','Maceió',-9.67,-35.74],['AP','Macapá',0.04,-51.06],['AM','Manaus',-3.12,-60.02],['BA','Salvador',-12.97,-38.50],['CE','Fortaleza',-3.73,-38.52],['DF','Brasília',-15.79,-47.88],['ES','Vitória',-20.32,-40.34],['GO','Goiânia',-16.68,-49.25],['MA','São Luís',-2.53,-44.30],['MT','Cuiabá',-15.60,-56.10],['MS','Campo Grande',-20.47,-54.62],['MG','Belo Horizonte',-19.92,-43.94],['PA','Belém',-1.46,-48.49],['PB','João Pessoa',-7.12,-34.86],['PR','Curitiba',-25.43,-49.27],['PE','Recife',-8.05,-34.88],['PI','Teresina',-5.09,-42.80],['RJ','Rio de Janeiro',-22.91,-43.17],['RN','Natal',-5.79,-35.21],['RS','Porto Alegre',-30.03,-51.23],['RO','Porto Velho',-8.76,-63.90],['RR','Boa Vista',2.82,-60.67],['SC','Florianópolis',-27.60,-48.55],['SP','São Paulo',-23.55,-46.63],['SE','Aracaju',-10.91,-37.07],['TO','Palmas',-10.17,-48.33]];
+var CIDADES_BRICS=[
+  ['Brasília','Brasil','BR',-15.79,-47.88],
+  ['Moscou','Rússia','RU',55.76,37.62],
+  ['Nova Délhi','Índia','IN',28.61,77.21],
+  ['Pequim','China','CN',39.90,116.40],
+  ['Pretória','África do Sul','ZA',-25.75,28.19]
+];
 function wmoInfo(c){
   c=+c;
   if(c===0)return {txt:'Céu limpo',ico:'sol'};
@@ -25,6 +32,23 @@ function registrarClima(app, cacheGet, cacheSet, getJSON){
       });
     });
   }
+  function atual(lat,lon){
+    var url='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto';
+    return getJSON(url,{},15000).then(function(r){ return (r.data&&r.data.current)||{}; });
+  }
+  app.get('/api/clima/agora', function(req,res){
+    var hit=cacheGet('clima_agora'); if(hit) return res.json(hit);
+    Promise.all(CIDADES_BRICS.map(function(c){
+      return atual(c[3],c[4]).then(function(cur){
+        var w=wmoInfo(cur.weather_code);
+        return {cidade:c[0],pais:c[1],sigla:c[2],temp:cur.temperature_2m,sensacao:cur.apparent_temperature,
+          umidade:cur.relative_humidity_2m,vento:cur.wind_speed_10m,condicao:w.txt,icone:w.ico,codigo:cur.weather_code};
+      }).catch(function(){return {cidade:c[0],pais:c[1],sigla:c[2],erro:true};});
+    })).then(function(rs){
+      var out={fonte:'Open-Meteo (modelo numérico)',atualizadoEm:new Date().toISOString(),cidades:rs};
+      cacheSet('clima_agora',out,600000); res.json(out);
+    });
+  });
   app.get('/api/clima/capitais', function(req,res){
     var hit=cacheGet('clima_caps'); if(hit) return res.json(hit);
     Promise.all(CAPS.map(function(c){

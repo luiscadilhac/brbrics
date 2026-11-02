@@ -313,3 +313,17 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
   .ticker-track{animation:none !important}
 }
+
+/* ===== Clima agora (home) ===== */
+.clima-agora{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.clima-card{background:#111114;border:1px solid var(--line);border-radius:12px;padding:14px}
+.cc-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.cc-head b{color:var(--paper);font-size:.92rem}
+.cc-pais{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.cc-main{display:flex;align-items:center;gap:10px}
+.cc-ico{color:var(--ico-vivo);display:inline-flex;flex:none}
+.cc-ico svg{width:30px;height:30px}
+.cc-temp{font-size:1.7rem;font-weight:800;color:var(--paper);line-height:1}
+.cc-cond{color:var(--verde-sub);font-size:.8rem;margin:6px 0 10px}
+.cc-det{display:flex;flex-wrap:wrap;gap:6px 12px;color:var(--muted);font-size:.74rem}
+@media(max-width:520px){.clima-agora{grid-template-columns:1fr 1fr}.cc-temp{font-size:1.4rem}}
