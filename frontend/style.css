@@ -20,9 +20,9 @@ body{margin:0;background:radial-gradient(1200px 500px at 80% -10%,rgba(34,197,94
 .brand b{color:var(--marca)}
 .brand-tx{display:inline-block;white-space:nowrap}
 .nav{display:flex;gap:6px;flex:1;flex-wrap:wrap}
-.nav a{color:var(--pos-deep);text-decoration:none;font-size:14.5px;font-weight:600;padding:8px 13px;border-radius:999px}
+.nav a{color:var(--pos-deep);text-decoration:none;font-size:14.5px;font-weight:600;padding:8px 13px;border-radius:999px;transition:background .15s ease,color .15s ease,box-shadow .15s ease}
 .nav a:hover{color:var(--pos-deep);background:rgba(34,197,94,.12);box-shadow:inset 0 0 0 1px rgba(134,239,172,.3)}
-.nav a.active{color:var(--pos-deep);background:rgba(34,197,94,.28);box-shadow:inset 0 0 0 1px rgba(134,239,172,.7)}
+.nav a.active{color:#08130c;background:var(--acc-deep);box-shadow:none;font-weight:700}
 .actions{display:flex;gap:8px;align-items:center}
 .actions input{padding:9px 12px;border-radius:999px;border:1px solid var(--line);background:#0f0f12;color:var(--paper);min-width:190px;outline:none}
 .actions input:focus{border-color:var(--acc)}
@@ -41,10 +41,10 @@ body{margin:0;background:radial-gradient(1200px 500px at 80% -10%,rgba(34,197,94
 .navgrp .sub{position:absolute;top:calc(100% - 2px);left:0;min-width:230px;background:#141419;border:1px solid var(--marco-fora);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.45);padding:8px;display:flex;flex-direction:column;gap:2px;z-index:30;visibility:hidden;opacity:0;transform:translateY(6px);transition:opacity .15s ease,transform .15s ease,visibility 0s linear .25s}
 .navgrp .sub a{padding:10px 13px;border-radius:8px;white-space:nowrap;font-size:14px;color:#86EFAC!important}
 .navgrp .sub a:hover{background:rgba(34,197,94,.12);color:var(--pos-deep);box-shadow:inset 0 0 0 1px rgba(134,239,172,.28)}
-.navgrp .sub a.active{background:rgba(34,197,94,.28);color:var(--pos-deep);box-shadow:inset 0 0 0 1px rgba(134,239,172,.6)}
+.navgrp .sub a.active{background:rgba(34,197,94,.16);color:var(--marca);box-shadow:inset 0 0 0 1px rgba(134,239,172,.35)}
 .navgrp:hover .sub,.navgrp:focus-within .sub,.navgrp.open .sub{visibility:visible;opacity:1;transform:translateY(0);transition-delay:0s}
 .navgrp:hover .navtop,.navgrp:focus-within .navtop{color:var(--pos-deep);background:rgba(34,197,94,.12);box-shadow:inset 0 0 0 1px rgba(134,239,172,.3)}
-.navtop.active,.navgrp:hover .navtop.active,.navgrp:focus-within .navtop.active{background:rgba(34,197,94,.28);box-shadow:inset 0 0 0 1px rgba(134,239,172,.7)}
+.navtop.active,.navgrp:hover .navtop.active,.navgrp:focus-within .navtop.active{color:#08130c;background:var(--acc-deep);box-shadow:none;font-weight:700}
 .hamb{display:none;background:transparent;border:1px solid var(--line);color:var(--ico-vivo);font-size:16px;width:40px;height:40px;border-radius:10px;cursor:pointer}
 .hamb:hover{border-color:var(--acc);color:var(--acc)}
 @media(max-width:900px){

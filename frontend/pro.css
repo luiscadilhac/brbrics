@@ -180,13 +180,13 @@ tr.clickable:hover td{color:var(--marca);}
 /* ===== Submenus do menu principal (sem vão + tolerância ao sair do mouse) ===== */
 .navgrp{position:relative}
 .nav .navtop{cursor:pointer;user-select:none}
-.navgrp .sub{position:absolute;top:calc(100% - 2px);left:0;min-width:230px;background:var(--card);border:1px solid var(--marco-fora);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:2px;box-shadow:0 12px 30px rgba(0,0,0,.45);z-index:40;visibility:hidden;opacity:0;transform:translateY(6px);transition:opacity .15s ease,transform .15s ease,visibility 0s linear .25s}
+.navgrp .sub{position:absolute;top:calc(100% - 2px);left:0;min-width:230px;background:#1b1b21;border:1px solid #33413a;border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:2px;box-shadow:0 12px 30px rgba(0,0,0,.45);z-index:40;visibility:hidden;opacity:0;transform:translateY(6px);transition:opacity .15s ease,transform .15s ease,visibility 0s linear .25s}
 .navgrp:hover .sub,.navgrp:focus-within .sub,.navgrp.open .sub{visibility:visible;opacity:1;transform:translateY(0);transition-delay:0s}
 .navgrp .sub a{width:100%;padding:5px 10px;border-radius:8px;white-space:nowrap;display:block;font-size:.78rem}
 .navgrp .sub a:hover{background:rgba(34,197,94,.12);color:var(--pos-deep);box-shadow:inset 0 0 0 1px rgba(134,239,172,.28)}
-.navgrp .sub a.active{background:rgba(34,197,94,.28);color:var(--pos-deep);box-shadow:inset 0 0 0 1px rgba(134,239,172,.6)}
+.navgrp .sub a.active{background:rgba(34,197,94,.16);color:var(--marca);box-shadow:inset 0 0 0 1px rgba(134,239,172,.35)}
 .navgrp:hover .navtop,.navgrp:focus-within .navtop{background:rgba(34,197,94,.12);color:var(--pos-deep);box-shadow:inset 0 0 0 1px rgba(134,239,172,.3)}
-.nav .navtop.active{background:rgba(34,197,94,.28);color:var(--pos-deep);box-shadow:inset 0 0 0 1px rgba(134,239,172,.7)}
+.nav .navtop.active{background:var(--acc-deep);color:#08130c;box-shadow:none;font-weight:700}
 .hamb{display:none;background:transparent;border:1px solid #4a4a55;color:var(--ico-vivo);border-radius:10px;padding:6px 11px;font-size:14px;cursor:pointer;line-height:1}
 .hamb:hover{background:rgba(134,239,172,.1)}
 @media(max-width:900px){
