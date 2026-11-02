@@ -97,7 +97,8 @@ footer{background:#08080a;border-top:1px solid var(--line);color:#9a9aa5;margin-
 .foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
 .foot b{color:var(--paper)}
 .flinks{display:flex;gap:16px;flex-wrap:wrap}
-.flinks a{color:var(--marca);text-decoration:none}
+.flinks a{color:var(--pos-deep);text-decoration:none}
+    .foot-sub a{color:var(--marca);text-decoration:none}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th{color:var(--ico);text-transform:uppercase;font-size:12px;letter-spacing:.06em}
 th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}
