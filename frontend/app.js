@@ -263,7 +263,7 @@ function renderMktTicker(d){
 }
 jget('/api/mercado/resumo').then(function(m){renderMktTicker(m);}).catch(function(){var el=document.getElementById('ticker-mkt');if(el)el.innerHTML='<span class="muted">Mercado indisponível no momento</span>';});
 
-// ===== Clima agora (home) =====
+// ===== Clima agora no cabecalho =====
 var _CLIMA_SVG={
   sol:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
   nuvem:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 10h-1.3A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>',
@@ -272,21 +272,31 @@ var _CLIMA_SVG={
   nevoa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h18M3 12h18M3 16h18"/></svg>',
   tempest:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 10h-1.3A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><path d="M13 12l-2 4h3l-2 4"/></svg>'
 };
-function _climaCard(c){
-  if(c.erro||c.temp==null){
-    return '<div class="clima-card"><div class="cc-head"><b>'+esc(c.cidade)+'</b><span class="cc-pais">'+esc(c.pais)+'</span></div><p class="muted" style="margin:8px 0 0;font-size:12px">Indisponível</p></div>';
-  }
-  var ico=_CLIMA_SVG[c.icone]||_CLIMA_SVG.nuvem;
-  return '<div class="clima-card">'
-   +'<div class="cc-head"><b>'+esc(c.cidade)+'</b><span class="cc-pais">'+esc(c.pais)+'</span></div>'
-   +'<div class="cc-main"><span class="cc-ico">'+ico+'</span><span class="cc-temp">'+Math.round(c.temp)+'°C</span></div>'
-   +'<div class="cc-cond">'+esc(c.condicao||'—')+'</div>'
-   +'<div class="cc-det"><span>Sensação '+Math.round(c.sensacao)+'°</span><span>Umidade '+Math.round(c.umidade)+'%</span><span>Vento '+Math.round(c.vento)+' km/h</span></div>'
-   +'</div>';
+var _CLIMA_CIDADES=[
+  ['Brasília','Brasil',-15.79,-47.88],
+  ['Moscou','Rússia',55.76,37.62],
+  ['Nova Délhi','Índia',28.61,77.21],
+  ['Pequim','China',39.90,116.40],
+  ['Pretória','África do Sul',-25.75,28.19]
+];
+function _climaWmo(c){c=+c;if(c===0)return {txt:'Céu limpo',ico:'sol'};if(c===1||c===2)return {txt:'Parcialmente nublado',ico:'sol'};if(c===3)return {txt:'Nublado',ico:'nuvem'};if(c===45||c===48)return {txt:'Nevoeiro',ico:'nevoa'};if(c>=51&&c<=57)return {txt:'Garoa',ico:'chuva'};if((c>=61&&c<=67)||(c>=80&&c<=82))return {txt:'Chuva',ico:'chuva'};if((c>=71&&c<=77)||c===85||c===86)return {txt:'Neve',ico:'neve'};if(c>=95)return {txt:'Tempestade',ico:'tempest'};return {txt:'—',ico:'nuvem'};}
+function _climaFonte(lat,lon){
+  var url='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto';
+  return fetch(url).then(function(r){if(!r.ok)throw new Error('clima '+r.status);return r.json();});
 }
-jget('/api/clima/agora').then(function(r){
-  var box=document.getElementById('clima-agora'); if(!box)return;
-  box.innerHTML=(r.cidades||[]).map(_climaCard).join('');
-  var src=document.getElementById('clima-agora-fonte');
-  if(src)src.textContent='Fonte: '+(r.fonte||'Open-Meteo')+' · atualizado '+horaBR(r.atualizadoEm);
-}).catch(function(){var box=document.getElementById('clima-agora');if(box)box.innerHTML='<p class="muted">Clima indisponível no momento.</p>';});
+function _climaItemHTML(cidade,pais,cur){
+  var w=_climaWmo(cur.weather_code);
+  var ico=_CLIMA_SVG[w.ico]||_CLIMA_SVG.nuvem;
+  var t=(cur.temperature_2m!=null?Math.round(cur.temperature_2m)+'°C':'—');
+  var hum=(cur.relative_humidity_2m!=null?Math.round(cur.relative_humidity_2m)+'%':'—');
+  var vento=(cur.wind_speed_10m!=null?Math.round(cur.wind_speed_10m)+' km/h':'—');
+  var sens=(cur.apparent_temperature!=null?Math.round(cur.apparent_temperature)+'°':'—');
+  var tip=pais+' · '+w.txt+' · sensação '+sens+' · umidade '+hum+' · vento '+vento;
+  return '<span class="clima-item" title="'+escA(tip)+'"><span class="ci-ico">'+ico+'</span><b>'+esc(cidade)+' '+t+'</b><span class="ci-pais">'+esc(pais)+'</span></span>';
+}
+(function(){
+  var box=document.getElementById('clima-top-itens'); if(!box)return;
+  Promise.all(_CLIMA_CIDADES.map(function(c){
+    return _climaFonte(c[2],c[3]).then(function(d){return _climaItemHTML(c[0],c[1],(d&&d.current)||{});}).catch(function(){return '<span class="clima-item"><span class="ci-ico">'+_CLIMA_SVG.nuvem+'</span><b>'+esc(c[0])+' —</b></span>';});
+  })).then(function(itens){box.innerHTML=itens.join('<span class="clima-sep">·</span>');});
+})();
