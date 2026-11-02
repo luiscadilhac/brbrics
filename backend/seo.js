@@ -72,17 +72,47 @@ function aplicarCabecalhos(app) {
   app.use(hstsMiddleware);
   app.use(hostOficial);
 }
+function fileDate(rel){
+  try{
+    var f=(rel==='/'||rel==='/index.html')?'index.html':rel.replace(/^\//,'');
+    return fs.statSync(pathMod.join(__dirname,'..','frontend',f)).mtime.toISOString().slice(0,10);
+  }catch(e){ return new Date().toISOString().slice(0,10); }
+}
 function registrarSEO(app, cacheGet, cacheSet){
   app.get('/robots.txt', function(req,res){
     res.set('Content-Type','text/plain');
-    res.send('User-agent: *\nAllow: /\nSitemap: '+base(req)+'/sitemap.xml\n');
+    var b=base(req);
+    res.send('User-agent: *\nAllow: /\nSitemap: '+b+'/sitemap.xml\nSitemap: '+b+'/sitemap-detalhes.xml\nSitemap: '+b+'/sitemap-images.xml\n');
   });
   app.get('/sitemap.xml', function(req,res){
     var b=base(req), hoje=new Date().toISOString().slice(0,10);
     var xml='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-      +PAGINAS.map(function(p){return '  <url><loc>'+b+p[0]+'</loc><lastmod>'+hoje+'</lastmod><changefreq>'+p[1]+'</changefreq></url>';}).join('\n')
+      +PAGINAS.map(function(p){return '  <url><loc>'+b+p[0]+'</loc><lastmod>'+(fileDate(p[0])||hoje)+'</lastmod><changefreq>'+p[1]+'</changefreq></url>';}).join('\n')
       +'\n</urlset>';
     res.set('Content-Type','application/xml'); res.send(xml);
+  });
+  app.get('/sitemap-images.xml', function(req,res){
+    var b=base(req);
+    var xml='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
+      +'  <url><loc>'+b+'/</loc><image:image><image:loc>'+b+'/logo-brics.png</image:loc></image:image></url>\n'
+      +'  <url><loc>'+b+'/sobre.html</loc><image:image><image:loc>'+b+'/logo-brics.png</image:loc></image:image></url>\n'
+      +'\n</urlset>';
+    res.set('Content-Type','application/xml'); res.send(xml);
+  });
+  app.get('/sitemap-detalhes.xml', function(req,res){
+    var hit=cacheGet('sitemap_det'); if(hit){res.set('Content-Type','application/xml');return res.send(hit);}
+    Promise.all([interno('/api/licitacoes'),interno('/api/proposicoes'),interno('/api/deputados')]).then(function(rs){
+      var b=base(req), hoje=new Date().toISOString().slice(0,10), urls=[];
+      var lic=Array.isArray(rs[0])?rs[0]:((rs[0]&&(rs[0].licitacoes||rs[0].itens))||[]);
+      lic.slice(0,300).forEach(function(x){ if(x&&x.numeroControlePNCP) urls.push(b+'/licitacao/'+encodeURIComponent(x.numeroControlePNCP)); });
+      ((rs[1]&&rs[1].proposicoes)||[]).slice(0,300).forEach(function(x){ if(x&&x.id) urls.push(b+'/proposicao/'+x.id); });
+      ((rs[2]&&rs[2].deputados)||[]).slice(0,600).forEach(function(x){ if(x&&x.id) urls.push(b+'/deputado/'+x.id); });
+      var xml='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        +urls.map(function(u){return '  <url><loc>'+escX(u)+'</loc><lastmod>'+hoje+'</lastmod><changefreq>daily</changefreq></url>';}).join('\n')
+        +'\n</urlset>';
+      cacheSet('sitemap_det',xml,6*3600000);
+      res.set('Content-Type','application/xml'); res.send(xml);
+    }).catch(function(){ res.status(502).send('Sitemap de detalhes indisponível'); });
   });
   function rss(req,res){
     var hit=cacheGet('rss_geral'); if(hit){res.set('Content-Type','application/rss+xml');return res.send(hit);}
