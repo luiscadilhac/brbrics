@@ -439,4 +439,10 @@ app.get('/deputado/:id', function(req, res){
   });
 });
 
+// ---- 404 amigavel (nao indexar) ----
+app.use(function(req, res){
+  if(String(req.path||'').indexOf('/api/')===0) return res.status(404).json({erro:'Rota não encontrada'});
+  res.status(404).sendFile(path.join(__dirname, '..', 'frontend', '404.html'));
+});
+
 app.listen(PORT, function(){ console.log('BrBRICS em http://localhost:'+PORT); });

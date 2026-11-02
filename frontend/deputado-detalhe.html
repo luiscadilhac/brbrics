@@ -140,6 +140,7 @@ function carregar(id){
     renderPresenca(r.presenca||{presencas:[]});
     renderProposicoes(r.proposicoes||[]);
   }).catch(function(e){
+    var _ni=document.createElement('meta');_ni.name='robots';_ni.content='noindex';document.head.appendChild(_ni);
     document.getElementById('loading').style.display='none';
     document.getElementById('erro').style.display='block';
     document.getElementById('erro-msg').textContent = e.message;

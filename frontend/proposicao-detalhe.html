@@ -174,6 +174,7 @@ function carregar(id){
       tl.innerHTML = '<p class="muted">Sem tramitação registrada.</p>';
     }
   }).catch(function(e){
+    var _ni=document.createElement('meta');_ni.name='robots';_ni.content='noindex';document.head.appendChild(_ni);
     document.getElementById('loading').style.display='none';
     document.getElementById('erro').style.display='block';
     document.getElementById('erro-msg').textContent = e.message;
