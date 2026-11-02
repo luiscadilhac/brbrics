@@ -241,7 +241,7 @@ tr.clickable:hover td{color:var(--marca);}
 .rank .r-meta{color:#9a9aa5;font-size:.74rem;margin-top:3px}
 
 /* no celular o submenu é lista empilhada: um pouco mais de alvo de toque, mas nunca maior que o menu */
-@media(max-width:900px){.navgrp .sub a{font-size:.78rem;padding:7px 10px}}
+@media(max-width:900px){.navgrp .sub a{font-size:.78rem;padding:7px 10px;white-space:normal}}
 /* o carrossel de casa vive dentro de um cartão, logo é caixa de dentro; na página de manchetes ele é de fora */
 .card .carousel{border-color:var(--marco-dentro)}
 

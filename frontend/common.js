@@ -106,7 +106,7 @@ var BRBRICS_NAV=[
   {t:'Território (IBGE)',h:'territorio.html',ic:'pin'},
   {t:'Clima nas capitais',h:'clima.html',ic:'clima'},
   {t:'Contas públicas',h:'contas.html',ic:'banknote'},
-  {t:'Energia',h:'energia.html',ic:'zap'},
+  {t:'Energia',h:'energia.html',ic:'zap',sub:[{t:'Bandeira tarifária (ANEEL)',h:'energia.html#bandeira',ic:'zap'},{t:'Capacidade por fonte (SIGA)',h:'energia.html#matriz',ic:'chart'},{t:'ANEEL — Dados Abertos',h:'https://dadosabertos.aneel.gov.br/',ic:'folder',ext:true},{t:'EPE — Matriz energética',h:'https://www.epe.gov.br/',ic:'chart',ext:true},{t:'ONS — Carga e geração',h:'https://www.ons.org.br/',ic:'trend',ext:true},{t:'ANP — Petróleo e gás',h:'https://www.gov.br/anp/pt-br',ic:'banknote',ext:true},{t:'Nuclear — CNEN',h:'https://www.gov.br/cnen/pt-br',ic:'zap',ext:true},{t:'Mundo — Ember (solar/eólica)',h:'https://ember-energy.org/',ic:'leaf',ext:true},{t:'Mundo — Nuclear (WNA)',h:'https://world-nuclear.org/',ic:'globe',ext:true},{t:'Mundo — Our World in Data',h:'https://ourworldindata.org/energy',ic:'globe',ext:true}]},
   {t:'Comércio exterior',h:'comex.html',ic:'trend'},
   {t:'Guia Fipe',h:'fipe.html',ic:'car'},
   {t:'Agro e safra',h:'agro.html',ic:'leaf'},
@@ -124,7 +124,7 @@ function buildNav(){
         var top=document.createElement('a');top.className='navtop';top.href=item.h;top.textContent=item.t;
         var topIco=navIco(item.ic);if(topIco)top.appendChild(topIco);
         var box=document.createElement('div');box.className='sub';var act=false;
-        item.sub.forEach(function(sp){var a=document.createElement('a');a.href=sp.h;var spFile=sp.h.split('?')[0];a.textContent=sp.t;var spIco=navIco(sp.ic);if(spIco)a.appendChild(spIco);if(spFile===cur){a.classList.add('active');act=true;}box.appendChild(a);});
+        item.sub.forEach(function(sp){var a=document.createElement('a');a.href=sp.h;if(sp.ext){a.target='_blank';a.rel='noopener';}var spFile=sp.h.split('?')[0];a.textContent=sp.t;var spIco=navIco(sp.ic);if(spIco)a.appendChild(spIco);if(spFile===cur){a.classList.add('active');act=true;}box.appendChild(a);});
         if(item.h.split('?')[0]===cur||act)top.classList.add('active');
         top.addEventListener('click',function(e){if(window.innerWidth<=900){e.preventDefault();var wasOpen=g.classList.contains('open');var abertos=nav.querySelectorAll('.navgrp.open');for(var gi=0;gi<abertos.length;gi++){abertos[gi].classList.remove('open');}if(!wasOpen)g.classList.add('open');}});
         g.appendChild(top);g.appendChild(box);nav.appendChild(g);
