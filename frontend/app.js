@@ -37,7 +37,7 @@ function _homeMontarCar(items){
   track.innerHTML=items.map(function(n,i){
     var b=_homeBadge(n.cat);var vd=n.video||'';var src=n.imagem||(vd?ytThumb(ytId(vd)):'');
     var vid=vd?'▶ Vídeo · ':'';
-    var img=src?'<img loading="lazy" src="'+esc(src)+'" alt="" style="width:100%;height:100%;object-fit:cover">':'<div style="width:100%;height:100%;background:linear-gradient(135deg,#16161c,#0c0c0e)"></div>';
+    var img='<div style="width:100%;height:100%;background:linear-gradient(135deg,#16161c,#0c0c0e)"></div>';
     var rel=tempoRel(n.data);
     return '<div class="car-slide" data-idx="'+i+'">'+img+(vd?playIco():'')+'<div class="car-fade"></div><div class="car-cap"><span class="badge '+b[0]+'">'+vid+b[1]+'</span><h3>'+esc(n.titulo)+'</h3><div class="car-meta">'+esc(n.fonteNome||n.fonte)+(rel?' · '+esc(rel):(n.data?' · '+_homeFmtData(n.data):''))+' · '+tempoLeitura(n.resumo)+' · <span class="car-cta">Ler matéria &#8599;</span></div></div></div>';
   }).join('');
@@ -46,8 +46,8 @@ function _homeMontarCar(items){
 }
 function _homeThumb(n){
   var vd=n.video||'';var src=n.imagem||(vd?ytThumb(ytId(vd)):'');
-  var inner=src?'<a class="vid-link" href="'+esc(vd||n.link)+'" target="_blank" rel="noopener" title="Abrir matéria original"><img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.closest(\'a\').style.display=\'none\';var t=this.closest(\'.news-thumb\');if(t){var x=t.querySelector(\'.noimg\');if(x)x.style.display=\'flex\';}">'+(vd?playIco():'')+'</a>':'';
-  var noimg=src?'<div class="noimg" style="display:none">📰</div>':'<div class="noimg">📰</div>';
+  var inner='';
+  var noimg='<div class="noimg">📰</div>';
   return '<div class="news-thumb">'+inner+noimg+(vd&&!src?'<span class="badge vid">Vídeo</span>':'')+'</div>';
 }
 function _homeMeta(n){
@@ -56,7 +56,7 @@ function _homeMeta(n){
 }
 function _homeHero(n){
   var b=_homeBadge(n.cat);var vd=n.video||'';var src=n.imagem||(vd?ytThumb(ytId(vd)):'');var rel=tempoRel(n.data);
-  return '<article class="hero-news">'+(src?'<a class="hero-link" href="'+esc(vd||n.link)+'" target="_blank" rel="noopener" title="Abrir matéria original"><img class="hero-bg" loading="lazy" src="'+esc(src)+'" alt=""></a>'+(vd?playIco():''):'')
+  return '<article class="hero-news">'+''
   +'<div class="hero-fade"></div><div class="hero-body"><span class="badge '+b[0]+'">'+(vd?'Vídeo · ':'')+b[1]+'</span> '+favBtnHTML(n.link,n.titulo)
   +'<h2><a href="'+esc(vd||n.link)+'" target="_blank" rel="noopener" data-link="'+esc(n.link)+'">'+esc(n.titulo)+'</a></h2>'
   +(n.resumo?'<p class="muted">'+esc(n.resumo.slice(0,180))+'…</p>':'')
@@ -140,7 +140,7 @@ jget('/api/tribunais/noticias').then(function(r){
   (r.tribunais||[]).forEach(function(t){(t.noticias||[]).slice(0,2).forEach(function(x){
     if(n<3){n++;
       var vd=x.video||'';var src=x.imagem||(vd?ytThumb(ytId(vd)):'');
-      var img = src ? '<div class="rss-img vid-wrap" style="margin:6px 0"><a class="vid-link" href="'+esc(vd||x.link)+'" target="_blank" rel="noopener" title="Abrir matéria original"><img src="'+esc(src)+'" alt="" style="width:100%;height:auto;border-radius:8px;max-height:160px;object-fit:cover">'+(vd?playIco():'')+'</a></div>' : '';
+      var img = '';
       var rel=tempoRel(x.data);
       html+='<article>'+img+'<div class="tag-row"><span class="tag">'+esc(t.sigla)+'</span>'+(vd?'<span class="tag">Vídeo</span>':'')+favBtnHTML(x.link,x.titulo)+'</div><h4><a href="'+esc(vd||x.link)+'" target="_blank" rel="noopener">'+esc((x.titulo||'').slice(0,120))+'</a></h4><small class="muted">'+esc(x.data||'')+(rel?' · '+esc(rel):'')+' · '+tempoLeitura(x.resumo)+'</small>'+shareHTML(x.link,x.titulo)+'</article>';
     }});});
@@ -187,7 +187,7 @@ jget('/api/reguladores').then(function(r){
     (t.noticias||[]).slice(0,1).forEach(function(n){
       if(count>=3)return;count++;
       var vd=n.video||'';var src=n.imagem||(vd?ytThumb(ytId(vd)):'' );
-      var img = src ? '<div class="rss-img vid-wrap" style="margin:6px 0"><a class="vid-link" href="'+esc(vd||n.link)+'" target="_blank" rel="noopener" title="Abrir matéria original"><img src="'+esc(src)+'" alt="" style="width:100%;height:auto;border-radius:8px;max-height:140px;object-fit:cover">'+(vd?playIco():'')+'</a></div>' : '';
+      var img = '';
       var rel=tempoRel(n.data);
       html+='<article>'+img+'<div class="tag-row"><span class="tag">'+esc(t.sigla)+'</span>'+(vd?'<span class="tag">Vídeo</span>':'')+favBtnHTML(n.link,n.titulo)+'</div><h4><a href="'+esc(vd||n.link)+'" target="_blank" rel="noopener">'+esc((n.titulo||'').slice(0,110))+'</a></h4><small class="muted">'+(rel?esc(rel):_homeFmtData(n.data))+' · '+esc(t.sigla)+' · '+tempoLeitura(n.resumo)+'</small>'+shareHTML(n.link,n.titulo)+'</article>';
     });
