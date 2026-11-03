@@ -91,7 +91,7 @@ tr.clickable:hover td{color:var(--marca);}
 .car-dots button.active{background:var(--acc);width:22px;border-radius:999px}
 
 /* badges */
-.badge{font-size:10.5px;font-weight:800;text-transform:uppercase;border-radius:6px;padding:3px 8px;display:inline-block;letter-spacing:.03em}
+.badge{font-size:9.5px;font-weight:800;text-transform:uppercase;border-radius:6px;padding:3px 8px;display:inline-block;letter-spacing:.03em}
 .badge.reg{background:rgba(134, 239, 172,.16);color:var(--marca);border:1px solid rgba(134, 239, 172,.35)}
 .badge.min{background:rgba(255,255,255,.06);color:#c7c7d1;border:1px solid rgba(255,255,255,.14)}
 .badge.trib{background:rgba(34,197,94,.16);color:#86EFAC;border:1px solid rgba(34,197,94,.35)}
@@ -146,7 +146,7 @@ tr.clickable:hover td{color:var(--marca);}
 .hero-body h2 a{color:var(--paper);text-decoration:none;}
 .hero-body h2 a:hover{color:var(--marca);}
 .hero-meta{color:var(--paper);font-size:.8rem;}
-.badge{display:inline-block;background:var(--acc);color:#111;font-weight:700;font-size:.72rem;letter-spacing:.5px;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
+.badge{display:inline-block;background:var(--acc);color:#111;font-weight:700;font-size:.66rem;letter-spacing:.5px;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
 .badge.vid{background:#FF2D55;color:#fff;}
 .badge.reg{background:var(--marca);color:#111;}
 .badge.min{background:var(--marca);color:#111;}

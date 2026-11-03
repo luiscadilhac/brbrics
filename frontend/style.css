@@ -64,7 +64,7 @@ body{margin:0;background:radial-gradient(1200px 500px at 80% -10%,rgba(34,197,94
 .hero-edicao .kicker{display:inline-block;margin-bottom:10px}
 .hero-edicao h1{font-size:16px;max-width:800px;margin:0 auto 12px}
 .hero-edicao .sub{max-width:680px;margin:0 auto 18px;font-size:12px}
-.kicker{color:var(--ico);text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:800}
+.kicker{color:var(--ico);text-transform:uppercase;letter-spacing:.14em;font-size:9.5px;font-weight:800}
 h1{font-size:16px;line-height:1.2;margin:.2em 0;font-weight:800;letter-spacing:-.02em}
 h1 .hl{color:var(--acc)}
 h2,h3{color:var(--paper)}
@@ -86,7 +86,7 @@ h2,h3{color:var(--paper)}
 .list article:hover{background:rgba(134,239,172,.05);border-radius:8px;padding-left:8px}
 .list h4{margin:0 0 4px;font-size:11.9px;color:var(--paper)}
 .list a{color:var(--marca)}
-.tag{font-size:11px;font-weight:800;background:#26262e;color:var(--marca);border:1px solid #3a3a45;border-radius:7px;padding:2px 9px;margin-right:6px;text-transform:uppercase}
+.tag{font-size:10px;font-weight:800;background:#26262e;color:var(--marca);border:1px solid #3a3a45;border-radius:7px;padding:2px 9px;margin-right:6px;text-transform:uppercase}
 .muted{color:var(--muted)}
 .kpis{display:grid;gap:10px}
 .kpi{border:1px solid var(--marco-dentro);border-radius:12px;padding:11px 14px;background:#101014}
@@ -100,7 +100,7 @@ footer{background:#08080a;border-top:1px solid var(--line);color:#9a9aa5;margin-
 .flinks a{color:var(--verde-menu)!important;text-decoration:none}
     .flinks a:hover{color:var(--verde-ico)!important}
 table{width:100%;border-collapse:collapse;font-size:14px}
-th{color:var(--ico);text-transform:uppercase;font-size:12px;letter-spacing:.06em}
+th{color:var(--ico);text-transform:uppercase;font-size:11px;letter-spacing:.06em}
 th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}
 tbody tr:hover{background:rgba(134,239,172,.05)}
 .toolbar{display:flex;gap:10px;margin:16px 0;flex-wrap:wrap;align-items:center}
@@ -220,7 +220,7 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 .timeline{border-left:2px solid var(--acc-deep);margin:12px 0 4px 8px;padding-left:16px;display:flex;flex-direction:column;gap:10px}
 .tl-item{position:relative}
 .tl-item:before{content:"";position:absolute;left:-23px;top:5px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:2px solid var(--acc-deep)}
-.tl-date{font-size:11.5px;color:var(--ico);font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.tl-date{font-size:10.5px;color:var(--ico);font-weight:800;text-transform:uppercase;letter-spacing:.04em}
 .tl-body{font-size:12px;color:var(--paper)}
 /* ===== Prazo e modalidade (licitações) ===== */
 .prazo{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 10px;margin-left:6px;white-space:nowrap}
@@ -237,7 +237,7 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 @media(max-width:520px){.agenda-grid{grid-template-columns:1fr}}
 .ag-dia{background:#101014;border:1px solid var(--marco-dentro);border-radius:12px;padding:10px;min-width:0}
 .ag-dia.hoje{border-color:var(--acc)}
-.ag-dia h4{margin:0 0 8px;font-size:12px;color:var(--ico);text-transform:uppercase;letter-spacing:.05em}
+.ag-dia h4{margin:0 0 8px;font-size:11px;color:var(--ico);text-transform:uppercase;letter-spacing:.05em}
 .ag-ev{border-top:1px dashed var(--line);padding:7px 0;font-size:11.5px}
 .ag-ev b.hora{color:var(--paper)}
 /* ===== Sparkline e tendência ===== */
@@ -277,7 +277,7 @@ section.card > h2 .nav-ico svg{width:18px;height:18px}
 .f-brand img{width:54px;height:54px;border-radius:12px;flex:none}
 .f-brand b{color:var(--paper);font-size:14px}
 .f-brand p{margin:6px 0 0;font-size:13px;color:var(--muted)}
-.f-col h4{margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);font-size:11.5px;font-weight:800;color:var(--verde-menu);text-transform:uppercase;letter-spacing:.08em}
+.f-col h4{margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);font-size:10.5px;font-weight:800;color:var(--verde-menu);text-transform:uppercase;letter-spacing:.08em}
 .f-col a{display:block;color:var(--verde-sub);text-decoration:none;font-size:13px;padding:4px 0;line-height:1.4}
 .f-col a:hover{color:var(--verde-menu)}
 /* duas colunas de nomes por grupo: a lista deixa de ficar comprida */
@@ -318,15 +318,15 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .clima-top{background:rgba(34,197,94,.05);border-bottom:1px solid var(--line)}
 .clima-top-in{display:flex;align-items:center;gap:14px;padding:6px 22px;overflow-x:auto;white-space:nowrap}
 .clima-top-in::-webkit-scrollbar{display:none}
-.clima-lbl{color:var(--verde-menu);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;flex:none}
+.clima-lbl{color:var(--verde-menu);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;flex:none}
 .clima-itens{display:inline-flex;align-items:center;gap:14px;font-size:12px;color:var(--paper)}
 .clima-item{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;cursor:default}
 .clima-item .ci-ico{color:var(--ico-vivo);display:inline-flex;flex:none}
 .clima-item .ci-ico svg{width:15px;height:15px}
 .clima-item b{color:var(--paper);font-weight:700}
-.clima-item .ci-pais{color:var(--verde-sub);font-size:10px;text-transform:uppercase;letter-spacing:.03em}
+.clima-item .ci-pais{color:var(--verde-sub);font-size:9px;text-transform:uppercase;letter-spacing:.03em}
 .clima-item-local b{color:var(--verde-ico)}
-.ci-local{font-size:9px;line-height:1;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 5px}
+.ci-local{font-size:8px;line-height:1;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 5px}
 .clima-sep{color:var(--line)}
 @media(max-width:760px){.clima-lbl{display:none}}
 
@@ -380,3 +380,4 @@ a,button,summary,select,.btn,.chip,.hamb,.car-nav,.car-dots button,.chip-row but
 .stats-home .stat{min-width:0}
 @media(max-width:760px){.stats-home{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.stats-home{grid-template-columns:1fr}}
+.card-h h2{font-size:.98rem !important}
