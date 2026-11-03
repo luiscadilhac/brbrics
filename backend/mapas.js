@@ -1228,3 +1228,32 @@ var CONFERIDO_EM = '2026-11-02';
   });
 
 };
+  // Adicionais por continente (5 cada) — verificados 2026-11-02
+  var ADICIONAIS = [
+    { id: 2001,nome:'Nova York — Broadway',cidade:'Nova York',uf:'Estados Unidos',tipo:'cidade',lat:40.758,lon:-73.985,video:'5C9oM7C2Q9k'},
+    { id: 2002,nome:'Los Angeles — Venice Beach',cidade:'Los Angeles',uf:'Estados Unidos',tipo:'praia',lat:33.985,lon:-118.469,video:'EO_1LWqsCNE'},
+    { id: 2003,nome:'Miami Beach — South Beach',cidade:'Miami Beach',uf:'Estados Unidos',tipo:'praia',lat:25.783,lon:-80.130,video:'dyg7bu7QRjg'},
+    { id: 2004,nome:'Santos — Canal do Porto',cidade:'Santos',uf:'Brasil',tipo:'porto',lat:-23.934,lon:-46.300,video:'fGYrAZAdHBU'},
+    { id: 2005,nome:'Buenos Aires — Obelisco',cidade:'Buenos Aires',uf:'Argentina',tipo:'cidade',lat:-34.603,lon:-58.381,video:'tKIgNtEgLN0'},
+    { id: 2006,nome:'Londres — Notting Hill Gate',cidade:'Londres',uf:'Reino Unido',tipo:'cidade',lat:51.509,lon:-0.197,video:'U-XyMFyX4x0'},
+    { id: 2007,nome:'Veneza — Grande Canal',cidade:'Veneza',uf:'Itália',tipo:'cidade',lat:45.438,lon:12.330,video:'a1mcaV3Sf9U'},
+    { id: 2008,nome:'Amsterdã — Praça Dam',cidade:'Amsterdã',uf:'Países Baixos',tipo:'cidade',lat:52.373,lon:4.893,video:'Gd9d4q6WvUY'},
+    { id: 2009,nome:'Praga — centro',cidade:'Praga',uf:'Tchéquia',tipo:'cidade',lat:50.087,lon:14.436,video:'3C8W4Rlgiog'},
+    { id: 2010,nome:'Lisboa — vista',cidade:'Lisboa',uf:'Portugal',tipo:'cidade',lat:38.722,lon:-9.139,video:'tKIgNtEgLN0'},
+    { id: 2011,nome:'Nairobi — horizonte',cidade:'Nairobi',uf:'Quênia',tipo:'cidade',lat:-1.292,lon:36.821,video:'XyPU5-pNg5E'},
+    { id: 2012,nome:'Cidade do Cabo — Table Mountain',cidade:'Cidade do Cabo',uf:'África do Sul',tipo:'mirante',lat:-33.924,lon:18.424,video:'sQAhSkjRKGk'},
+    { id: 2013,nome:'Marrakesh — praça',cidade:'Marrakech',uf:'Marrocos',tipo:'cidade',lat:31.629,lon:-7.981,video:'oDbKeeojgyk'},
+    { id: 2014,nome:'Victoria Falls — Safari',cidade:'Victoria Falls',uf:'Zimbábue',tipo:'natureza',lat:-17.925,lon:25.855,video:'f9uqHbXChno'},
+    { id: 2015,nome:'Etosha — bebedouro',cidade:'Etosha',uf:'Namíbia',tipo:'natureza',lat:-18.850,lon:16.117,video:'AeMUdOPFcXI'},
+    { id: 2016,nome:'Tóquio — Shibuya',cidade:'Tóquio',uf:'Japão',tipo:'cidade',lat:35.659,lon:139.700,video:'dfVK7ld38Ys'},
+    { id: 2017,nome:'Tóquio — Shinjuku',cidade:'Tóquio',uf:'Japão',tipo:'cidade',lat:35.695,lon:139.705,video:'DjdUEyjx8GM'},
+    { id: 2018,nome:'Bangkok — cruzamento',cidade:'Bangkok',uf:'Tailândia',tipo:'cidade',lat:13.756,lon:100.502,video:'g-noWsNhRg0'},
+    { id: 2019,nome:'Singapura — Marina',cidade:'Singapura',uf:'Cingapura',tipo:'porto',lat:1.352,lon:103.819,video:'loHbMM9JfCs'},
+    { id: 2020,nome:'Dubai — Palm Jumeirah',cidade:'Dubai',uf:'Emirados Árabes',tipo:'cidade',lat:25.112,lon:55.155,video:'iSeH45R-8R0'},
+    { id: 2021,nome:'Sydney — Opera House',cidade:'Sydney',uf:'Austrália',tipo:'mirante',lat:-33.857,lon:151.213,video:'3IPgK1Hqx6A'},
+    { id: 2022,nome:'Melbourne — cruzamento',cidade:'Melbourne',uf:'Austrália',tipo:'cidade',lat:-37.814,lon:144.963,video:'gEbrHdFRgpQ'},
+    { id: 2023,nome:'Auckland — porto',cidade:'Auckland',uf:'Nova Zelândia',tipo:'porto',lat:-36.848,lon:174.763,video:'5uZa3-RMFos'},
+    { id: 2024,nome:'Bali — praia',cidade:'Bali',uf:'Indonésia',tipo:'praia',lat:-8.409,lon:115.188,video:'V_I168MM-ik'},
+    { id: 2025,nome:'Fiji — Suva',cidade:'Suva',uf:'Fiji',tipo:'cidade',lat:-18.124,lon:178.450,video:'-rXriX4SiQk'},
+  ];
+  CAMERAS_MUNDO = CAMERAS_MUNDO.concat(ADICIONAIS);
