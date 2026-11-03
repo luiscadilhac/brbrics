@@ -9,7 +9,7 @@ var PAGINAS=[
   ['/areas.html','weekly'],['/territorio.html','weekly'],['/clima.html','daily'],
   ['/contas.html','weekly'],['/energia.html','weekly'],['/comex.html','weekly'],
   ['/fipe.html','monthly'],['/agro.html','weekly'],['/painel.html','monthly'],
-  ['/contato.html','monthly'],['/privacidade.html','monthly'],['/mapas.html','weekly'],
+  ['/privacidade.html','monthly'],['/mapas.html','weekly'],
   ['/rss.html','daily'],['/calendario.html','monthly'],
   ['/mapa-brasil.html','weekly'],['/mapa-satelite.html','daily'],['/mapa-avioes.html','daily'],
   ['/mapa-embarcacoes.html','daily'],['/mapa-orbita.html','daily'],['/globo-satelites.html','daily'],
