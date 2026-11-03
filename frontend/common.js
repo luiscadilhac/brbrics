@@ -471,4 +471,20 @@ function buildFooter(){
     setTimeout(function(){ if(s&&s.parentNode)s.parentNode.removeChild(s); },1500);
   },{passive:true});
 }
-buildNav();buildFooter();initHamburger();initLogoHome();setActiveNav();initSearch();initBackTop();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();initVisita();initFolhas();
+function initTickerSTF(){
+  var h=document.querySelector('header'); if(!h) return;
+  if(!document.getElementById('ticker-stf')){
+    h.insertAdjacentHTML('beforeend','<div class="ticker stf-ticker"><div class="ticker-track" id="ticker-stf"><span class="muted">Carregando STF...</span></div></div>');
+  }
+  jget('/api/tribunais/noticias').then(function(r){
+    var stf=(r.tribunais||[]).filter(function(t){return t.sigla==='STF';})[0]||{};
+    var ns=(stf.noticias||[]).slice(0,8);
+    var box=document.getElementById('ticker-stf'); if(!box)return;
+    if(!ns.length){ box.innerHTML='<span class="muted">STF indisponível</span>'; return; }
+    var html=ns.map(function(n){
+      return '<span class="tick-sep">///</span><a href="'+escA(n.link)+'" target="_blank" rel="noopener"><span class="tick-ico">'+NAV_ICONS.scale+'</span>'+escA(String(n.titulo||'').slice(0,130))+'</a>';
+    }).join('');
+    box.innerHTML='<div style="display:inline-block;white-space:nowrap">'+html+html+'</div>';
+  }).catch(function(){var box=document.getElementById('ticker-stf');if(box)box.innerHTML='<span class="muted">STF indisponível</span>';});
+}
+buildNav();buildFooter();initHamburger();initLogoHome();setActiveNav();initSearch();initBackTop();initLightbox();initFonte();initProgresso();renderMaisLidas();renderSalvos();decorateTitles();initVisita();initFolhas();initTickerSTF();

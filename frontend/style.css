@@ -381,3 +381,4 @@ a,button,summary,select,.btn,.chip,.hamb,.car-nav,.car-dots button,.chip-row but
 @media(max-width:760px){.stats-home{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.stats-home{grid-template-columns:1fr}}
 .card-h h2{font-size:.98rem !important}
+.stf-ticker{background:rgba(134,239,172,.05);border-top:1px solid var(--line)}
