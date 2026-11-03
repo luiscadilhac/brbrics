@@ -374,3 +374,9 @@ a,button,summary,select,.btn,.chip,.hamb,.car-nav,.car-dots button,.chip-row but
 .folha{position:fixed;pointer-events:none;z-index:9998;opacity:.95;line-height:0;will-change:transform,opacity;animation:folha-cair 1.4s ease-out forwards}
 .folha svg{display:block;width:1em;height:1em}
 @keyframes folha-cair{0%{opacity:.95;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--dx,0),70px) rotate(var(--rot,180deg))}}
+
+/* ===== Home: destaque central e indicadores lado a lado ===== */
+.stats-home{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;max-width:900px;margin:20px auto 0}
+.stats-home .stat{min-width:0}
+@media(max-width:760px){.stats-home{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.stats-home{grid-template-columns:1fr}}
