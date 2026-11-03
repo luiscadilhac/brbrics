@@ -414,7 +414,7 @@ function buildFooter(){
       var m=rs[0];
       if(m){
         var itens='';
-        (m.manchetes||[]).slice(0,6).forEach(function(n){
+        (m.manchetes||[]).filter(function(n){return n.cat!=='trib';}).slice(0,6).forEach(function(n){
           itens+='<span class="tick-sep">///</span><a href="'+escA(n.link)+'" target="_blank" rel="noopener"><span class="tick-ico">●</span>'+escA(String(n.titulo||'').slice(0,110))+'</a>';
         });
         if(!itens)itens='<span class="muted">Sem manchetes.</span>';
